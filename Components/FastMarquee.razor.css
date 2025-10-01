@@ -1,0 +1,72 @@
+.bfm-marquee-container {
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    width: var(--width, 100%);
+    transform: var(--container-transform, none);
+    transform-origin: center;
+    isolation: isolate;
+}
+
+.bfm-marquee-container:hover .bfm-marquee {
+    animation-play-state: var(--pause-on-hover, running);
+}
+
+.bfm-marquee-container:active .bfm-marquee {
+    animation-play-state: var(--pause-on-click, running);
+}
+
+.bfm-marquee {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    min-width: var(--min-width, 100%);
+    animation-name: bfm-marquee-scroll;
+    animation-timing-function: linear;
+    animation-duration: var(--duration, 0s);
+    animation-iteration-count: var(--iteration-count, infinite);
+    animation-direction: var(--direction, normal);
+    animation-play-state: var(--play-state, running);
+    animation-delay: var(--delay, 0s);
+    will-change: transform;
+}
+
+.bfm-marquee + .bfm-marquee {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.bfm-initial-child-container {
+    display: flex;
+    flex: 0 0 auto;
+    min-width: var(--min-width, 100%);
+}
+
+.bfm-child {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    transform: var(--child-transform, none);
+}
+
+.bfm-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg,
+            var(--gradient-color, white) 0,
+            rgba(255, 255, 255, 0) var(--gradient-width, 200px),
+            rgba(255, 255, 255, 0) calc(100% - var(--gradient-width, 200px)),
+            var(--gradient-color, white) 100%);
+    z-index: 1;
+}
+
+@keyframes bfm-marquee-scroll {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-100%, 0, 0);
+    }
+}
