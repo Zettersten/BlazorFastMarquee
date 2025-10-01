@@ -1,0 +1,34 @@
+<div
+    @ref="_containerRef"
+    class="@CssClass"
+    style="@ContainerStyle"
+    @attributes="AdditionalAttributesWithoutClassOrStyle">
+    @if (Gradient)
+    {
+        <div class="bfm-overlay" style="@GradientStyle"></div>
+    }
+    <div class="bfm-marquee"
+         style="@MarqueeStyle"
+         @onanimationiteration="HandleIteration"
+         @onanimationend="HandleAnimationEnd">
+        <div class="bfm-initial-child-container" @ref="_marqueeRef">
+            <div class="bfm-child" style="@ChildStyle">
+                @ChildContent
+            </div>
+        </div>
+        @for (var i = 0; i < Math.Max(0, _multiplier - 1); i++)
+        {
+            <div class="bfm-child" style="@ChildStyle" @key=$"initial-{i}">
+                @ChildContent
+            </div>
+        }
+    </div>
+    <div class="bfm-marquee" style="@MarqueeStyle">
+        @for (var i = 0; i < _multiplier; i++)
+        {
+            <div class="bfm-child" style="@ChildStyle" @key=$"clone-{i}">
+                @ChildContent
+            </div>
+        }
+    </div>
+</div>
