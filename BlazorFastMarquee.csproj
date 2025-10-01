@@ -1,9 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
-
+<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <RazorLangVersion>9.0</RazorLangVersion>
+    <IsPackable>true</IsPackable>
+    <PackageId>BlazorFastMarquee</PackageId>
+    <Authors>BlazorFastMarquee</Authors>
+    <Description>High performance Blazor marquee component inspired by react-fast-marquee.</Description>
+    <PackageTags>blazor;marquee;components;webassembly;server</PackageTags>
+    <RepositoryUrl>https://github.com/example/BlazorFastMarquee</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
-
 </Project>
