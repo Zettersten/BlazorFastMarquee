@@ -11,5 +11,19 @@
     <PackageTags>blazor;marquee;components;webassembly;server</PackageTags>
     <RepositoryUrl>https://github.com/example/BlazorFastMarquee</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <IsTrimmable>true</IsTrimmable>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>link</TrimMode>
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+    <IlcInvariantGlobalization>true</IlcInvariantGlobalization>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
 </Project>
