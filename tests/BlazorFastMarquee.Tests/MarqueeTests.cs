@@ -2,15 +2,16 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Bunit;
+using BlazorFastMarquee;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.JSInterop;
 using Xunit;
 
 namespace BlazorFastMarquee.Tests;
 
-public class FastMarqueeTests : TestContext
+public class MarqueeTests : TestContext
 {
     [Fact]
     public void RendersWithDefaultMarkup()
@@ -18,7 +19,7 @@ public class FastMarqueeTests : TestContext
         var jsRuntime = new StubJsRuntime();
         Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-        var cut = RenderComponent<FastMarquee>(parameters => parameters
+        var cut = RenderComponent<Marquee>(parameters => parameters
             .AddChildContent("Hello world"));
 
         var container = cut.Find(".bfm-marquee-container");
@@ -32,7 +33,7 @@ public class FastMarqueeTests : TestContext
         var jsRuntime = new StubJsRuntime();
         Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-        var cut = RenderComponent<FastMarquee>(parameters => parameters
+        var cut = RenderComponent<Marquee>(parameters => parameters
             .Add(p => p.AutoFill, true)
             .AddChildContent("Item"));
 
@@ -53,7 +54,7 @@ public class FastMarqueeTests : TestContext
         var cycles = 0;
         var finished = 0;
 
-        var cut = RenderComponent<FastMarquee>(parameters => parameters
+        var cut = RenderComponent<Marquee>(parameters => parameters
             .Add(p => p.Loop, 1)
             .Add(p => p.OnCycleComplete, EventCallback.Factory.Create(this, () => cycles++))
             .Add(p => p.OnFinish, EventCallback.Factory.Create(this, () => finished++))
@@ -72,7 +73,7 @@ public class FastMarqueeTests : TestContext
         var jsRuntime = new StubJsRuntime();
         Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-        var cut = RenderComponent<FastMarquee>(parameters => parameters
+        var cut = RenderComponent<Marquee>(parameters => parameters
             .Add(p => p.ClassName, "custom")
             .AddUnmatched("data-testid", "marquee")
             .AddUnmatched("class", "extra")
@@ -94,7 +95,7 @@ public class FastMarqueeTests : TestContext
 
         var mountCount = 0;
 
-        var cut = RenderComponent<FastMarquee>(parameters => parameters
+        var cut = RenderComponent<Marquee>(parameters => parameters
             .Add(p => p.OnMount, EventCallback.Factory.Create(this, () => mountCount++))
             .AddChildContent("Mounted"));
 
@@ -133,9 +134,14 @@ public class FastMarqueeTests : TestContext
 
             public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
             {
-                if (identifier == "initialize" && typeof(TValue) == typeof(IJSObjectReference))
+                if (identifier == "observe" && typeof(TValue) == typeof(IJSObjectReference))
                 {
                     return ValueTask.FromResult((TValue)(object)_observer);
+                }
+
+                if (identifier == "measure")
+                {
+                    return ValueTask.FromResult(default(TValue)!);
                 }
 
                 throw new NotSupportedException($"Unexpected module call '{identifier}'.");
@@ -144,9 +150,6 @@ public class FastMarqueeTests : TestContext
 
         private sealed class StubObserver : IJSObjectReference
         {
-            public int UpdateOptionsCallCount { get; private set; }
-            public int ForceMeasureCallCount { get; private set; }
-
             public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
             public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
@@ -154,19 +157,7 @@ public class FastMarqueeTests : TestContext
 
             public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
             {
-                if (identifier == "updateOptions")
-                {
-                    UpdateOptionsCallCount++;
-                    return ValueTask.FromResult(default(TValue)!);
-                }
-
-                if (identifier == "forceMeasure")
-                {
-                    ForceMeasureCallCount++;
-                    return ValueTask.FromResult(default(TValue)!);
-                }
-
-                if (identifier == "dispose")
+                if (identifier == "update" || identifier == "dispose")
                 {
                     return ValueTask.FromResult(default(TValue)!);
                 }

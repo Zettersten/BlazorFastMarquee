@@ -1,82 +1,74 @@
 const noop = () => {};
 
-function normalizeOptions(options) {
-    const direction = (options?.direction ?? 'left').toString().toLowerCase();
-    return {
-        direction: direction === 'right' || direction === 'up' || direction === 'down' ? direction : 'left',
-        autoFill: Boolean(options?.autoFill)
-    };
-}
-
-function measure(state) {
-    if (!state.container || !state.marquee) {
-        return;
+function measureSpan(container, marquee, vertical) {
+    if (!container || !marquee) {
+        return { containerSpan: 0, marqueeSpan: 0 };
     }
 
-    const containerRect = state.container.getBoundingClientRect();
-    const marqueeRect = state.marquee.getBoundingClientRect();
-
-    const vertical = state.options.direction === 'up' || state.options.direction === 'down';
+    const containerRect = container.getBoundingClientRect();
+    const marqueeRect = marquee.getBoundingClientRect();
     const containerSpan = vertical ? containerRect.height : containerRect.width;
     const marqueeSpan = vertical ? marqueeRect.height : marqueeRect.width;
 
-    state.dotnetRef?.invokeMethodAsync('UpdateLayout', containerSpan, marqueeSpan).catch(noop);
+    return { containerSpan, marqueeSpan };
 }
 
-function createHandle(state) {
+function notify(state) {
+    if (!state.dotnetRef) {
+        return;
+    }
+
+    const { containerSpan, marqueeSpan } = measureSpan(state.container, state.marquee, state.vertical);
+    state.dotnetRef.invokeMethodAsync('UpdateLayout', containerSpan, marqueeSpan).catch(noop);
+}
+
+function createResizeHandle(state) {
+    const resizeHandler = () => notify(state);
+
+    if (typeof ResizeObserver !== 'undefined') {
+        const resizeObserver = new ResizeObserver(resizeHandler);
+        resizeObserver.observe(state.container);
+        resizeObserver.observe(state.marquee);
+        state.cleanup = () => resizeObserver.disconnect();
+    } else {
+        window.addEventListener('resize', resizeHandler);
+        state.cleanup = () => window.removeEventListener('resize', resizeHandler);
+    }
+
+    notify(state);
+
     return {
-        updateOptions(opts) {
-            state.options = normalizeOptions(opts);
-            requestAnimationFrame(() => measure(state));
-        },
-        forceMeasure() {
-            requestAnimationFrame(() => measure(state));
+        update(vertical) {
+            state.vertical = Boolean(vertical);
+            notify(state);
         },
         dispose() {
-            state.resizeObserver?.disconnect();
-            state.mutationObserver?.disconnect();
+            if (state.cleanup) {
+                state.cleanup();
+                state.cleanup = null;
+            }
+
             state.dotnetRef = null;
         }
     };
 }
 
-export function initialize(container, marquee, options, dotnetRef) {
-    if (!container || !marquee) {
+export function measure(container, marquee, vertical) {
+    return measureSpan(container, marquee, Boolean(vertical));
+}
+
+export function observe(container, marquee, vertical, dotnetRef) {
+    if (!container || !marquee || !dotnetRef) {
         return null;
     }
 
     const state = {
         container,
         marquee,
-        options: normalizeOptions(options),
         dotnetRef,
-        resizeObserver: null,
-        mutationObserver: null
+        vertical: Boolean(vertical),
+        cleanup: null
     };
 
-    if (typeof ResizeObserver !== 'undefined') {
-        const resizeObserver = new ResizeObserver(() => measure(state));
-        resizeObserver.observe(container);
-        resizeObserver.observe(marquee);
-        state.resizeObserver = resizeObserver;
-    } else {
-        const resizeHandler = () => measure(state);
-        window.addEventListener('resize', resizeHandler);
-        state.resizeObserver = {
-            disconnect() {
-                window.removeEventListener('resize', resizeHandler);
-            }
-        };
-    }
-
-    if (typeof MutationObserver !== 'undefined') {
-        const mutationObserver = new MutationObserver(() => measure(state));
-        mutationObserver.observe(marquee, { childList: true, subtree: true, characterData: true });
-        state.mutationObserver = mutationObserver;
-    }
-
-    requestAnimationFrame(() => measure(state));
-
-    return createHandle(state);
+    return createResizeHandle(state);
 }
-
