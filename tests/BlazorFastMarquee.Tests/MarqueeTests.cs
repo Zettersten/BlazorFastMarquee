@@ -306,9 +306,14 @@ public class MarqueeTests : TestContext
         private sealed class StubModule : IJSObjectReference
         {
             private readonly StubObserver _observer = new();
+            private readonly StubAnimationHandler _animationHandler = new();
 
             public ValueTask DisposeAsync()
-                => _observer.DisposeAsync();
+            {
+                _ = _observer.DisposeAsync();
+                _ = _animationHandler.DisposeAsync();
+                return ValueTask.CompletedTask;
+            }
 
             public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
                 => InvokeAsync<TValue>(identifier, default, args);
@@ -318,6 +323,11 @@ public class MarqueeTests : TestContext
                 if (identifier == "observe" && typeof(TValue) == typeof(IJSObjectReference))
                 {
                     return ValueTask.FromResult((TValue)(object)_observer);
+                }
+
+                if (identifier == "setupAnimationEvents" && typeof(TValue) == typeof(IJSObjectReference))
+                {
+                    return ValueTask.FromResult((TValue)(object)_animationHandler);
                 }
 
                 if (identifier == "measure")
@@ -344,6 +354,25 @@ public class MarqueeTests : TestContext
                 }
 
                 throw new NotSupportedException($"Unexpected observer call '{identifier}'.");
+            }
+        }
+
+        private sealed class StubAnimationHandler : IJSObjectReference
+        {
+            public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+            public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
+                => InvokeAsync<TValue>(identifier, default, args);
+
+            public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
+            {
+                // Handle animation event methods
+                if (identifier == "dispose")
+                {
+                    return ValueTask.FromResult(default(TValue)!);
+                }
+
+                throw new NotSupportedException($"Unexpected animation handler call '{identifier}'.");
             }
         }
     }
