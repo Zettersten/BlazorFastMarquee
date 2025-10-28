@@ -42,10 +42,13 @@ Enables debugging into the library source code directly from NuGet packages.
 
 #### Package Validation
 ```xml
-<EnablePackageValidation>true</EnablePackageValidation>
-<PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>
+<!-- Disabled until first version is published -->
+<!-- <EnablePackageValidation>true</EnablePackageValidation> -->
+<!-- <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion> -->
 ```
-Validates API compatibility across versions to prevent breaking changes.
+Validates API compatibility across versions to prevent breaking changes. 
+
+**Note:** This is currently disabled and should be enabled after the first successful publish to NuGet.org. See `PACKAGE_VALIDATION.md` for details.
 
 ## Versioning with MinVer
 

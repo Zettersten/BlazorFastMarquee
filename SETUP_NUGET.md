@@ -75,6 +75,25 @@ git push origin v1.0.0
    - Check [NuGet.org](https://www.nuget.org/packages/BlazorFastMarquee) (may take a few minutes to appear)
    - Check **Releases** tab for the GitHub Release with artifacts
 
+### Step 5: Enable Package Validation (After First Release)
+
+After v1.0.0 is successfully published:
+
+1. Edit `BlazorFastMarquee.csproj`
+2. Uncomment these lines:
+   ```xml
+   <EnablePackageValidation>true</EnablePackageValidation>
+   <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>
+   ```
+3. Commit and push:
+   ```bash
+   git add BlazorFastMarquee.csproj
+   git commit -m "Enable package validation against v1.0.0 baseline"
+   git push origin main
+   ```
+
+This enables validation to prevent accidental breaking changes in future releases. See `PACKAGE_VALIDATION.md` for details.
+
 ## 📦 How Versioning Works
 
 BlazorFastMarquee uses **MinVer** for automatic versioning:

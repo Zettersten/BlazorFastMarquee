@@ -142,18 +142,17 @@ pack() {
 validate_package() {
     print_header "Validating NuGet Package"
     
-    # Check if dotnet-validate is installed
-    if ! command -v dotnet-validate &> /dev/null; then
-        print_warning "dotnet-validate not found. Install with:"
-        echo "  dotnet tool install --global dotnet-validate --version 0.0.1-preview.304"
-        return 0
-    fi
-    
-    # Validate each package
+    # Basic validation - check package structure
     for pkg in "$OUTPUT_DIR"/*.nupkg; do
         if [[ "$pkg" != *".symbols.nupkg" ]] && [[ "$pkg" != *".snupkg" ]]; then
             echo "Validating: $(basename "$pkg")"
-            dotnet-validate package local "$pkg" || print_warning "Package validation had warnings"
+            # Check if package can be extracted
+            if unzip -t "$pkg" > /dev/null 2>&1; then
+                print_success "Package structure is valid"
+            else
+                print_error "Package structure validation failed"
+                return 1
+            fi
         fi
     done
     

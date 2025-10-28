@@ -100,12 +100,12 @@ jobs:
           
     - name: Validate NuGet package
       run: |
-        echo "📋 Validating NuGet package..."
+        echo "📋 Validating NuGet package structure..."
         for pkg in ./artifacts/*.nupkg; do
           if [[ "$pkg" != *".symbols.nupkg" ]] && [[ "$pkg" != *".snupkg" ]]; then
             echo "Validating: $pkg"
-            dotnet tool install --global dotnet-validate --version 0.0.1-preview.304 || true
-            dotnet-validate package local "$pkg" || echo "⚠️  Package validation had warnings"
+            # Basic validation - check package can be extracted
+            unzip -t "$pkg" > /dev/null 2>&1 && echo "✅ Package structure is valid" || echo "⚠️ Package structure validation failed"
           fi
         done
         

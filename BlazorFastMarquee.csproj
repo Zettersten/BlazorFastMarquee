@@ -55,8 +55,9 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
     <!-- NuGet Package Validation -->
-    <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>
+    <!-- Enable after first version is published to NuGet.org -->
+    <!-- <EnablePackageValidation>true</EnablePackageValidation> -->
+    <!-- <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion> -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>

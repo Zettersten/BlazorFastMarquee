@@ -11,7 +11,7 @@ Your BlazorFastMarquee project is now fully configured for professional NuGet pa
 - MinVer for Git-based semantic versioning
 - Source Link for debugging NuGet packages
 - Symbol package generation (.snupkg)
-- Package validation to prevent breaking changes
+- Package validation (disabled until first publish - see PACKAGE_VALIDATION.md)
 - Reproducible builds configuration
 - Enhanced analyzers and code quality checks
 - AOT and trimming optimizations maintained
