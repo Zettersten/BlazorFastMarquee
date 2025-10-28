@@ -14,18 +14,42 @@ Blazor Fast Marquee is a high-performance marquee component for Blazor inspired 
 
 ## Getting Started
 
+### Installation
+
 Install the package from NuGet:
 
 ```bash
- dotnet add package BlazorFastMarquee
+dotnet add package BlazorFastMarquee
 ```
 
-Then register the static web assets (for JS and CSS) in your `Program.cs` when using Blazor WebAssembly or Server:
+### Setup
 
+**1. Configure your Blazor app** in `Program.cs`:
+
+For **Blazor WebAssembly**:
 ```csharp
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+// ... rest of your configuration
+await builder.Build().RunAsync();
 ```
+
+For **Blazor Server** or **Blazor Web App**:
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents()
+    .AddInteractiveWebAssemblyComponents(); // If using WebAssembly interactivity
+```
+
+**2. CSS and JavaScript are automatically included** via Blazor's static web assets system. The component's styles (`Marquee.razor.css`) and JavaScript module (`Marquee.razor.js`) are bundled and served automatically—no manual script or link tags required.
+
+**3. Import the namespace** in your `_Imports.razor`:
+```razor
+@using BlazorFastMarquee
+```
+
+### Usage
 
 Include the component in your Razor file:
 
