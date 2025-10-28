@@ -89,22 +89,20 @@ jobs:
     - name: Build library
       run: dotnet build BlazorFastMarquee.csproj --configuration Release --no-restore
       
-    - name: Get version from MinVer
-      id: version
-      run: |
-        VERSION=$(dotnet minver -t v -m 1.0 -d preview.0 -v e)
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "📦 Package Version: $VERSION"
-        
     - name: Pack NuGet package
       run: |
         dotnet pack BlazorFastMarquee.csproj \
           --configuration Release \
           --no-build \
           --output ./artifacts \
-          -p:PackageVersion=${{ steps.version.outputs.version }} \
           -p:IncludeSymbols=true \
           -p:SymbolPackageFormat=snupkg
+        
+        # MinVer automatically calculates version during pack
+        # Extract version from generated package filename
+        PACKAGE=$(ls ./artifacts/*.nupkg | grep -v symbols | head -n 1)
+        VERSION=$(basename "$PACKAGE" | sed 's/BlazorFastMarquee\.\(.*\)\.nupkg/\1/')
+        echo "📦 Package Version: $VERSION"
           
     - name: Validate NuGet package
       run: |

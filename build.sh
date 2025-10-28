@@ -103,32 +103,19 @@ pack() {
     
     mkdir -p "$OUTPUT_DIR"
     
-    # Get version using MinVer
-    if command -v minver &> /dev/null; then
-        VERSION=$(minver -t v -m 1.0 -d preview.0 -v e)
-        print_success "Package version: $VERSION"
-    else
-        print_warning "MinVer CLI not found. Using default versioning."
-        print_warning "Install with: dotnet tool install --global minver-cli"
-        VERSION=""
-    fi
+    # Pack the project (MinVer automatically calculates version)
+    dotnet pack "$PROJECT" \
+        --configuration "$CONFIGURATION" \
+        --no-build \
+        --output "$OUTPUT_DIR" \
+        -p:IncludeSymbols=true \
+        -p:SymbolPackageFormat=snupkg
     
-    # Pack the project
-    if [ -n "$VERSION" ]; then
-        dotnet pack "$PROJECT" \
-            --configuration "$CONFIGURATION" \
-            --no-build \
-            --output "$OUTPUT_DIR" \
-            -p:PackageVersion="$VERSION" \
-            -p:IncludeSymbols=true \
-            -p:SymbolPackageFormat=snupkg
-    else
-        dotnet pack "$PROJECT" \
-            --configuration "$CONFIGURATION" \
-            --no-build \
-            --output "$OUTPUT_DIR" \
-            -p:IncludeSymbols=true \
-            -p:SymbolPackageFormat=snupkg
+    # Extract and display version from package filename
+    PACKAGE=$(ls "$OUTPUT_DIR"/*.nupkg 2>/dev/null | grep -v symbols | head -n 1)
+    if [ -n "$PACKAGE" ]; then
+        VERSION=$(basename "$PACKAGE" | sed 's/BlazorFastMarquee\.\(.*\)\.nupkg/\1/')
+        print_success "Package version: $VERSION"
     fi
     
     print_success "Pack completed"
