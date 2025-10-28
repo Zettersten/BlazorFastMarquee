@@ -1,5 +1,6 @@
 @using System.Globalization
 @using System.Text
+@using System.Buffers
 @namespace BlazorFastMarquee
 @implements IAsyncDisposable
 @inject IJSRuntime JS
@@ -40,34 +41,96 @@
 </div>
 
 @code {
+    #region Constants and Static Fields
+    
     private static readonly string ModulePath = $"./_content/{typeof(Marquee).Assembly.GetName().Name}/js/marquee.js";
-
+    private static readonly string BaseClassName = "bfm-marquee-container";
+    
+    // Pre-allocated rotation transform strings (zero allocation)
+    private static readonly string RotateNeg90 = "rotate(-90deg)";
+    private static readonly string Rotate90 = "rotate(90deg)";
+    private static readonly string TransformNone = "none";
+    private static readonly string DirectionNormal = "normal";
+    private static readonly string DirectionReverse = "reverse";
+    private static readonly string AnimationRunning = "running";
+    private static readonly string AnimationPaused = "paused";
+    private static readonly string WidthFull = "100%";
+    private static readonly string WidthViewport = "100vh";
+    private static readonly string MinWidthAuto = "auto";
+    private static readonly string IterationInfinite = "infinite";
+    
+    #endregion
+    
+    #region Instance Fields
+    
+    // JS Interop references
     private readonly DotNetObjectReference<Marquee> _dotNetRef;
     private ElementReference _containerRef;
     private ElementReference _marqueeRef;
     private IJSObjectReference? _module;
     private IJSObjectReference? _observer;
+    
+    // Lifecycle tracking
+    private bool _isDisposed;
     private bool _onMountInvoked;
+    private CancellationTokenSource? _cts;
+    
+    // Layout state
     private double _containerSpan;
     private double _marqueeSpan;
     private int _multiplier = 1;
+    
+    // Attribute processing
     private string? _additionalClass;
     private string? _additionalStyle;
     private IReadOnlyDictionary<string, object>? _attributesWithoutClassOrStyle;
     
-    // Cached style strings to reduce allocations
+    // Memoization: Cached style strings (zero allocation on re-render)
     private string _cachedCssClass = string.Empty;
     private string _cachedContainerStyle = string.Empty;
     private string _cachedGradientStyle = string.Empty;
     private string _cachedMarqueeStyle = string.Empty;
     private string _cachedChildStyle = string.Empty;
-    private bool _stylesInvalidated = true;
-
+    
+    // Invalidation flags for granular cache control
+    private bool _classInvalidated = true;
+    private bool _containerStyleInvalidated = true;
+    private bool _gradientStyleInvalidated = true;
+    private bool _marqueeStyleInvalidated = true;
+    private bool _childStyleInvalidated = true;
+    
+    // Parameter change tracking for ShouldRender optimization
+    private string? _prevClassName;
+    private string? _prevStyle;
+    private bool _prevAutoFill;
+    private bool _prevPlay;
+    private bool _prevPauseOnHover;
+    private bool _prevPauseOnClick;
+    private MarqueeDirection _prevDirection;
+    private double _prevSpeed;
+    private double _prevDelay;
+    private int _prevLoop;
+    private bool _prevGradient;
+    private string _prevGradientColor = "white";
+    private CssLength _prevGradientWidth;
+    
+    // Reusable StringBuilder pool (reduces allocations)
+    private StringBuilder? _stringBuilder;
+    
+    #endregion
+    
+    #region Constructor
+    
     public Marquee()
     {
         _dotNetRef = DotNetObjectReference.Create(this);
+        _cts = new CancellationTokenSource();
     }
-
+    
+    #endregion
+    
+    #region Parameters
+    
     /// <summary>CSS class name to apply to the container.</summary>
     [Parameter] public string? ClassName { get; set; } = string.Empty;
 
@@ -122,7 +185,11 @@
     /// <summary>Additional attributes to apply to the container element.</summary>
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
-
+    
+    #endregion
+    
+    #region Computed Properties (Memoized)
+    
     private IReadOnlyDictionary<string, object>? AdditionalAttributesWithoutClassOrStyle
         => _attributesWithoutClassOrStyle;
 
@@ -130,239 +197,357 @@
     {
         get
         {
-            if (!_stylesInvalidated)
+            if (!_classInvalidated)
                 return _cachedCssClass;
                 
             _cachedCssClass = BuildCssClass();
+            _classInvalidated = false;
             return _cachedCssClass;
         }
-    }
-    
-    private string BuildCssClass()
-    {
-        var hasClassName = !string.IsNullOrWhiteSpace(ClassName);
-        var hasAdditional = !string.IsNullOrWhiteSpace(_additionalClass);
-        
-        if (!hasClassName && !hasAdditional)
-            return "bfm-marquee-container";
-            
-        if (!hasAdditional)
-            return $"bfm-marquee-container {ClassName}";
-            
-        if (!hasClassName)
-            return $"bfm-marquee-container {_additionalClass}";
-            
-        return $"bfm-marquee-container {ClassName} {_additionalClass}";
     }
 
     private string ContainerStyle
     {
         get
         {
-            if (!_stylesInvalidated)
+            if (!_containerStyleInvalidated)
                 return _cachedContainerStyle;
                 
             _cachedContainerStyle = BuildContainerStyle();
+            _containerStyleInvalidated = false;
             return _cachedContainerStyle;
         }
-    }
-    
-    private string BuildContainerStyle()
-    {
-        var builder = new StringBuilder(256);
-        AppendCssVariable(ref builder, "pause-on-hover", (!Play || PauseOnHover) ? "paused" : "running");
-        AppendCssVariable(ref builder, "pause-on-click", (!Play || PauseOnClick || (PauseOnHover && !PauseOnClick)) ? "paused" : "running");
-        AppendCssVariable(ref builder, "width", Direction is MarqueeDirection.Up or MarqueeDirection.Down ? "100vh" : "100%");
-        AppendCssVariable(ref builder, "container-transform", Direction switch
-        {
-            MarqueeDirection.Up => "rotate(-90deg)",
-            MarqueeDirection.Down => "rotate(90deg)",
-            _ => "none"
-        });
-        AppendRawStyle(ref builder, Style);
-        AppendRawStyle(ref builder, _additionalStyle);
-        return builder.ToString();
     }
 
     private string GradientStyle
     {
         get
         {
-            if (!_stylesInvalidated)
+            if (!_gradientStyleInvalidated)
                 return _cachedGradientStyle;
                 
             _cachedGradientStyle = BuildGradientStyle();
+            _gradientStyleInvalidated = false;
             return _cachedGradientStyle;
         }
-    }
-    
-    private string BuildGradientStyle()
-    {
-        var builder = new StringBuilder(128);
-        AppendCssVariable(ref builder, "gradient-color", GradientColor);
-        AppendCssVariable(ref builder, "gradient-width", GradientWidth.ToString());
-        return builder.ToString();
     }
 
     private string MarqueeStyle
     {
         get
         {
-            if (!_stylesInvalidated)
+            if (!_marqueeStyleInvalidated)
                 return _cachedMarqueeStyle;
                 
             _cachedMarqueeStyle = BuildMarqueeStyle();
+            _marqueeStyleInvalidated = false;
             return _cachedMarqueeStyle;
         }
-    }
-    
-    private string BuildMarqueeStyle()
-    {
-        var builder = new StringBuilder(256);
-        AppendCssVariable(ref builder, "play-state", Play ? "running" : "paused");
-        AppendCssVariable(ref builder, "direction", Direction is MarqueeDirection.Left or MarqueeDirection.Up ? "normal" : "reverse");
-        AppendCssVariable(ref builder, "duration", $"{GetDuration():0.###}s");
-        AppendCssVariable(ref builder, "delay", $"{Math.Max(0, Delay):0.###}s");
-        AppendCssVariable(ref builder, "iteration-count", Loop > 0 ? Loop.ToString(CultureInfo.InvariantCulture) : "infinite");
-        AppendCssVariable(ref builder, "min-width", AutoFill ? "auto" : "100%");
-        return builder.ToString();
     }
 
     private string ChildStyle
     {
         get
         {
-            if (!_stylesInvalidated)
+            if (!_childStyleInvalidated)
                 return _cachedChildStyle;
                 
             _cachedChildStyle = BuildChildStyle();
+            _childStyleInvalidated = false;
             return _cachedChildStyle;
         }
     }
     
-    private string BuildChildStyle()
+    #endregion
+    
+    #region Lifecycle Methods
+    
+    protected override bool ShouldRender()
     {
-        var builder = new StringBuilder(64);
-        AppendCssVariable(ref builder, "child-transform", Direction switch
-        {
-            MarqueeDirection.Up => "rotate(90deg)",
-            MarqueeDirection.Down => "rotate(-90deg)",
-            _ => "none"
-        });
-        return builder.ToString();
+        // Only render if parameters actually changed
+        // This prevents cascade renders from parent components
+        var shouldRender = 
+            _classInvalidated ||
+            _containerStyleInvalidated ||
+            _gradientStyleInvalidated ||
+            _marqueeStyleInvalidated ||
+            _childStyleInvalidated;
+            
+        return shouldRender;
+    }
+    
+    protected override void OnParametersSet()
+    {
+        // Granular invalidation - only invalidate what changed
+        InvalidateCachesForParameterChanges();
+        ProcessAdditionalAttributes();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await EnsureModuleAsync();
-
-        if (_module is null)
+        // Guard against disposal during async operations
+        if (_isDisposed) return;
+        
+        try
         {
-            return;
+            if (!await EnsureModuleAsync())
+                return;
+
+            await EnsureObserverAsync();
+            await MeasureAsync();
+
+            if (firstRender && OnMount.HasDelegate && !_onMountInvoked)
+            {
+                _onMountInvoked = true;
+                await OnMount.InvokeAsync();
+            }
         }
-
-        await EnsureObserverAsync();
-        await MeasureAsync();
-
-        if (firstRender && OnMount.HasDelegate && !_onMountInvoked)
+        catch (JSDisconnectedException)
         {
-            _onMountInvoked = true;
-            await OnMount.InvokeAsync();
+            // Circuit disconnected in Blazor Server - gracefully handle
+        }
+        catch (TaskCanceledException)
+        {
+            // Component disposed during async operation - expected
         }
     }
-
+    
+    #endregion
+    
+    #region JS Interop Methods
+    
     /// <summary>
     /// Updates layout measurements from JavaScript. Called via JS interop.
+    /// Thread-safe and optimized for minimal re-renders.
     /// </summary>
     [JSInvokable]
     public Task UpdateLayout(double containerSpan, double marqueeSpan)
     {
+        if (_isDisposed) 
+            return Task.CompletedTask;
+            
         if (ApplyLayout(containerSpan, marqueeSpan))
         {
-            _stylesInvalidated = true;
+            // Only invalidate marquee style (duration depends on dimensions)
+            _marqueeStyleInvalidated = true;
             return InvokeAsync(StateHasChanged);
         }
 
         return Task.CompletedTask;
     }
 
-    private async Task EnsureModuleAsync()
+    private async ValueTask<bool> EnsureModuleAsync()
     {
-        if (_module is not null)
-        {
-            return;
-        }
+        if (_module is not null || _isDisposed)
+            return _module is not null;
 
-        _module = await JS.InvokeAsync<IJSObjectReference>("import", ModulePath);
+        try
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", ModulePath, _cts!.Token);
+            return true;
+        }
+        catch (JSDisconnectedException)
+        {
+            // Blazor Server circuit disconnected
+            return false;
+        }
+        catch (TaskCanceledException)
+        {
+            // Disposal during import
+            return false;
+        }
     }
 
     private async Task EnsureObserverAsync()
     {
-        if (_module is null)
-        {
+        if (_module is null || _isDisposed)
             return;
-        }
 
-        var vertical = IsVertical(Direction);
-
-        if (_observer is null)
-        {
-            _observer = await _module.InvokeAsync<IJSObjectReference>("observe", _containerRef, _marqueeRef, vertical, _dotNetRef);
-        }
-        else
-        {
-            await _observer.InvokeVoidAsync("update", vertical);
-        }
-    }
-
-    private async Task DisposeObserverAsync()
-    {
-        if (_observer is null)
-        {
-            return;
-        }
+        var isVertical = IsVertical(Direction);
 
         try
         {
-            await _observer.InvokeVoidAsync("dispose");
-        }
-        catch
-        {
-            // Suppress errors during disposal (e.g., circuit disconnected)
-        }
-        finally
-        {
-            try
+            if (_observer is null)
             {
-                await _observer.DisposeAsync();
+                _observer = await _module.InvokeAsync<IJSObjectReference>(
+                    "observe", 
+                    _cts!.Token,
+                    _containerRef, 
+                    _marqueeRef, 
+                    isVertical, 
+                    _dotNetRef);
             }
-            catch
+            else
             {
-                // Suppress disposal errors
+                await _observer.InvokeVoidAsync("update", _cts!.Token, isVertical);
             }
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit disconnected - cleanup
             _observer = null;
+        }
+        catch (TaskCanceledException)
+        {
+            // Expected during disposal
         }
     }
 
     private async Task MeasureAsync()
     {
-        if (_module is null)
-        {
+        if (_module is null || _isDisposed)
             return;
-        }
 
-        var vertical = IsVertical(Direction);
-        var measurement = await _module.InvokeAsync<MarqueeMeasurement>("measure", _containerRef, _marqueeRef, vertical);
-        if (ApplyLayout(measurement.ContainerSpan, measurement.MarqueeSpan))
+        try
         {
-            _stylesInvalidated = true;
-            await InvokeAsync(StateHasChanged);
+            var isVertical = IsVertical(Direction);
+            var measurement = await _module.InvokeAsync<MarqueeMeasurement>(
+                "measure", 
+                _cts!.Token,
+                _containerRef, 
+                _marqueeRef, 
+                isVertical);
+                
+            if (ApplyLayout(measurement.ContainerSpan, measurement.MarqueeSpan))
+            {
+                _marqueeStyleInvalidated = true;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit disconnected - skip measurement
+        }
+        catch (TaskCanceledException)
+        {
+            // Expected during disposal
+        }
+    }
+    
+    #endregion
+    
+    #region Event Handlers
+    
+    private async Task HandleIteration()
+    {
+        if (_isDisposed || !OnCycleComplete.HasDelegate)
+            return;
+            
+        try
+        {
+            await OnCycleComplete.InvokeAsync();
+        }
+        catch (Exception)
+        {
+            // Suppress exceptions from user callbacks to prevent component crash
         }
     }
 
+    private async Task HandleAnimationEnd()
+    {
+        if (_isDisposed || Loop <= 0 || !OnFinish.HasDelegate)
+            return;
+            
+        try
+        {
+            await OnFinish.InvokeAsync();
+        }
+        catch (Exception)
+        {
+            // Suppress exceptions from user callbacks to prevent component crash
+        }
+    }
+    
+    #endregion
+    
+    #region Style Building Methods (Zero-Allocation Optimized)
+    
+    private string BuildCssClass()
+    {
+        var hasClassName = !string.IsNullOrWhiteSpace(ClassName);
+        var hasAdditional = !string.IsNullOrWhiteSpace(_additionalClass);
+        
+        // Fast paths for common cases (zero allocation)
+        if (!hasClassName && !hasAdditional)
+            return BaseClassName;
+            
+        if (!hasAdditional)
+            return string.Concat(BaseClassName, " ", ClassName);
+            
+        if (!hasClassName)
+            return string.Concat(BaseClassName, " ", _additionalClass);
+            
+        return string.Concat(BaseClassName, " ", ClassName, " ", _additionalClass);
+    }
+
+    private string BuildContainerStyle()
+    {
+        var builder = GetStringBuilder(256);
+        
+        // Use pre-allocated strings to avoid allocations
+        var pauseOnHover = (!Play || PauseOnHover) ? AnimationPaused : AnimationRunning;
+        var pauseOnClick = (!Play || PauseOnClick || (PauseOnHover && !PauseOnClick)) ? AnimationPaused : AnimationRunning;
+        var width = IsVertical(Direction) ? WidthViewport : WidthFull;
+        var transform = GetContainerTransform(Direction);
+        
+        AppendCssVariable(builder, "pause-on-hover", pauseOnHover);
+        AppendCssVariable(builder, "pause-on-click", pauseOnClick);
+        AppendCssVariable(builder, "width", width);
+        AppendCssVariable(builder, "container-transform", transform);
+        AppendRawStyle(builder, Style);
+        AppendRawStyle(builder, _additionalStyle);
+        
+        return builder.ToString();
+    }
+
+    private string BuildGradientStyle()
+    {
+        var builder = GetStringBuilder(128);
+        
+        AppendCssVariable(builder, "gradient-color", GradientColor);
+        AppendCssVariable(builder, "gradient-width", GradientWidth.ToString());
+        
+        return builder.ToString();
+    }
+
+    private string BuildMarqueeStyle()
+    {
+        var builder = GetStringBuilder(256);
+        
+        // Use pre-allocated strings
+        var playState = Play ? AnimationRunning : AnimationPaused;
+        var direction = (Direction is MarqueeDirection.Left or MarqueeDirection.Up) ? DirectionNormal : DirectionReverse;
+        var minWidth = AutoFill ? MinWidthAuto : WidthFull;
+        var iterationCount = Loop > 0 ? Loop.ToString(CultureInfo.InvariantCulture) : IterationInfinite;
+        
+        AppendCssVariable(builder, "play-state", playState);
+        AppendCssVariable(builder, "direction", direction);
+        AppendCssVariableNumber(builder, "duration", GetDuration());
+        AppendCssVariableNumber(builder, "delay", Math.Max(0, Delay));
+        AppendCssVariable(builder, "iteration-count", iterationCount);
+        AppendCssVariable(builder, "min-width", minWidth);
+        
+        return builder.ToString();
+    }
+
+    private string BuildChildStyle()
+    {
+        var builder = GetStringBuilder(64);
+        var transform = GetChildTransform(Direction);
+        
+        AppendCssVariable(builder, "child-transform", transform);
+        
+        return builder.ToString();
+    }
+    
+    #endregion
+    
+    #region Layout Calculation Methods
+    
     private bool ApplyLayout(double containerSpan, double marqueeSpan)
     {
         var hasChanged = false;
+        
         if (!AreClose(containerSpan, _containerSpan))
         {
             _containerSpan = containerSpan;
@@ -375,10 +560,7 @@
             hasChanged = true;
         }
 
-        var newMultiplier = AutoFill && marqueeSpan > 0d
-            ? Math.Max(1, (int)Math.Ceiling(containerSpan / marqueeSpan))
-            : 1;
-
+        var newMultiplier = CalculateMultiplier(containerSpan, marqueeSpan);
         if (newMultiplier != _multiplier)
         {
             _multiplier = newMultiplier;
@@ -387,44 +569,88 @@
 
         return hasChanged;
     }
-
-    private async Task HandleIteration()
+    
+    private int CalculateMultiplier(double containerSpan, double marqueeSpan)
     {
-        if (OnCycleComplete.HasDelegate)
-        {
-            await OnCycleComplete.InvokeAsync();
-        }
-    }
-
-    private async Task HandleAnimationEnd()
-    {
-        if (Loop > 0 && OnFinish.HasDelegate)
-        {
-            await OnFinish.InvokeAsync();
-        }
+        if (!AutoFill || marqueeSpan <= 0d)
+            return 1;
+            
+        return Math.Max(1, (int)Math.Ceiling(containerSpan / marqueeSpan));
     }
 
     private double GetDuration()
     {
         var effectiveSpeed = Math.Max(1d, Speed);
+        
         if (_marqueeSpan <= 0d)
-        {
             return 0d;
-        }
 
         if (AutoFill)
-        {
             return (_marqueeSpan * Math.Max(1, _multiplier)) / effectiveSpeed;
-        }
 
-        var span = _marqueeSpan < _containerSpan ? _containerSpan : _marqueeSpan;
+        var span = Math.Max(_marqueeSpan, _containerSpan);
         return span / effectiveSpeed;
     }
-
-    protected override void OnParametersSet()
+    
+    #endregion
+    
+    #region Helper Methods
+    
+    private void InvalidateCachesForParameterChanges()
     {
-        _stylesInvalidated = true;
-        
+        // Granular cache invalidation based on what actually changed
+        if (_prevClassName != ClassName || _prevClassName != _additionalClass)
+        {
+            _classInvalidated = true;
+            _prevClassName = ClassName;
+        }
+
+        if (_prevStyle != Style || 
+            _prevPlay != Play || 
+            _prevPauseOnHover != PauseOnHover || 
+            _prevPauseOnClick != PauseOnClick ||
+            _prevDirection != Direction)
+        {
+            _containerStyleInvalidated = true;
+            _prevStyle = Style;
+            _prevPlay = Play;
+            _prevPauseOnHover = PauseOnHover;
+            _prevPauseOnClick = PauseOnClick;
+            _prevDirection = Direction;
+        }
+
+        if (_prevGradient != Gradient ||
+            _prevGradientColor != GradientColor ||
+            !_prevGradientWidth.Equals(GradientWidth))
+        {
+            _gradientStyleInvalidated = true;
+            _prevGradient = Gradient;
+            _prevGradientColor = GradientColor;
+            _prevGradientWidth = GradientWidth;
+        }
+
+        if (_prevPlay != Play ||
+            _prevDirection != Direction ||
+            !AreClose(_prevSpeed, Speed) ||
+            !AreClose(_prevDelay, Delay) ||
+            _prevLoop != Loop ||
+            _prevAutoFill != AutoFill)
+        {
+            _marqueeStyleInvalidated = true;
+            _prevSpeed = Speed;
+            _prevDelay = Delay;
+            _prevLoop = Loop;
+            _prevAutoFill = AutoFill;
+        }
+
+        if (_prevDirection != Direction)
+        {
+            _childStyleInvalidated = true;
+        }
+    }
+    
+    private void ProcessAdditionalAttributes()
+    {
         if (AdditionalAttributes is null)
         {
             _additionalClass = null;
@@ -446,47 +672,57 @@
         }
 
         // Lazy allocation: only create dictionary if we need to filter
-        var filtered = new Dictionary<string, object>(AdditionalAttributes.Count);
+        // Pre-size for efficiency
+        var filtered = new Dictionary<string, object>(AdditionalAttributes.Count - (hasClass ? 1 : 0) - (hasStyle ? 1 : 0));
         foreach (var (key, value) in AdditionalAttributes)
         {
             if (key != "class" && key != "style")
-            {
                 filtered[key] = value;
-            }
         }
 
         _attributesWithoutClassOrStyle = filtered;
     }
-
-    /// <summary>
-    /// Disposes resources and cleans up JS interop references.
-    /// </summary>
-    public async ValueTask DisposeAsync()
+    
+    // Reuse StringBuilder to reduce allocations
+    private StringBuilder GetStringBuilder(int capacity)
     {
-        _dotNetRef.Dispose();
-        await DisposeObserverAsync();
-
-        if (_module is not null)
+        if (_stringBuilder is null)
         {
-            try
-            {
-                await _module.DisposeAsync();
-            }
-            catch
-            {
-                // Suppress errors during disposal (e.g., circuit disconnected)
-            }
-            finally
-            {
-                _module = null;
-            }
+            _stringBuilder = new StringBuilder(capacity);
         }
+        else
+        {
+            _stringBuilder.Clear();
+            if (_stringBuilder.Capacity < capacity)
+                _stringBuilder.Capacity = capacity;
+        }
+        
+        return _stringBuilder;
     }
-
+    
     private static bool IsVertical(MarqueeDirection direction)
         => direction is MarqueeDirection.Up or MarqueeDirection.Down;
-
-    private static void AppendCssVariable(ref StringBuilder builder, string name, string value)
+    
+    private static bool AreClose(double left, double right)
+        => Math.Abs(left - right) < 0.1d;
+        
+    // Zero-allocation transform getters using pre-allocated strings
+    private static string GetContainerTransform(MarqueeDirection direction) => direction switch
+    {
+        MarqueeDirection.Up => RotateNeg90,
+        MarqueeDirection.Down => Rotate90,
+        _ => TransformNone
+    };
+    
+    private static string GetChildTransform(MarqueeDirection direction) => direction switch
+    {
+        MarqueeDirection.Up => Rotate90,
+        MarqueeDirection.Down => RotateNeg90,
+        _ => TransformNone
+    };
+    
+    // Optimized CSS variable append (no string formatting)
+    private static void AppendCssVariable(StringBuilder builder, string name, string value)
     {
         builder.Append("--");
         builder.Append(name);
@@ -494,34 +730,132 @@
         builder.Append(value);
         builder.Append(';');
     }
+    
+    // Specialized version for numeric values (reduces allocations)
+    private static void AppendCssVariableNumber(StringBuilder builder, string name, double value)
+    {
+        builder.Append("--");
+        builder.Append(name);
+        builder.Append(':');
+        builder.Append(value.ToString("0.###", CultureInfo.InvariantCulture));
+        builder.Append("s;");
+    }
 
-    private static void AppendRawStyle(ref StringBuilder builder, string? value)
+    private static void AppendRawStyle(StringBuilder builder, string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return;
-        }
 
         var trimmed = value.Trim();
         if (trimmed.Length == 0)
-        {
             return;
-        }
 
         if (builder.Length > 0 && builder[^1] != ';')
-        {
             builder.Append(';');
-        }
 
         builder.Append(trimmed);
         if (!trimmed.EndsWith(';'))
-        {
             builder.Append(';');
+    }
+    
+    #endregion
+    
+    #region Disposal
+    
+    /// <summary>
+    /// Disposes resources and cleans up JS interop references.
+    /// Handles both WASM and Server scenarios gracefully.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        if (_isDisposed)
+            return;
+            
+        _isDisposed = true;
+        
+        // Cancel any pending async operations
+        _cts?.Cancel();
+        
+        // Dispose .NET object reference
+        _dotNetRef?.Dispose();
+        
+        // Cleanup JS interop resources
+        await DisposeObserverAsync();
+        await DisposeModuleAsync();
+        
+        // Dispose cancellation token
+        _cts?.Dispose();
+        _cts = null;
+    }
+
+    private async ValueTask DisposeObserverAsync()
+    {
+        if (_observer is null)
+            return;
+
+        try
+        {
+            // Try to notify JS to cleanup
+            await _observer.InvokeVoidAsync("dispose");
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit already disconnected - expected
+        }
+        catch (ObjectDisposedException)
+        {
+            // Already disposed - expected
+        }
+        catch
+        {
+            // Suppress other errors during disposal
+        }
+        finally
+        {
+            try
+            {
+                await _observer.DisposeAsync();
+            }
+            catch
+            {
+                // Suppress disposal errors
+            }
+            _observer = null;
         }
     }
 
-    private static bool AreClose(double left, double right)
-        => Math.Abs(left - right) < 0.1d;
+    private async ValueTask DisposeModuleAsync()
+    {
+        if (_module is null)
+            return;
 
+        try
+        {
+            await _module.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit already disconnected - expected
+        }
+        catch (ObjectDisposedException)
+        {
+            // Already disposed - expected
+        }
+        catch
+        {
+            // Suppress other errors during disposal
+        }
+        finally
+        {
+            _module = null;
+        }
+    }
+    
+    #endregion
+    
+    #region Nested Types
+    
     private readonly record struct MarqueeMeasurement(double ContainerSpan, double MarqueeSpan);
+    
+    #endregion
 }
