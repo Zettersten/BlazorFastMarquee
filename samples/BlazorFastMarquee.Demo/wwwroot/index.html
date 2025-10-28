@@ -9,17 +9,9 @@
     <link rel="stylesheet" href="css/app.css" />
     <link href="BlazorFastMarquee.Demo.styles.css" rel="stylesheet" />
 
-    <!-- Dynamic base href for GitHub Pages -->
+    <!-- GitHub Pages SPA routing support -->
     <script>
         (function() {
-            // Detect if running on GitHub Pages
-            var isGitHubPages = location.hostname === 'zettersten.github.io';
-            if (isGitHubPages) {
-                // Update base href for GitHub Pages
-                document.querySelector('base').setAttribute('href', '/BlazorFastMarquee/');
-            }
-            
-            // GitHub Pages SPA routing support
             var redirect = sessionStorage.redirect;
             delete sessionStorage.redirect;
             if (redirect && redirect != location.href) {
