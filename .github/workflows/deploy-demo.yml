@@ -55,15 +55,17 @@ jobs:
         echo "✅ Published to: output/wwwroot"
         ls -la output/wwwroot
       
-    - name: Update base path in index.html
+    - name: Update base path for GitHub Pages
       run: |
         # Update base href for GitHub Pages (repo name will be the path)
         REPO_NAME="${GITHUB_REPOSITORY#*/}"
         echo "📝 Updating base href to /${REPO_NAME}/"
         sed -i "s|<base href=\"/\" />|<base href=\"/${REPO_NAME}/\" />|g" output/wwwroot/index.html
         sed -i "s|<base href=\"/\">|<base href=\"/${REPO_NAME}/\">|g" output/wwwroot/index.html
-        echo "✅ Base href updated"
+        echo "✅ Base href updated in index.html"
         grep "base href" output/wwwroot/index.html
+        echo ""
+        echo "📝 Note: 404.html uses dynamic path detection and doesn't need updating"
         
     - name: Verify build output
       run: |

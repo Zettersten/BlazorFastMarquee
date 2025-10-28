@@ -5,9 +5,17 @@
     <title>BlazorFastMarquee Demo</title>
     <script>
         // GitHub Pages SPA redirect for Blazor routing
+        // Store the full path and redirect to the app root (base href will handle the rest)
         sessionStorage.redirect = location.href;
+        
+        // Get the base path from current URL
+        // For GitHub Pages projects, this extracts the repo name from the path
+        var pathSegments = location.pathname.split('/').filter(function(segment) { return segment; });
+        var basePath = pathSegments.length > 0 ? '/' + pathSegments[0] + '/' : '/';
+        
+        // Redirect to base path, index.html will restore the full route
+        location.replace(basePath);
     </script>
-    <meta http-equiv="refresh" content="0;URL='/'">
 </head>
 <body>
 </body>
