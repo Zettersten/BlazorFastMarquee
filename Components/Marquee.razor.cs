@@ -72,7 +72,7 @@ public sealed partial class Marquee : ComponentBase, IAsyncDisposable
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
 
-    protected IReadOnlyDictionary<string, object>? AdditionalAttributesWithoutClassOrStyle
+    private IReadOnlyDictionary<string, object>? AdditionalAttributesWithoutClassOrStyle
         => _attributesWithoutClassOrStyle;
 
     private string CssClass
@@ -260,7 +260,7 @@ public sealed partial class Marquee : ComponentBase, IAsyncDisposable
         return hasChanged;
     }
 
-    private void HandleIteration(AnimationIterationEventArgs args)
+    private void HandleIteration()
     {
         if (OnCycleComplete.HasDelegate)
         {
@@ -268,7 +268,7 @@ public sealed partial class Marquee : ComponentBase, IAsyncDisposable
         }
     }
 
-    private void HandleAnimationEnd(AnimationEventArgs args)
+    private void HandleAnimationEnd()
     {
         if (Loop > 0 && OnFinish.HasDelegate)
         {

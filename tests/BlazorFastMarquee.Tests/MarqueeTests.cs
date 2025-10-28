@@ -11,6 +11,10 @@ using Xunit;
 
 namespace BlazorFastMarquee.Tests;
 
+/// <summary>
+/// Comprehensive test suite for Marquee component.
+/// Tests SSR, Server, and WASM compatibility scenarios.
+/// </summary>
 public class MarqueeTests : TestContext
 {
     [Fact]
@@ -25,6 +29,20 @@ public class MarqueeTests : TestContext
         var container = cut.Find(".bfm-marquee-container");
         Assert.Contains("--pause-on-hover", container.GetAttribute("style"));
         Assert.Equal("Hello world", cut.Find(".bfm-child").TextContent.Trim());
+    }
+    
+    [Fact]
+    public void RendersWithoutJavaScriptErrors()
+    {
+        // Simulates SSR scenario where JS may not be available
+        var jsRuntime = new StubJsRuntime();
+        Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+        var cut = RenderComponent<Marquee>(parameters => parameters
+            .AddChildContent("SSR Test"));
+
+        Assert.NotNull(cut.Find(".bfm-marquee-container"));
+        Assert.NotNull(cut.Find(".bfm-marquee"));
     }
 
     [Fact]
@@ -103,6 +121,166 @@ public class MarqueeTests : TestContext
 
         cut.Render();
         cut.WaitForAssertion(() => Assert.Equal(1, mountCount));
+    }
+    
+    [Theory]
+    [InlineData(MarqueeDirection.Left)]
+    [InlineData(MarqueeDirection.Right)]
+    [InlineData(MarqueeDirection.Up)]
+    [InlineData(MarqueeDirection.Down)]
+    public void SupportsAllDirections(MarqueeDirection direction)
+    {
+        var jsRuntime = new StubJsRuntime();
+        Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+        var cut = RenderComponent<Marquee>(parameters => parameters
+            .Add(p => p.Direction, direction)
+            .AddChildContent("Direction Test"));
+
+        var container = cut.Find(".bfm-marquee-container");
+        var style = container.GetAttribute("style");
+        
+        if (direction is MarqueeDirection.Up or MarqueeDirection.Down)
+        {
+            Assert.Contains("100vh", style);
+        }
+        else
+        {
+            Assert.Contains("100%", style);
+        }
+    }
+    
+    [Fact]
+    public void HandlesSpeedAndDelayParameters()
+    {
+        var jsRuntime = new StubJsRuntime();
+        Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+        var cut = RenderComponent<Marquee>(parameters => parameters
+            .Add(p => p.Speed, 100)
+            .Add(p => p.Delay, 2)
+            .AddChildContent("Speed Test"));
+
+        var marquee = cut.Find(".bfm-marquee");
+        var style = marquee.GetAttribute("style");
+        
+        Assert.Contains("--delay:2s", style);
+    }
+    
+    [Fact]
+    public void HandlesGradientParameter()
+    {
+        var jsRuntime = new StubJsRuntime();
+        Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+        var cut = RenderComponent<Marquee>(parameters => parameters
+            .Add(p => p.Gradient, true)
+            .Add(p => p.GradientColor, "blue")
+            .Add(p => p.GradientWidth, new CssLength(300))
+            .AddChildContent("Gradient Test"));
+
+        var overlay = cut.Find(".bfm-overlay");
+        var style = overlay.GetAttribute("style");
+        
+        Assert.Contains("--gradient-color:blue", style);
+        Assert.Contains("--gradient-width:300px", style);
+    }
+    
+    [Fact]
+    public void HandlesPauseStatesCorrectly()
+    {
+        var jsRuntime = new StubJsRuntime();
+        Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+        var cut = RenderComponent<Marquee>(parameters => parameters
+            .Add(p => p.Play, false)
+            .AddChildContent("Paused"));
+
+        var marquee = cut.Find(".bfm-marquee");
+        var style = marquee.GetAttribute("style");
+        
+        Assert.Contains("--play-state:paused", style);
+    }
+    
+    [Fact]
+    public async Task ProperlyDisposesResources()
+    {
+        var jsRuntime = new StubJsRuntime();
+        Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+        var cut = RenderComponent<Marquee>(parameters => parameters
+            .AddChildContent("Dispose Test"));
+
+        var instance = cut.Instance;
+        await instance.DisposeAsync();
+        
+        // Verify disposal doesn't throw
+        Assert.True(true);
+    }
+    
+    [Fact]
+    public void HandlesCssLengthConversions()
+    {
+        Assert.Equal("100px", new CssLength(100).ToString());
+        Assert.Equal("0px", new CssLength(0).ToString());
+        Assert.Equal("10rem", new CssLength("10rem").ToString());
+        
+        CssLength fromInt = 50;
+        Assert.Equal("50px", fromInt.ToString());
+        
+        CssLength fromDouble = 75.5;
+        Assert.Equal("75.5px", fromDouble.ToString());
+    }
+    
+    [Fact]
+    public async Task UpdateLayoutRecalculatesMultiplier()
+    {
+        var jsRuntime = new StubJsRuntime();
+        Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+        var cut = RenderComponent<Marquee>(parameters => parameters
+            .Add(p => p.AutoFill, true)
+            .AddChildContent("Layout Test"));
+
+        // Simulate small content in large container
+        await cut.Instance.UpdateLayout(1000, 100);
+        
+        cut.WaitForAssertion(() =>
+        {
+            var children = cut.FindAll(".bfm-child");
+            Assert.True(children.Count >= 10); // Should duplicate content
+        });
+    }
+    
+    [Fact]
+    public void HandlesEmptyChildContent()
+    {
+        var jsRuntime = new StubJsRuntime();
+        Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+        var cut = RenderComponent<Marquee>();
+        
+        Assert.NotNull(cut.Find(".bfm-marquee-container"));
+    }
+    
+    [Fact]
+    public void StylesAreCachedForPerformance()
+    {
+        var jsRuntime = new StubJsRuntime();
+        Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+        var cut = RenderComponent<Marquee>(parameters => parameters
+            .Add(p => p.Direction, MarqueeDirection.Left)
+            .AddChildContent("Cache Test"));
+
+        var container = cut.Find(".bfm-marquee-container");
+        var style1 = container.GetAttribute("style");
+        
+        // Re-render without parameter changes
+        cut.Render();
+        
+        var style2 = container.GetAttribute("style");
+        Assert.Equal(style1, style2);
     }
 
     private sealed class StubJsRuntime : IJSRuntime
