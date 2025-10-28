@@ -1,3 +1,9 @@
+@using System.Globalization
+@using System.Text
+@namespace BlazorFastMarquee
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
 <div
     @ref="_containerRef"
     class="@CssClass"
@@ -18,7 +24,7 @@
         </div>
         @for (var i = 0; i < Math.Max(0, _multiplier - 1); i++)
         {
-            <div class="bfm-child" style="@ChildStyle" @key=$"initial-{i}">
+            <div class="bfm-child" style="@ChildStyle" @key="@($"initial-{i}")">
                 @ChildContent
             </div>
         }
@@ -26,9 +32,496 @@
     <div class="bfm-marquee" style="@MarqueeStyle">
         @for (var i = 0; i < _multiplier; i++)
         {
-            <div class="bfm-child" style="@ChildStyle" @key=$"clone-{i}">
+            <div class="bfm-child" style="@ChildStyle" @key="@($"clone-{i}")">
                 @ChildContent
             </div>
         }
     </div>
 </div>
+
+@code {
+    private static readonly string ModulePath = $"./_content/{typeof(Marquee).Assembly.GetName().Name}/js/marquee.js";
+
+    private readonly DotNetObjectReference<Marquee> _dotNetRef;
+    private ElementReference _containerRef;
+    private ElementReference _marqueeRef;
+    private IJSObjectReference? _module;
+    private IJSObjectReference? _observer;
+    private bool _onMountInvoked;
+    private double _containerSpan;
+    private double _marqueeSpan;
+    private int _multiplier = 1;
+    private string? _additionalClass;
+    private string? _additionalStyle;
+    private IReadOnlyDictionary<string, object>? _attributesWithoutClassOrStyle;
+    
+    // Cached style strings to reduce allocations
+    private string _cachedCssClass = string.Empty;
+    private string _cachedContainerStyle = string.Empty;
+    private string _cachedGradientStyle = string.Empty;
+    private string _cachedMarqueeStyle = string.Empty;
+    private string _cachedChildStyle = string.Empty;
+    private bool _stylesInvalidated = true;
+
+    public Marquee()
+    {
+        _dotNetRef = DotNetObjectReference.Create(this);
+    }
+
+    /// <summary>CSS class name to apply to the container.</summary>
+    [Parameter] public string? ClassName { get; set; } = string.Empty;
+
+    /// <summary>Inline CSS styles to apply to the container.</summary>
+    [Parameter] public string? Style { get; set; } = string.Empty;
+
+    /// <summary>Automatically fills the container with duplicated content to avoid gaps.</summary>
+    [Parameter] public bool AutoFill { get; set; }
+
+    /// <summary>Controls animation playback state.</summary>
+    [Parameter] public bool Play { get; set; } = true;
+
+    /// <summary>Pauses animation on hover.</summary>
+    [Parameter] public bool PauseOnHover { get; set; }
+
+    /// <summary>Pauses animation on click.</summary>
+    [Parameter] public bool PauseOnClick { get; set; }
+
+    /// <summary>Direction of marquee animation.</summary>
+    [Parameter] public MarqueeDirection Direction { get; set; } = MarqueeDirection.Left;
+
+    /// <summary>Speed in pixels per second.</summary>
+    [Parameter] public double Speed { get; set; } = 50d;
+
+    /// <summary>Delay before animation starts (in seconds).</summary>
+    [Parameter] public double Delay { get; set; }
+
+    /// <summary>Number of animation loops. 0 for infinite.</summary>
+    [Parameter] public int Loop { get; set; }
+
+    /// <summary>Enables gradient overlay at edges.</summary>
+    [Parameter] public bool Gradient { get; set; }
+
+    /// <summary>Color of the gradient overlay.</summary>
+    [Parameter] public string GradientColor { get; set; } = "white";
+
+    /// <summary>Width of the gradient overlay.</summary>
+    [Parameter] public CssLength GradientWidth { get; set; } = new CssLength(200);
+
+    /// <summary>Callback invoked when animation completes (finite loops only).</summary>
+    [Parameter] public EventCallback OnFinish { get; set; }
+
+    /// <summary>Callback invoked on each animation iteration.</summary>
+    [Parameter] public EventCallback OnCycleComplete { get; set; }
+
+    /// <summary>Callback invoked once after first render.</summary>
+    [Parameter] public EventCallback OnMount { get; set; }
+
+    /// <summary>Content to animate in the marquee.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Additional attributes to apply to the container element.</summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private IReadOnlyDictionary<string, object>? AdditionalAttributesWithoutClassOrStyle
+        => _attributesWithoutClassOrStyle;
+
+    private string CssClass
+    {
+        get
+        {
+            if (!_stylesInvalidated)
+                return _cachedCssClass;
+                
+            _cachedCssClass = BuildCssClass();
+            return _cachedCssClass;
+        }
+    }
+    
+    private string BuildCssClass()
+    {
+        var hasClassName = !string.IsNullOrWhiteSpace(ClassName);
+        var hasAdditional = !string.IsNullOrWhiteSpace(_additionalClass);
+        
+        if (!hasClassName && !hasAdditional)
+            return "bfm-marquee-container";
+            
+        if (!hasAdditional)
+            return $"bfm-marquee-container {ClassName}";
+            
+        if (!hasClassName)
+            return $"bfm-marquee-container {_additionalClass}";
+            
+        return $"bfm-marquee-container {ClassName} {_additionalClass}";
+    }
+
+    private string ContainerStyle
+    {
+        get
+        {
+            if (!_stylesInvalidated)
+                return _cachedContainerStyle;
+                
+            _cachedContainerStyle = BuildContainerStyle();
+            return _cachedContainerStyle;
+        }
+    }
+    
+    private string BuildContainerStyle()
+    {
+        var builder = new StringBuilder(256);
+        AppendCssVariable(ref builder, "pause-on-hover", (!Play || PauseOnHover) ? "paused" : "running");
+        AppendCssVariable(ref builder, "pause-on-click", (!Play || PauseOnClick || (PauseOnHover && !PauseOnClick)) ? "paused" : "running");
+        AppendCssVariable(ref builder, "width", Direction is MarqueeDirection.Up or MarqueeDirection.Down ? "100vh" : "100%");
+        AppendCssVariable(ref builder, "container-transform", Direction switch
+        {
+            MarqueeDirection.Up => "rotate(-90deg)",
+            MarqueeDirection.Down => "rotate(90deg)",
+            _ => "none"
+        });
+        AppendRawStyle(ref builder, Style);
+        AppendRawStyle(ref builder, _additionalStyle);
+        return builder.ToString();
+    }
+
+    private string GradientStyle
+    {
+        get
+        {
+            if (!_stylesInvalidated)
+                return _cachedGradientStyle;
+                
+            _cachedGradientStyle = BuildGradientStyle();
+            return _cachedGradientStyle;
+        }
+    }
+    
+    private string BuildGradientStyle()
+    {
+        var builder = new StringBuilder(128);
+        AppendCssVariable(ref builder, "gradient-color", GradientColor);
+        AppendCssVariable(ref builder, "gradient-width", GradientWidth.ToString());
+        return builder.ToString();
+    }
+
+    private string MarqueeStyle
+    {
+        get
+        {
+            if (!_stylesInvalidated)
+                return _cachedMarqueeStyle;
+                
+            _cachedMarqueeStyle = BuildMarqueeStyle();
+            return _cachedMarqueeStyle;
+        }
+    }
+    
+    private string BuildMarqueeStyle()
+    {
+        var builder = new StringBuilder(256);
+        AppendCssVariable(ref builder, "play-state", Play ? "running" : "paused");
+        AppendCssVariable(ref builder, "direction", Direction is MarqueeDirection.Left or MarqueeDirection.Up ? "normal" : "reverse");
+        AppendCssVariable(ref builder, "duration", $"{GetDuration():0.###}s");
+        AppendCssVariable(ref builder, "delay", $"{Math.Max(0, Delay):0.###}s");
+        AppendCssVariable(ref builder, "iteration-count", Loop > 0 ? Loop.ToString(CultureInfo.InvariantCulture) : "infinite");
+        AppendCssVariable(ref builder, "min-width", AutoFill ? "auto" : "100%");
+        return builder.ToString();
+    }
+
+    private string ChildStyle
+    {
+        get
+        {
+            if (!_stylesInvalidated)
+                return _cachedChildStyle;
+                
+            _cachedChildStyle = BuildChildStyle();
+            return _cachedChildStyle;
+        }
+    }
+    
+    private string BuildChildStyle()
+    {
+        var builder = new StringBuilder(64);
+        AppendCssVariable(ref builder, "child-transform", Direction switch
+        {
+            MarqueeDirection.Up => "rotate(90deg)",
+            MarqueeDirection.Down => "rotate(-90deg)",
+            _ => "none"
+        });
+        return builder.ToString();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await EnsureModuleAsync();
+
+        if (_module is null)
+        {
+            return;
+        }
+
+        await EnsureObserverAsync();
+        await MeasureAsync();
+
+        if (firstRender && OnMount.HasDelegate && !_onMountInvoked)
+        {
+            _onMountInvoked = true;
+            await OnMount.InvokeAsync();
+        }
+    }
+
+    /// <summary>
+    /// Updates layout measurements from JavaScript. Called via JS interop.
+    /// </summary>
+    [JSInvokable]
+    public Task UpdateLayout(double containerSpan, double marqueeSpan)
+    {
+        if (ApplyLayout(containerSpan, marqueeSpan))
+        {
+            _stylesInvalidated = true;
+            return InvokeAsync(StateHasChanged);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private async Task EnsureModuleAsync()
+    {
+        if (_module is not null)
+        {
+            return;
+        }
+
+        _module = await JS.InvokeAsync<IJSObjectReference>("import", ModulePath);
+    }
+
+    private async Task EnsureObserverAsync()
+    {
+        if (_module is null)
+        {
+            return;
+        }
+
+        var vertical = IsVertical(Direction);
+
+        if (_observer is null)
+        {
+            _observer = await _module.InvokeAsync<IJSObjectReference>("observe", _containerRef, _marqueeRef, vertical, _dotNetRef);
+        }
+        else
+        {
+            await _observer.InvokeVoidAsync("update", vertical);
+        }
+    }
+
+    private async Task DisposeObserverAsync()
+    {
+        if (_observer is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await _observer.InvokeVoidAsync("dispose");
+        }
+        catch
+        {
+            // Suppress errors during disposal (e.g., circuit disconnected)
+        }
+        finally
+        {
+            try
+            {
+                await _observer.DisposeAsync();
+            }
+            catch
+            {
+                // Suppress disposal errors
+            }
+            _observer = null;
+        }
+    }
+
+    private async Task MeasureAsync()
+    {
+        if (_module is null)
+        {
+            return;
+        }
+
+        var vertical = IsVertical(Direction);
+        var measurement = await _module.InvokeAsync<MarqueeMeasurement>("measure", _containerRef, _marqueeRef, vertical);
+        if (ApplyLayout(measurement.ContainerSpan, measurement.MarqueeSpan))
+        {
+            _stylesInvalidated = true;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private bool ApplyLayout(double containerSpan, double marqueeSpan)
+    {
+        var hasChanged = false;
+        if (!AreClose(containerSpan, _containerSpan))
+        {
+            _containerSpan = containerSpan;
+            hasChanged = true;
+        }
+
+        if (!AreClose(marqueeSpan, _marqueeSpan))
+        {
+            _marqueeSpan = marqueeSpan;
+            hasChanged = true;
+        }
+
+        var newMultiplier = AutoFill && marqueeSpan > 0d
+            ? Math.Max(1, (int)Math.Ceiling(containerSpan / marqueeSpan))
+            : 1;
+
+        if (newMultiplier != _multiplier)
+        {
+            _multiplier = newMultiplier;
+            hasChanged = true;
+        }
+
+        return hasChanged;
+    }
+
+    private async Task HandleIteration()
+    {
+        if (OnCycleComplete.HasDelegate)
+        {
+            await OnCycleComplete.InvokeAsync();
+        }
+    }
+
+    private async Task HandleAnimationEnd()
+    {
+        if (Loop > 0 && OnFinish.HasDelegate)
+        {
+            await OnFinish.InvokeAsync();
+        }
+    }
+
+    private double GetDuration()
+    {
+        var effectiveSpeed = Math.Max(1d, Speed);
+        if (_marqueeSpan <= 0d)
+        {
+            return 0d;
+        }
+
+        if (AutoFill)
+        {
+            return (_marqueeSpan * Math.Max(1, _multiplier)) / effectiveSpeed;
+        }
+
+        var span = _marqueeSpan < _containerSpan ? _containerSpan : _marqueeSpan;
+        return span / effectiveSpeed;
+    }
+
+    protected override void OnParametersSet()
+    {
+        _stylesInvalidated = true;
+        
+        if (AdditionalAttributes is null)
+        {
+            _additionalClass = null;
+            _additionalStyle = null;
+            _attributesWithoutClassOrStyle = null;
+            return;
+        }
+
+        var hasClass = AdditionalAttributes.TryGetValue("class", out var classAttribute);
+        var hasStyle = AdditionalAttributes.TryGetValue("style", out var styleAttribute);
+
+        _additionalClass = hasClass ? classAttribute as string : null;
+        _additionalStyle = hasStyle ? styleAttribute as string : null;
+
+        if (!hasClass && !hasStyle)
+        {
+            _attributesWithoutClassOrStyle = AdditionalAttributes;
+            return;
+        }
+
+        // Lazy allocation: only create dictionary if we need to filter
+        var filtered = new Dictionary<string, object>(AdditionalAttributes.Count);
+        foreach (var (key, value) in AdditionalAttributes)
+        {
+            if (key != "class" && key != "style")
+            {
+                filtered[key] = value;
+            }
+        }
+
+        _attributesWithoutClassOrStyle = filtered;
+    }
+
+    /// <summary>
+    /// Disposes resources and cleans up JS interop references.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        _dotNetRef.Dispose();
+        await DisposeObserverAsync();
+
+        if (_module is not null)
+        {
+            try
+            {
+                await _module.DisposeAsync();
+            }
+            catch
+            {
+                // Suppress errors during disposal (e.g., circuit disconnected)
+            }
+            finally
+            {
+                _module = null;
+            }
+        }
+    }
+
+    private static bool IsVertical(MarqueeDirection direction)
+        => direction is MarqueeDirection.Up or MarqueeDirection.Down;
+
+    private static void AppendCssVariable(ref StringBuilder builder, string name, string value)
+    {
+        builder.Append("--");
+        builder.Append(name);
+        builder.Append(':');
+        builder.Append(value);
+        builder.Append(';');
+    }
+
+    private static void AppendRawStyle(ref StringBuilder builder, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        var trimmed = value.Trim();
+        if (trimmed.Length == 0)
+        {
+            return;
+        }
+
+        if (builder.Length > 0 && builder[^1] != ';')
+        {
+            builder.Append(';');
+        }
+
+        builder.Append(trimmed);
+        if (!trimmed.EndsWith(';'))
+        {
+            builder.Append(';');
+        }
+    }
+
+    private static bool AreClose(double left, double right)
+        => Math.Abs(left - right) < 0.1d;
+
+    private readonly record struct MarqueeMeasurement(double ContainerSpan, double MarqueeSpan);
+}
