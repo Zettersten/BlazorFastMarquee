@@ -136,7 +136,9 @@ html, body {
     flex: 1;
     margin-left: 260px;
     padding: 1.75rem 2rem;
-    width: 100%;
+    width: calc(100% - 260px);
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .main-content h1 {
@@ -213,6 +215,7 @@ html, body {
     .main-content {
         margin-left: 220px;
         padding: 1.5rem;
+        width: calc(100% - 220px);
     }
 }
 
@@ -231,6 +234,7 @@ html, body {
     .main-content {
         margin-left: 0;
         padding: 1.25rem;
+        width: 100%;
     }
     
     .main-content h1 {
@@ -309,12 +313,13 @@ button:focus-visible {
 
 /* Print Styles */
 @media print {
-  .sidebar {
-    display: none;
-  }
-
-  .main-content {
-    margin-left: 0;
-    max-width: none;
-  }
+    .sidebar {
+        display: none;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        max-width: none;
+    }
 }
