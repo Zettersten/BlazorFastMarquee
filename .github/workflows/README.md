@@ -1,129 +1,180 @@
 # GitHub Actions Workflows
 
-## Deploy Demo to GitHub Pages
+This repository uses GitHub Actions for continuous integration and deployment.
 
-### Overview
-This workflow automatically builds and deploys the BlazorFastMarquee demo application to GitHub Pages whenever changes are pushed to the main branch.
+## Workflows
 
-### Workflow: `deploy-demo.yml`
+### 1. `nuget.yml` - Build, Test & Publish NuGet Package
 
-#### Triggers
-- **Push to main/master**: Automatically deploys when changes are pushed to the main or master branch
-- **Path filters**: Only triggers when relevant files change:
-  - Demo project files (`samples/BlazorFastMarquee.Demo/**`)
-  - Component files (`Components/**`)
-  - Static assets (`wwwroot/**`)
-  - C# and Razor files
-  - Project files
-  - The workflow file itself
-- **Manual trigger**: Can be manually triggered from the Actions tab (`workflow_dispatch`)
+**Triggers:**
+- Push to `main`, `master`, or `develop` branches
+- Pull requests to these branches
+- Git tags matching `v*.*.*` pattern
+- Manual workflow dispatch
 
-#### What It Does
+**Jobs:**
 
-1. **Checkout**: Clones the repository
-2. **Setup .NET**: Installs .NET 9.0 SDK
-3. **Restore**: Restores NuGet packages
-4. **Build Library**: Builds the BlazorFastMarquee component library
-5. **Publish WASM**: Publishes the demo as a WebAssembly application
-6. **Update Base Path**: Automatically adjusts the base href for GitHub Pages subdirectory hosting
-7. **Add .nojekyll**: Ensures GitHub Pages doesn't process files with Jekyll
-8. **Upload Artifact**: Prepares the build output for deployment
-9. **Deploy**: Deploys to GitHub Pages
+#### Build & Test
+- Builds the library in both Debug and Release configurations
+- Runs all unit tests with BUnit
+- Uploads test results as artifacts
+- Fails fast on test failures
 
-#### Requirements
+#### Pack NuGet Package
+- Uses MinVer for automatic semantic versioning from Git tags
+- Creates NuGet package (.nupkg) and symbol package (.snupkg)
+- Validates package contents
+- Uploads packages as artifacts
 
-To use this workflow, you need to:
+#### Publish to NuGet.org (Production)
+- **Trigger:** Only on Git tags (e.g., `v1.2.3`)
+- Requires `NUGET_API_KEY` secret
+- Publishes to NuGet.org
+- Creates GitHub Release with package files
 
-1. **Enable GitHub Pages** in your repository settings:
-   - Go to Settings → Pages
-   - Source: Select "GitHub Actions"
+#### Publish Preview to GitHub Packages
+- **Trigger:** Push to main/master/develop branches
+- Publishes preview versions to GitHub Packages
+- Uses GITHUB_TOKEN for authentication
 
-2. **Permissions**: The workflow needs these permissions (already configured in the workflow):
-   - `contents: read` - To checkout the code
-   - `pages: write` - To deploy to Pages
-   - `id-token: write` - For secure deployment
+### 2. `deploy-demo.yml` - Deploy Demo to GitHub Pages
 
-#### Viewing Your Demo
+Deploys the Blazor WASM demo application to GitHub Pages.
 
-Once deployed, your demo will be available at:
+## Versioning Strategy
+
+This project uses **MinVer** for automatic semantic versioning based on Git tags.
+
+### Version Calculation
+
+- **Tagged commits:** Use the tag as version (e.g., `v1.2.3` → `1.2.3`)
+- **Commits after tag:** Add height and commit SHA (e.g., `1.2.3-preview.5+abc1234`)
+- **No tags:** Uses `MinVerMinimumMajorMinor` + preview identifier (e.g., `1.0.0-preview.0.5+abc1234`)
+
+### Creating a Release
+
+1. **Create and push a Git tag:**
+   ```bash
+   git tag v1.2.3
+   git push origin v1.2.3
+   ```
+
+2. **GitHub Actions automatically:**
+   - Builds and tests the package
+   - Creates NuGet package with version `1.2.3`
+   - Publishes to NuGet.org
+   - Creates GitHub Release
+
+### Version Examples
+
+| Git State | Version Output |
+|-----------|---------------|
+| `v1.0.0` tag | `1.0.0` |
+| 5 commits after `v1.0.0` | `1.0.0-preview.5+sha` |
+| No tags, 10 commits | `1.0.0-preview.0.10+sha` |
+| `v2.1.0-beta.1` tag | `2.1.0-beta.1` |
+
+## Required Secrets
+
+### `NUGET_API_KEY`
+Create a NuGet API key at https://www.nuget.org/account/apikeys
+
+**Setup:**
+1. Go to repository Settings → Secrets and variables → Actions
+2. Click "New repository secret"
+3. Name: `NUGET_API_KEY`
+4. Value: Your NuGet API key
+5. Save
+
+### `GITHUB_TOKEN`
+Automatically provided by GitHub Actions. No setup required.
+
+## Environment Protection (Optional)
+
+For added safety, configure environment protection rules:
+
+1. Go to Settings → Environments
+2. Create environment: `nuget-production`
+3. Add protection rules:
+   - Required reviewers
+   - Wait timer
+   - Deployment branches: Only tags matching `v*.*.*`
+
+## Local Development
+
+### Build Package Locally
+
+```bash
+# Restore and build
+dotnet restore
+dotnet build --configuration Release
+
+# Run tests
+dotnet test --configuration Release
+
+# Create package
+dotnet pack --configuration Release --output ./artifacts
 ```
-https://[your-username].github.io/[repository-name]/
+
+### Preview Version Locally
+
+```bash
+# Install MinVer CLI tool
+dotnet tool install --global minver-cli
+
+# Check current version
+minver -t v -m 1.0 -d preview.0 -v e
 ```
 
-For example:
-```
-https://johndoe.github.io/BlazorFastMarquee/
-```
+### Test Package Locally
 
-#### Manual Deployment
+```bash
+# Pack the library
+dotnet pack --configuration Release --output ./artifacts
 
-You can manually trigger a deployment:
-
-1. Go to the **Actions** tab in your repository
-2. Select **Deploy Demo to GitHub Pages**
-3. Click **Run workflow**
-4. Select the branch (usually main/master)
-5. Click **Run workflow**
-
-#### Monitoring Deployments
-
-- View deployment status in the **Actions** tab
-- Each deployment shows:
-  - Build logs
-  - Publish output
-  - Deployment URL
-  - Success/failure status
-
-#### Troubleshooting
-
-**Build Failures:**
-- Check the Actions tab for detailed error logs
-- Ensure .NET 9.0 SDK is being used
-- Verify all project references are correct
-
-**404 Errors After Deployment:**
-- Verify GitHub Pages is enabled in Settings
-- Check that the base href is correctly updated
-- Ensure `.nojekyll` file exists in the output
-
-**Base Path Issues:**
-- The workflow automatically updates the base path
-- Manual adjustments can be made in the workflow file if needed
-- The base path should match your repository name
-
-#### Customization
-
-**Change Deployment Branch:**
-```yaml
-on:
-  push:
-    branches: [ "your-branch-name" ]
+# Reference in test project
+dotnet add samples/BlazorFastMarquee.Demo/BlazorFastMarquee.Demo.csproj \
+  package BlazorFastMarquee \
+  --source ./artifacts \
+  --prerelease
 ```
 
-**Adjust Path Filters:**
-Add or remove paths in the `paths:` section to control when the workflow runs.
+## Package Validation
 
-**Enable AOT Compilation:**
-In `BlazorFastMarquee.Demo.csproj`, change:
-```xml
-<RunAOTCompilation>true</RunAOTCompilation>
+The workflow validates packages using:
+- **EnablePackageValidation:** Ensures API compatibility with baseline version
+- **dotnet-validate:** Validates package structure and content
+- **Manual inspection:** Lists package contents in workflow logs
+
+## Troubleshooting
+
+### Build Fails on `MinVer`
+Ensure you have at least one commit in your repository. MinVer requires Git history.
+
+### Tests Fail
+Run tests locally first:
+```bash
+dotnet test --configuration Release --verbosity detailed
 ```
-Note: AOT compilation increases build time but improves runtime performance.
 
-#### Performance Optimization
+### Package Already Exists
+NuGet.org doesn't allow republishing the same version. Increment your version tag.
 
-The published WASM app includes:
-- ✅ Trimmed assemblies (smaller download size)
-- ✅ Compressed with Brotli and GZip
-- ✅ Static asset optimization
-- ✅ Framework-dependent deployment
+### GitHub Packages Authentication
+For consuming packages from GitHub Packages, add authentication:
+```bash
+dotnet nuget add source \
+  --username YOUR_GITHUB_USERNAME \
+  --password YOUR_GITHUB_TOKEN \
+  --store-password-in-clear-text \
+  --name github \
+  "https://nuget.pkg.github.com/OWNER/index.json"
+```
 
-For production, consider:
-- Enabling AOT compilation for better performance
-- Using a CDN for the _framework files
-- Implementing service worker for offline support
+## Best Practices
 
----
-
-**Status**: ✅ Ready to use  
-**Last Updated**: 2025-10-28
+1. **Always create tags for releases:** Don't push directly to NuGet without a tag
+2. **Test before tagging:** Ensure all tests pass locally
+3. **Use semantic versioning:** Follow [SemVer](https://semver.org/) guidelines
+4. **Write release notes:** GitHub Releases are auto-generated but can be edited
+5. **Monitor package quality:** Check NuGet.org package health after publishing

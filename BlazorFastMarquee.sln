@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36616.10
@@ -8,6 +8,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{5D20AA90-6969-D8BD-9DCD-8634F4692FDA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorFastMarquee.Demo", "samples\BlazorFastMarquee.Demo\BlazorFastMarquee.Demo.csproj", "{009C5915-4943-7F47-F4DC-BF79D15A6F4C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8B3C4E1A-2F5D-4A6C-B8E9-1234567890AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorFastMarquee.Tests", "tests\BlazorFastMarquee.Tests\BlazorFastMarquee.Tests.csproj", "{7A2B3C4D-5E6F-7890-ABCD-EF1234567890}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,12 +27,17 @@ Global
 		{009C5915-4943-7F47-F4DC-BF79D15A6F4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{009C5915-4943-7F47-F4DC-BF79D15A6F4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{009C5915-4943-7F47-F4DC-BF79D15A6F4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A2B3C4D-5E6F-7890-ABCD-EF1234567890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A2B3C4D-5E6F-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A2B3C4D-5E6F-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A2B3C4D-5E6F-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{009C5915-4943-7F47-F4DC-BF79D15A6F4C} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
+		{7A2B3C4D-5E6F-7890-ABCD-EF1234567890} = {8B3C4E1A-2F5D-4A6C-B8E9-1234567890AB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5F67EEA8-AC2B-43F6-B753-33369FE55890}

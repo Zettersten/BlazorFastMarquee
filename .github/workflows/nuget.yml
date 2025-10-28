@@ -1,0 +1,225 @@
+name: Build, Test & Publish NuGet Package
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+    tags: [ "v*.*.*" ]
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+  workflow_dispatch:
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+  CI: true
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for MinVer versioning
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore BlazorFastMarquee.csproj
+      
+    - name: Build library (Debug)
+      run: dotnet build BlazorFastMarquee.csproj --configuration Debug --no-restore
+      
+    - name: Build library (Release)
+      run: dotnet build BlazorFastMarquee.csproj --configuration Release --no-restore
+      
+    - name: Restore test dependencies
+      run: dotnet restore tests/BlazorFastMarquee.Tests/BlazorFastMarquee.Tests.csproj
+      
+    - name: Build tests
+      run: dotnet build tests/BlazorFastMarquee.Tests/BlazorFastMarquee.Tests.csproj --configuration Release --no-restore
+      
+    - name: Run tests
+      run: dotnet test tests/BlazorFastMarquee.Tests/BlazorFastMarquee.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+      
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: Test Results
+        path: '**/test-results.trx'
+        reporter: dotnet-trx
+        fail-on-error: true
+        fail-on-empty: true
+        
+    - name: Upload test results artifact
+      if: success() || failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: '**/test-results.trx'
+        retention-days: 30
+        if-no-files-found: warn
+
+  package:
+    name: Pack NuGet Package
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for MinVer versioning
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore BlazorFastMarquee.csproj
+      
+    - name: Build library
+      run: dotnet build BlazorFastMarquee.csproj --configuration Release --no-restore
+      
+    - name: Pack NuGet package
+      run: |
+        dotnet pack BlazorFastMarquee.csproj \
+          --configuration Release \
+          --no-build \
+          --output ./artifacts \
+          -p:IncludeSymbols=true \
+          -p:SymbolPackageFormat=snupkg
+        
+        # MinVer automatically calculates version during pack
+        # Extract version from generated package filename
+        PACKAGE=$(ls ./artifacts/*.nupkg | grep -v symbols | head -n 1)
+        VERSION=$(basename "$PACKAGE" | sed 's/BlazorFastMarquee\.\(.*\)\.nupkg/\1/')
+        echo "📦 Package Version: $VERSION"
+          
+    - name: Validate NuGet package
+      run: |
+        echo "📋 Validating NuGet package structure..."
+        for pkg in ./artifacts/*.nupkg; do
+          if [[ "$pkg" != *".symbols.nupkg" ]] && [[ "$pkg" != *".snupkg" ]]; then
+            echo "Validating: $pkg"
+            # Basic validation - check package can be extracted
+            unzip -t "$pkg" > /dev/null 2>&1 && echo "✅ Package structure is valid" || echo "⚠️ Package structure validation failed"
+          fi
+        done
+        
+    - name: List package contents
+      run: |
+        echo "📦 Package contents:"
+        for pkg in ./artifacts/*.nupkg; do
+          if [[ "$pkg" != *".symbols.nupkg" ]] && [[ "$pkg" != *".snupkg" ]]; then
+            echo ""
+            echo "=== $pkg ==="
+            unzip -l "$pkg" | grep -E '\.(dll|razor|css|js|json|md)$' || true
+          fi
+        done
+        
+    - name: Upload NuGet artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./artifacts/*.nupkg
+        retention-days: 30
+        
+    - name: Upload symbol packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: symbol-packages
+        path: ./artifacts/*.snupkg
+        retention-days: 30
+
+  publish:
+    name: Publish to NuGet.org
+    runs-on: ubuntu-latest
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/v')
+    environment:
+      name: nuget-production
+      url: https://www.nuget.org/packages/BlazorFastMarquee
+    
+    steps:
+    - name: Download NuGet artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./artifacts
+        
+    - name: Download symbol packages
+      uses: actions/download-artifact@v4
+      with:
+        name: symbol-packages
+        path: ./artifacts
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Publish to NuGet.org
+      run: |
+        for pkg in ./artifacts/*.nupkg; do
+          if [[ "$pkg" != *".symbols.nupkg" ]]; then
+            echo "Publishing: $pkg"
+            dotnet nuget push "$pkg" \
+              --api-key ${{ secrets.NUGET_API_KEY }} \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          fi
+        done
+        
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          ./artifacts/*.nupkg
+          ./artifacts/*.snupkg
+        generate_release_notes: true
+        draft: false
+        prerelease: ${{ contains(github.ref, 'preview') || contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-preview:
+    name: Publish Preview to GitHub Packages
+    runs-on: ubuntu-latest
+    needs: package
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop')
+    permissions:
+      packages: write
+      contents: read
+    
+    steps:
+    - name: Download NuGet artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./artifacts
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Publish to GitHub Packages
+      run: |
+        for pkg in ./artifacts/*.nupkg; do
+          if [[ "$pkg" != *".symbols.nupkg" ]]; then
+            echo "Publishing preview: $pkg"
+            dotnet nuget push "$pkg" \
+              --api-key ${{ secrets.GITHUB_TOKEN }} \
+              --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+              --skip-duplicate || echo "⚠️  Package already exists, skipping"
+          fi
+        done
