@@ -1,80 +1,80 @@
 .bfm-marquee-container {
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: row;
-    position: relative;
-    width: var(--width);
-    transform: var(--transform);
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  width: var(--width);
+  transform: var(--transform);
 }
 
-    .bfm-marquee-container:hover div {
-        animation-play-state: var(--pause-on-hover);
-    }
+  .bfm-marquee-container:hover div {
+    animation-play-state: var(--pause-on-hover);
+  }
 
-    .bfm-marquee-container:active div {
-        animation-play-state: var(--pause-on-click);
-    }
+  .bfm-marquee-container:active div {
+    animation-play-state: var(--pause-on-click);
+  }
 
 .bfm-overlay {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
-    .bfm-overlay::before,
-    .bfm-overlay::after {
-        background: linear-gradient(to right, var(--gradient-color), rgba(255, 255, 255, 0));
-        content: "";
-        height: 100%;
-        position: absolute;
-        width: var(--gradient-width);
-        z-index: 2;
-        pointer-events: none;
-        touch-action: none;
-    }
+  .bfm-overlay::before,
+  .bfm-overlay::after {
+    background: linear-gradient(to right, var(--gradient-color), rgba(255, 255, 255, 0));
+    content: "";
+    height: 100%;
+    position: absolute;
+    width: var(--gradient-width);
+    z-index: 2;
+    pointer-events: none;
+    touch-action: none;
+  }
 
-    .bfm-overlay::after {
-        right: 0;
-        top: 0;
-        transform: rotateZ(180deg);
-    }
+  .bfm-overlay::after {
+    right: 0;
+    top: 0;
+    transform: rotateZ(180deg);
+  }
 
-    .bfm-overlay::before {
-        left: 0;
-        top: 0;
-    }
+  .bfm-overlay::before {
+    left: 0;
+    top: 0;
+  }
 
 .bfm-marquee {
-    flex: 0 0 auto;
-    min-width: var(--min-width);
-    z-index: 1;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    animation: bfm-scroll var(--duration) linear var(--delay) var(--iteration-count);
-    animation-play-state: var(--play);
-    animation-delay: var(--delay);
-    animation-direction: var(--direction);
+  flex: 0 0 auto;
+  min-width: var(--min-width);
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  animation: bfm-scroll var(--duration) linear var(--delay) var(--iteration-count);
+  animation-play-state: var(--play);
+  animation-delay: var(--delay);
+  animation-direction: var(--direction);
 }
 
 @keyframes bfm-scroll {
-    0% {
-        transform: translateX(0%);
-    }
+  0% {
+    transform: translateX(0%);
+  }
 
-    100% {
-        transform: translateX(-100%);
-    }
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 .bfm-initial-child-container {
-    flex: 0 0 auto;
-    display: flex;
-    min-width: auto;
-    flex-direction: row;
-    align-items: center;
+  flex: 0 0 auto;
+  display: flex;
+  min-width: auto;
+  flex-direction: row;
+  align-items: center;
 }
 
 .bfm-child {
-    transform: var(--transform);
+  transform: var(--transform);
 }
