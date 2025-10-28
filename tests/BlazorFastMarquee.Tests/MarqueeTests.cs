@@ -199,7 +199,7 @@ public class MarqueeTests : TestContext
         var marquee = cut.Find(".bfm-marquee");
         var style = marquee.GetAttribute("style");
         
-        Assert.Contains("--play-state:paused", style);
+        Assert.Contains("--play:paused", style);
     }
     
     [Fact]
