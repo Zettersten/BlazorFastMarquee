@@ -46,6 +46,6 @@
 
   <!-- Package references for Blazor components (works with both Server and WASM) -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.10" />
   </ItemGroup>
 </Project>
