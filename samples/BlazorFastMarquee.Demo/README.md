@@ -2,6 +2,15 @@
 
 This is the demo application showcasing the BlazorFastMarquee component.
 
+## Package
+
+📦 **[BlazorFastMarquee on NuGet](https://www.nuget.org/packages/BlazorFastMarquee/)**
+
+Install via:
+```bash
+dotnet add package BlazorFastMarquee
+```
+
 ## Building
 
 ### Local Development
