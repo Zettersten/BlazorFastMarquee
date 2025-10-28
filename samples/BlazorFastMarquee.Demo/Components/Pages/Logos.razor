@@ -1,0 +1,481 @@
+@page "/logos"
+@using BlazorFastMarquee
+
+<PageTitle>Logo Showcase - BlazorFastMarquee Demo</PageTitle>
+
+<h1>🏢 Logo Showcase</h1>
+<p class="page-subtitle">Display partner logos, client lists, and brand showcases</p>
+
+<section class="demo-section">
+    <h2>Classic Logo Carousel</h2>
+    <p>Simple, elegant logo display for partners and clients</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="40" AutoFill="true" Gradient="true" PauseOnHover="true">
+            <div class="logos-container">
+                <div class="logo-item">
+                    <div class="logo-placeholder">ACME</div>
+                </div>
+                <div class="logo-item">
+                    <div class="logo-placeholder">TechCorp</div>
+                </div>
+                <div class="logo-item">
+                    <div class="logo-placeholder">Innovate</div>
+                </div>
+                <div class="logo-item">
+                    <div class="logo-placeholder">Digital+</div>
+                </div>
+                <div class="logo-item">
+                    <div class="logo-placeholder">CloudBase</div>
+                </div>
+                <div class="logo-item">
+                    <div class="logo-placeholder">NextGen</div>
+                </div>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Speed="40" AutoFill="true" PauseOnHover="true"&gt;
+    &lt;div class="logos-container"&gt;
+        &lt;img src="logo1.png" alt="Company 1" /&gt;
+        &lt;img src="logo2.png" alt="Company 2" /&gt;
+        &lt;!-- More logos --&gt;
+    &lt;/div&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section dark-section">
+    <h2>Dark Theme Logos</h2>
+    <p>Perfect for dark-themed websites</p>
+    
+    <div class="demo-container dark-container">
+        <Marquee Speed="50" AutoFill="true" Gradient="true" GradientColor="#1f2937" PauseOnHover="true">
+            <div class="logos-container">
+                <div class="logo-item dark-logo">
+                    <div class="logo-placeholder dark">Stripe</div>
+                </div>
+                <div class="logo-item dark-logo">
+                    <div class="logo-placeholder dark">Vercel</div>
+                </div>
+                <div class="logo-item dark-logo">
+                    <div class="logo-placeholder dark">GitHub</div>
+                </div>
+                <div class="logo-item dark-logo">
+                    <div class="logo-placeholder dark">OpenAI</div>
+                </div>
+                <div class="logo-item dark-logo">
+                    <div class="logo-placeholder dark">Supabase</div>
+                </div>
+            </div>
+        </Marquee>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Colorful Brand Badges</h2>
+    <p>Vibrant logos with brand colors</p>
+    
+    <div class="demo-container colorful-bg">
+        <Marquee Speed="45" AutoFill="true" Gradient="true" GradientColor="#fafafa" PauseOnHover="true">
+            <div class="logos-container">
+                <div class="brand-badge badge-blue">
+                    <span class="badge-icon">🚀</span>
+                    <span class="badge-name">LaunchPad</span>
+                </div>
+                <div class="brand-badge badge-green">
+                    <span class="badge-icon">🌱</span>
+                    <span class="badge-name">GreenTech</span>
+                </div>
+                <div class="brand-badge badge-purple">
+                    <span class="badge-icon">⚡</span>
+                    <span class="badge-name">PowerFlow</span>
+                </div>
+                <div class="brand-badge badge-orange">
+                    <span class="badge-icon">🔥</span>
+                    <span class="badge-name">FireBase</span>
+                </div>
+                <div class="brand-badge badge-pink">
+                    <span class="badge-icon">💎</span>
+                    <span class="badge-name">Diamond</span>
+                </div>
+            </div>
+        </Marquee>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Double Row Showcase</h2>
+    <p>Two opposite directions for dynamic effect</p>
+    
+    <div class="double-row-container">
+        <div class="row-wrapper">
+            <Marquee Speed="40" Direction="MarqueeDirection.Left" AutoFill="true" Gradient="true">
+                <div class="double-row-logos">
+                    <div class="double-logo logo-1">Alpha Corp</div>
+                    <div class="double-logo logo-2">Beta Inc</div>
+                    <div class="double-logo logo-3">Gamma Ltd</div>
+                    <div class="double-logo logo-4">Delta Co</div>
+                </div>
+            </Marquee>
+        </div>
+        
+        <div class="row-wrapper">
+            <Marquee Speed="40" Direction="MarqueeDirection.Right" AutoFill="true" Gradient="true">
+                <div class="double-row-logos">
+                    <div class="double-logo logo-5">Epsilon LLC</div>
+                    <div class="double-logo logo-6">Zeta Group</div>
+                    <div class="double-logo logo-7">Eta Labs</div>
+                    <div class="double-logo logo-8">Theta Tech</div>
+                </div>
+            </Marquee>
+        </div>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Premium Partners</h2>
+    <p>Elevated design for premium showcases</p>
+    
+    <div class="premium-container">
+        <h3 class="premium-title">Trusted by Industry Leaders</h3>
+        <Marquee Speed="35" AutoFill="true" Gradient="true" GradientColor="#ffffff" PauseOnHover="true">
+            <div class="premium-logos">
+                <div class="premium-logo">
+                    <div class="premium-border">
+                        <div class="premium-content">
+                            <span class="premium-icon">👑</span>
+                            <span class="premium-name">Premium Co</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="premium-logo">
+                    <div class="premium-border">
+                        <div class="premium-content">
+                            <span class="premium-icon">💼</span>
+                            <span class="premium-name">Elite Corp</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="premium-logo">
+                    <div class="premium-border">
+                        <div class="premium-content">
+                            <span class="premium-icon">⭐</span>
+                            <span class="premium-name">Star Inc</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="premium-logo">
+                    <div class="premium-border">
+                        <div class="premium-content">
+                            <span class="premium-icon">🏆</span>
+                            <span class="premium-name">Champion Ltd</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Marquee>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Technology Stack</h2>
+    <p>Show off your tech stack with style</p>
+    
+    <div class="demo-container tech-bg">
+        <Marquee Speed="50" AutoFill="true" Gradient="true" GradientColor="#f5f5f5">
+            <div class="tech-stack">
+                <div class="tech-badge">
+                    <span class="tech-icon">⚛️</span>
+                    <span class="tech-name">React</span>
+                </div>
+                <div class="tech-badge">
+                    <span class="tech-icon">🅰️</span>
+                    <span class="tech-name">Angular</span>
+                </div>
+                <div class="tech-badge">
+                    <span class="tech-icon">💚</span>
+                    <span class="tech-name">Vue</span>
+                </div>
+                <div class="tech-badge">
+                    <span class="tech-icon">⚡</span>
+                    <span class="tech-name">Blazor</span>
+                </div>
+                <div class="tech-badge">
+                    <span class="tech-icon">🟢</span>
+                    <span class="tech-name">Node.js</span>
+                </div>
+                <div class="tech-badge">
+                    <span class="tech-icon">🐍</span>
+                    <span class="tech-name">Python</span>
+                </div>
+            </div>
+        </Marquee>
+    </div>
+</section>
+
+<section class="info-box">
+    <h3>💡 Best Practices for Logo Showcases</h3>
+    <div class="tips-grid">
+        <div class="tip">
+            <strong>✅ Consistent Sizing:</strong> Keep all logos roughly the same size for visual balance
+        </div>
+        <div class="tip">
+            <strong>✅ AutoFill Mode:</strong> Enable AutoFill to ensure no gaps in the carousel
+        </div>
+        <div class="tip">
+            <strong>✅ Pause on Hover:</strong> Let users examine logos in detail
+        </div>
+        <div class="tip">
+            <strong>✅ Match Theme:</strong> Adjust gradient and background to match your design
+        </div>
+        <div class="tip">
+            <strong>✅ Optimal Speed:</strong> 30-50 px/s works best for logos
+        </div>
+        <div class="tip">
+            <strong>✅ Add Links:</strong> Make logos clickable to partner websites
+        </div>
+    </div>
+</section>
+
+<style>
+    .logos-container {
+        display: flex;
+        gap: 3rem;
+        align-items: center;
+    }
+    
+    .logo-item {
+        flex-shrink: 0;
+    }
+    
+    .logo-placeholder {
+        width: 160px;
+        height: 80px;
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #1f2937;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .logo-placeholder:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .dark-section {
+        background: #111827;
+        color: white;
+    }
+    
+    .dark-section h2,
+    .dark-section p {
+        color: white;
+    }
+    
+    .dark-container {
+        background: #1f2937;
+    }
+    
+    .logo-placeholder.dark {
+        background: transparent;
+        border-color: #374151;
+        color: white;
+    }
+    
+    .colorful-bg {
+        background: #fafafa;
+    }
+    
+    .brand-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .badge-icon {
+        font-size: 1.5rem;
+    }
+    
+    .badge-blue {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    }
+    
+    .badge-green {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .badge-purple {
+        background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    }
+    
+    .badge-orange {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+    
+    .badge-pink {
+        background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+    }
+    
+    .double-row-container {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        padding: 2rem;
+        border-radius: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .row-wrapper {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .double-row-logos {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .double-logo {
+        padding: 1.5rem 3rem;
+        border-radius: 0.5rem;
+        font-weight: 700;
+        font-size: 1.125rem;
+        color: white;
+        white-space: nowrap;
+    }
+    
+    .logo-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .logo-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .logo-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .logo-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    .logo-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .logo-6 { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+    .logo-7 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+    .logo-8 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+    
+    .premium-container {
+        background: white;
+        padding: 3rem 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .premium-title {
+        text-align: center;
+        font-size: 1.75rem;
+        margin-bottom: 2rem;
+        color: #1f2937;
+        font-weight: 700;
+    }
+    
+    .premium-logos {
+        display: flex;
+        gap: 3rem;
+    }
+    
+    .premium-logo {
+        flex-shrink: 0;
+    }
+    
+    .premium-border {
+        padding: 4px;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border-radius: 1rem;
+    }
+    
+    .premium-content {
+        background: white;
+        padding: 1.5rem 2.5rem;
+        border-radius: calc(1rem - 4px);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .premium-icon {
+        font-size: 2rem;
+    }
+    
+    .premium-name {
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #1f2937;
+    }
+    
+    .tech-bg {
+        background: #f5f5f5;
+    }
+    
+    .tech-stack {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .tech-badge {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        min-width: 100px;
+    }
+    
+    .tech-icon {
+        font-size: 2.5rem;
+    }
+    
+    .tech-name {
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 3rem 0;
+    }
+    
+    .info-box h3 {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.5rem;
+    }
+    
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .tip {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        line-height: 1.6;
+    }
+    
+    .tip strong {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+</style>

@@ -32,6 +32,11 @@
     <Compile Remove="tests/**/*.cs" />
     <Content Remove="tests/**/*" />
     <None Remove="tests/**/*" />
+    
+    <!-- Exclude sample/demo files from main project -->
+    <Compile Remove="samples/**/*.cs" />
+    <Content Remove="samples/**/*" />
+    <None Remove="samples/**/*" />
   </ItemGroup>
   
   <ItemGroup>

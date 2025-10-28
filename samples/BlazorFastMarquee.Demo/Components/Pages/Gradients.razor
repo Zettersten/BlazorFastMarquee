@@ -1,0 +1,306 @@
+@page "/gradients"
+@using BlazorFastMarquee
+
+<PageTitle>Gradients - BlazorFastMarquee Demo</PageTitle>
+
+<h1>🎨 Gradient Overlays</h1>
+<p class="page-subtitle">Create smooth edge fading effects for professional looking marquees</p>
+
+<section class="demo-section">
+    <h2>No Gradient</h2>
+    <p>Sharp edges where content enters and exits</p>
+    
+    <div class="demo-container no-gradient-bg">
+        <Marquee Speed="50" Gradient="false">
+            <div class="gradient-content">
+                <span class="gradient-item">No Fade</span>
+                <span class="gradient-item">Sharp Edges</span>
+                <span class="gradient-item">Visible Entry/Exit</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Gradient="false"&gt;&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>With White Gradient (Default)</h2>
+    <p>Smooth fade at edges blending with white background</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="50" Gradient="true" GradientColor="white">
+            <div class="gradient-content">
+                <span class="gradient-item">Smooth Fade</span>
+                <span class="gradient-item">Professional Look</span>
+                <span class="gradient-item">Seamless Edges</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Gradient="true" GradientColor="white"&gt;&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section dark-bg">
+    <h2>Dark Gradient</h2>
+    <p>Match gradient to dark backgrounds</p>
+    
+    <div class="demo-container dark-container">
+        <Marquee Speed="50" Gradient="true" GradientColor="#1f2937">
+            <div class="gradient-content">
+                <span class="gradient-item gradient-dark">Dark Theme</span>
+                <span class="gradient-item gradient-dark">Perfect Blend</span>
+                <span class="gradient-item gradient-dark">Night Mode</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Gradient="true" GradientColor="#1f2937"&gt;&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section colored-bg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <h2 style="color: white;">Colored Gradient</h2>
+    <p style="color: rgba(255,255,255,0.9);">Match gradient to any background color</p>
+    
+    <div class="demo-container" style="background: transparent;">
+        <Marquee Speed="50" Gradient="true" GradientColor="#667eea">
+            <div class="gradient-content">
+                <span class="gradient-item gradient-colored">Custom Color</span>
+                <span class="gradient-item gradient-colored">Perfect Match</span>
+                <span class="gradient-item gradient-colored">Any Background</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Gradient="true" GradientColor="#667eea"&gt;&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Small Gradient Width (100px)</h2>
+    <p>Shorter fade distance for subtle effect</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="50" Gradient="true" GradientColor="white" GradientWidth="100">
+            <div class="gradient-content">
+                <span class="gradient-item">Short Fade</span>
+                <span class="gradient-item">Subtle Effect</span>
+                <span class="gradient-item">Quick Transition</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee 
+    Gradient="true" 
+    GradientColor="white" 
+    GradientWidth="100"&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Large Gradient Width (400px)</h2>
+    <p>Longer fade distance for dramatic effect</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="50" Gradient="true" GradientColor="white" GradientWidth="400">
+            <div class="gradient-content">
+                <span class="gradient-item">Long Fade</span>
+                <span class="gradient-item">Dramatic Effect</span>
+                <span class="gradient-item">Gradual Transition</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee 
+    Gradient="true" 
+    GradientColor="white" 
+    GradientWidth="400"&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="comparison-section">
+    <h2>Gradient Width Comparison</h2>
+    
+    <div class="comparison-grid">
+        <div class="comparison-item-wrapper">
+            <h4>No Gradient</h4>
+            <div class="comparison-demo-box">
+                <Marquee Speed="50" Gradient="false">
+                    <span class="compare-item">Content</span>
+                </Marquee>
+            </div>
+        </div>
+        
+        <div class="comparison-item-wrapper">
+            <h4>100px Gradient</h4>
+            <div class="comparison-demo-box">
+                <Marquee Speed="50" Gradient="true" GradientWidth="100">
+                    <span class="compare-item">Content</span>
+                </Marquee>
+            </div>
+        </div>
+        
+        <div class="comparison-item-wrapper">
+            <h4>200px (Default)</h4>
+            <div class="comparison-demo-box">
+                <Marquee Speed="50" Gradient="true" GradientWidth="200">
+                    <span class="compare-item">Content</span>
+                </Marquee>
+            </div>
+        </div>
+        
+        <div class="comparison-item-wrapper">
+            <h4>400px Gradient</h4>
+            <div class="comparison-demo-box">
+                <Marquee Speed="50" Gradient="true" GradientWidth="400">
+                    <span class="compare-item">Content</span>
+                </Marquee>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="info-box">
+    <h3>💡 Gradient Best Practices</h3>
+    <div class="tips-grid">
+        <div class="tip">
+            <strong>✅ Match Background:</strong> Always set GradientColor to match your container's background
+        </div>
+        <div class="tip">
+            <strong>✅ Width Balance:</strong> 100-300px works well for most cases
+        </div>
+        <div class="tip">
+            <strong>✅ Subtle is Better:</strong> Gradients should enhance, not distract
+        </div>
+        <div class="tip">
+            <strong>✅ Test Colors:</strong> Use hex, RGB, or color names
+        </div>
+    </div>
+</section>
+
+<style>
+    .gradient-content {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .gradient-item {
+        font-size: 1.25rem;
+        font-weight: 600;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .gradient-dark {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .gradient-colored {
+        background: white;
+        color: #667eea;
+        font-weight: 700;
+    }
+    
+    .no-gradient-bg {
+        background: linear-gradient(90deg, #fff 0%, #f3f4f6 50%, #fff 100%);
+    }
+    
+    .dark-bg {
+        background: #111827;
+        color: white;
+    }
+    
+    .dark-bg h2,
+    .dark-bg p {
+        color: white;
+    }
+    
+    .dark-container {
+        background: #1f2937;
+    }
+    
+    .comparison-section {
+        background: #f9fafb;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 3rem 0;
+    }
+    
+    .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .comparison-item-wrapper h4 {
+        margin: 0 0 1rem 0;
+        font-size: 1rem;
+        color: #6b7280;
+        text-align: center;
+    }
+    
+    .comparison-demo-box {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .compare-item {
+        font-size: 1.125rem;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 3rem 0;
+    }
+    
+    .info-box h3 {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.5rem;
+    }
+    
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .tip {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        line-height: 1.6;
+    }
+    
+    .tip strong {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+</style>

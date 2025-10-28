@@ -1,0 +1,164 @@
+@page "/directions"
+@using BlazorFastMarquee
+
+<PageTitle>Directions - BlazorFastMarquee Demo</PageTitle>
+
+<h1>🧭 Direction Control</h1>
+<p class="page-subtitle">Scroll content in any direction - left, right, up, or down</p>
+
+<section class="demo-section">
+    <h2>Left (Default)</h2>
+    <p>Content scrolls from right to left</p>
+    
+    <div class="demo-container">
+        <Marquee Direction="MarqueeDirection.Left" Speed="50" Gradient="true">
+            <div class="direction-content">
+                <span class="direction-item">→ Scrolling Left</span>
+                <span class="direction-item">→ Right to Left</span>
+                <span class="direction-item">→ Classic Marquee</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Direction="MarqueeDirection.Left" Speed="50"&gt;
+    &lt;!-- Content scrolls → --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Right</h2>
+    <p>Content scrolls from left to right</p>
+    
+    <div class="demo-container">
+        <Marquee Direction="MarqueeDirection.Right" Speed="50" Gradient="true">
+            <div class="direction-content">
+                <span class="direction-item direction-right">← Scrolling Right</span>
+                <span class="direction-item direction-right">← Left to Right</span>
+                <span class="direction-item direction-right">← Reverse Direction</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Direction="MarqueeDirection.Right" Speed="50"&gt;
+    &lt;!-- Content scrolls ← --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Up</h2>
+    <p>Content scrolls from bottom to top (vertical)</p>
+    
+    <div class="demo-container vertical">
+        <Marquee Direction="MarqueeDirection.Up" Speed="30" Gradient="true" GradientColor="#f9fafb">
+            <div class="vertical-content">
+                <div class="vertical-item">↑ Scrolling Up</div>
+                <div class="vertical-item">↑ Bottom to Top</div>
+                <div class="vertical-item">↑ Vertical Motion</div>
+                <div class="vertical-item">↑ News Ticker Style</div>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Direction="MarqueeDirection.Up" Speed="30"&gt;
+    &lt;!-- Content scrolls ↑ --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Down</h2>
+    <p>Content scrolls from top to bottom (vertical)</p>
+    
+    <div class="demo-container vertical">
+        <Marquee Direction="MarqueeDirection.Down" Speed="30" Gradient="true" GradientColor="#f9fafb">
+            <div class="vertical-content">
+                <div class="vertical-item vertical-down">↓ Scrolling Down</div>
+                <div class="vertical-item vertical-down">↓ Top to Bottom</div>
+                <div class="vertical-item vertical-down">↓ Reverse Vertical</div>
+                <div class="vertical-item vertical-down">↓ Waterfall Effect</div>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Direction="MarqueeDirection.Down" Speed="30"&gt;
+    &lt;!-- Content scrolls ↓ --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="info-box">
+    <h3>💡 Pro Tip</h3>
+    <p>Vertical scrolling (Up/Down) is perfect for sidebars, news tickers, and social media feeds!</p>
+</section>
+
+<style>
+    .direction-content {
+        display: flex;
+        gap: 3rem;
+    }
+    
+    .direction-item {
+        font-size: 1.5rem;
+        font-weight: 600;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .direction-right {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .demo-container.vertical {
+        height: 400px;
+        overflow: hidden;
+    }
+    
+    .vertical-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .vertical-item {
+        font-size: 1.25rem;
+        font-weight: 600;
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 0.5rem;
+        text-align: center;
+        white-space: nowrap;
+    }
+    
+    .vertical-down {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 2rem 0;
+    }
+    
+    .info-box h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.5rem;
+    }
+    
+    .info-box p {
+        margin: 0;
+        font-size: 1.125rem;
+        opacity: 0.95;
+    }
+</style>

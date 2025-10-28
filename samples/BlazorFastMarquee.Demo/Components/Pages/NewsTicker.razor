@@ -1,0 +1,382 @@
+@page "/news-ticker"
+@using BlazorFastMarquee
+
+<PageTitle>News Ticker - BlazorFastMarquee Demo</PageTitle>
+
+<h1>📰 News Ticker Examples</h1>
+<p class="page-subtitle">Perfect for breaking news, announcements, and live updates</p>
+
+<section class="demo-section">
+    <h2>Breaking News Banner</h2>
+    <p>Top-of-page news ticker with urgent updates</p>
+    
+    <div class="news-banner breaking">
+        <div class="news-label breaking-label">🔴 BREAKING</div>
+        <div class="news-marquee">
+            <Marquee Speed="60" Gradient="true" GradientColor="#dc2626">
+                <div class="news-items">
+                    <span class="news-item">⚡ Major technology breakthrough announced</span>
+                    <span class="news-separator">•</span>
+                    <span class="news-item">🌍 Global summit reaches historic agreement</span>
+                    <span class="news-separator">•</span>
+                    <span class="news-item">💼 Markets hit all-time high</span>
+                    <span class="news-separator">•</span>
+                    <span class="news-item">🚀 Space mission launched successfully</span>
+                </div>
+            </Marquee>
+        </div>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Speed="60" Gradient="true"&gt;
+    &lt;span&gt;Breaking news item 1&lt;/span&gt;
+    &lt;span&gt;•&lt;/span&gt;
+    &lt;span&gt;Breaking news item 2&lt;/span&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Sports Scores Ticker</h2>
+    <p>Live scores and updates for sporting events</p>
+    
+    <div class="news-banner sports">
+        <div class="news-label sports-label">⚽ LIVE SCORES</div>
+        <div class="news-marquee">
+            <Marquee Speed="50" Gradient="true" GradientColor="#059669" PauseOnHover="true">
+                <div class="sports-items">
+                    <div class="sports-score">
+                        <span class="team">Lakers</span>
+                        <span class="score">98</span>
+                        <span class="vs">vs</span>
+                        <span class="score">95</span>
+                        <span class="team">Celtics</span>
+                        <span class="status">FINAL</span>
+                    </div>
+                    <span class="sports-separator">|</span>
+                    <div class="sports-score">
+                        <span class="team">United</span>
+                        <span class="score">2</span>
+                        <span class="vs">-</span>
+                        <span class="score">1</span>
+                        <span class="team">City</span>
+                        <span class="status live">⚫ LIVE</span>
+                    </div>
+                    <span class="sports-separator">|</span>
+                    <div class="sports-score">
+                        <span class="team">Yankees</span>
+                        <span class="score">5</span>
+                        <span class="vs">vs</span>
+                        <span class="score">3</span>
+                        <span class="team">Red Sox</span>
+                        <span class="status">7th</span>
+                    </div>
+                </div>
+            </Marquee>
+        </div>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Financial Ticker</h2>
+    <p>Stock prices and market updates</p>
+    
+    <div class="news-banner financial">
+        <div class="news-label financial-label">📈 MARKETS</div>
+        <div class="news-marquee">
+            <Marquee Speed="40" Gradient="true" GradientColor="#1f2937" PauseOnHover="true">
+                <div class="financial-items">
+                    <div class="stock-item">
+                        <span class="symbol">AAPL</span>
+                        <span class="price">$182.52</span>
+                        <span class="change up">+2.5%</span>
+                    </div>
+                    <div class="stock-item">
+                        <span class="symbol">GOOGL</span>
+                        <span class="price">$140.25</span>
+                        <span class="change up">+1.2%</span>
+                    </div>
+                    <div class="stock-item">
+                        <span class="symbol">MSFT</span>
+                        <span class="price">$378.91</span>
+                        <span class="change down">-0.8%</span>
+                    </div>
+                    <div class="stock-item">
+                        <span class="symbol">TSLA</span>
+                        <span class="price">$242.84</span>
+                        <span class="change up">+3.4%</span>
+                    </div>
+                    <div class="stock-item">
+                        <span class="symbol">AMZN</span>
+                        <span class="price">$178.35</span>
+                        <span class="change up">+0.5%</span>
+                    </div>
+                </div>
+            </Marquee>
+        </div>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Weather Updates</h2>
+    <p>Current conditions and forecasts</p>
+    
+    <div class="news-banner weather">
+        <div class="news-label weather-label">🌤️ WEATHER</div>
+        <div class="news-marquee">
+            <Marquee Speed="45" Gradient="true" GradientColor="#0ea5e9">
+                <div class="weather-items">
+                    <div class="weather-location">
+                        <span class="city">New York</span>
+                        <span class="temp">72°F</span>
+                        <span class="condition">☀️ Sunny</span>
+                    </div>
+                    <span class="weather-separator">•</span>
+                    <div class="weather-location">
+                        <span class="city">London</span>
+                        <span class="temp">58°F</span>
+                        <span class="condition">🌧️ Rainy</span>
+                    </div>
+                    <span class="weather-separator">•</span>
+                    <div class="weather-location">
+                        <span class="city">Tokyo</span>
+                        <span class="temp">68°F</span>
+                        <span class="condition">⛅ Cloudy</span>
+                    </div>
+                    <span class="weather-separator">•</span>
+                    <div class="weather-location">
+                        <span class="city">Sydney</span>
+                        <span class="temp">75°F</span>
+                        <span class="condition">🌤️ Partly Cloudy</span>
+                    </div>
+                </div>
+            </Marquee>
+        </div>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Event Announcements</h2>
+    <p>Upcoming events and important dates</p>
+    
+    <div class="news-banner events">
+        <div class="news-label events-label">📅 EVENTS</div>
+        <div class="news-marquee">
+            <Marquee Speed="55" Gradient="true" GradientColor="#7c3aed">
+                <div class="events-items">
+                    <div class="event-item">
+                        <span class="event-date">Dec 15</span>
+                        <span class="event-name">Tech Conference 2025</span>
+                    </div>
+                    <span class="event-separator">→</span>
+                    <div class="event-item">
+                        <span class="event-date">Dec 20</span>
+                        <span class="event-name">Product Launch Webinar</span>
+                    </div>
+                    <span class="event-separator">→</span>
+                    <div class="event-item">
+                        <span class="event-date">Jan 5</span>
+                        <span class="event-name">Q4 Results Announcement</span>
+                    </div>
+                    <span class="event-separator">→</span>
+                    <div class="event-item">
+                        <span class="event-date">Jan 12</span>
+                        <span class="event-name">Team Building Workshop</span>
+                    </div>
+                </div>
+            </Marquee>
+        </div>
+    </div>
+</section>
+
+<style>
+    .news-banner {
+        display: flex;
+        align-items: stretch;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin: 2rem 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .breaking {
+        background: #dc2626;
+    }
+    
+    .sports {
+        background: #059669;
+    }
+    
+    .financial {
+        background: #1f2937;
+    }
+    
+    .weather {
+        background: #0ea5e9;
+    }
+    
+    .events {
+        background: #7c3aed;
+    }
+    
+    .news-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem 1.5rem;
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: white;
+        white-space: nowrap;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .news-marquee {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+    }
+    
+    .news-items, .sports-items, .financial-items, .weather-items, .events-items {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 1rem 0;
+        color: white;
+    }
+    
+    .news-item {
+        font-weight: 600;
+        font-size: 1.125rem;
+        white-space: nowrap;
+    }
+    
+    .news-separator {
+        opacity: 0.5;
+        font-size: 1.5rem;
+    }
+    
+    .sports-score {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .team {
+        font-size: 1.125rem;
+    }
+    
+    .score {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    .vs {
+        opacity: 0.7;
+        font-size: 0.875rem;
+    }
+    
+    .status {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+    }
+    
+    .status.live {
+        background: #ef4444;
+        animation: pulse 2s infinite;
+    }
+    
+    @@keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    .sports-separator {
+        opacity: 0.3;
+        font-size: 1.5rem;
+    }
+    
+    .stock-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .symbol {
+        font-weight: 700;
+        font-size: 1.125rem;
+    }
+    
+    .price {
+        font-size: 1.125rem;
+    }
+    
+    .change {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .change.up {
+        background: #10b981;
+    }
+    
+    .change.down {
+        background: #ef4444;
+    }
+    
+    .weather-location {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .city {
+        font-weight: 700;
+        font-size: 1.125rem;
+    }
+    
+    .temp {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    .condition {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.25rem;
+    }
+    
+    .weather-separator {
+        opacity: 0.5;
+    }
+    
+    .event-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .event-date {
+        background: rgba(255, 255, 255, 0.25);
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.375rem;
+        font-weight: 700;
+        font-size: 0.875rem;
+    }
+    
+    .event-name {
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+    
+    .event-separator {
+        opacity: 0.5;
+        font-size: 1.25rem;
+    }
+</style>

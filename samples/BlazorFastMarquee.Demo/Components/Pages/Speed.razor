@@ -1,0 +1,250 @@
+@page "/speed"
+@using BlazorFastMarquee
+
+<PageTitle>Speed & Timing - BlazorFastMarquee Demo</PageTitle>
+
+<h1>⚡ Speed & Timing Control</h1>
+<p class="page-subtitle">Fine-tune animation speed, delay, and loops for perfect motion</p>
+
+<section class="demo-section">
+    <h2>Slow (25 px/s)</h2>
+    <p>Gentle, relaxed scrolling for easy reading</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="25" Gradient="true">
+            <div class="speed-content">
+                <span class="speed-item speed-slow">🐢 Slow & Steady</span>
+                <span class="speed-item speed-slow">📚 Easy to Read</span>
+                <span class="speed-item speed-slow">👓 Great for Text</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Speed="25"&gt;&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Normal (50 px/s - Default)</h2>
+    <p>Balanced speed for most use cases</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="50" Gradient="true">
+            <div class="speed-content">
+                <span class="speed-item speed-normal">🚶 Normal Pace</span>
+                <span class="speed-item speed-normal">⚖️ Balanced</span>
+                <span class="speed-item speed-normal">✨ Perfect Default</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Speed="50"&gt;&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Fast (100 px/s)</h2>
+    <p>Quick scrolling for attention-grabbing content</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="100" Gradient="true">
+            <div class="speed-content">
+                <span class="speed-item speed-fast">🏃 Moving Fast!</span>
+                <span class="speed-item speed-fast">⚡ High Energy</span>
+                <span class="speed-item speed-fast">🚀 Eye-Catching</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Speed="100"&gt;&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Very Fast (200 px/s)</h2>
+    <p>Lightning-fast for dynamic effects</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="200" Gradient="true">
+            <div class="speed-content">
+                <span class="speed-item speed-veryfast">🚄 Super Speed</span>
+                <span class="speed-item speed-veryfast">💨 Lightning Fast</span>
+                <span class="speed-item speed-veryfast">⚡ Blazing!</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Speed="200"&gt;&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>With Delay (3 seconds)</h2>
+    <p>Wait before starting the animation</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="50" Delay="3" Gradient="true">
+            <div class="speed-content">
+                <span class="speed-item speed-delay">⏰ 3 Second Delay</span>
+                <span class="speed-item speed-delay">⏳ Starts After Wait</span>
+                <span class="speed-item speed-delay">🎬 Dramatic Entrance</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Speed="50" Delay="3"&gt;
+    &lt;!-- Waits 3 seconds before starting --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Limited Loops (3 times)</h2>
+    <p>Animation stops after specified number of cycles</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="50" Loop="3" Gradient="true">
+            <div class="speed-content">
+                <span class="speed-item speed-loop">🔄 Loops 3 Times</span>
+                <span class="speed-item speed-loop">🛑 Then Stops</span>
+                <span class="speed-item speed-loop">🎯 Controlled</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Speed="50" Loop="3"&gt;
+    &lt;!-- Runs 3 times then stops --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="comparison-grid">
+    <h2>Speed Comparison</h2>
+    
+    <div class="comparison-row">
+        <div class="comparison-label">25 px/s</div>
+        <div class="comparison-demo">
+            <Marquee Speed="25">
+                <span class="comparison-item">🐢 Slow</span>
+            </Marquee>
+        </div>
+    </div>
+    
+    <div class="comparison-row">
+        <div class="comparison-label">50 px/s</div>
+        <div class="comparison-demo">
+            <Marquee Speed="50">
+                <span class="comparison-item">🚶 Normal</span>
+            </Marquee>
+        </div>
+    </div>
+    
+    <div class="comparison-row">
+        <div class="comparison-label">100 px/s</div>
+        <div class="comparison-demo">
+            <Marquee Speed="100">
+                <span class="comparison-item">🏃 Fast</span>
+            </Marquee>
+        </div>
+    </div>
+    
+    <div class="comparison-row">
+        <div class="comparison-label">200 px/s</div>
+        <div class="comparison-demo">
+            <Marquee Speed="200">
+                <span class="comparison-item">🚄 Very Fast</span>
+            </Marquee>
+        </div>
+    </div>
+</section>
+
+<style>
+    .speed-content {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .speed-item {
+        font-size: 1.25rem;
+        font-weight: 600;
+        padding: 1rem 2rem;
+        color: white;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .speed-slow {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .speed-normal {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .speed-fast {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+    
+    .speed-veryfast {
+        background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+    }
+    
+    .speed-delay {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .speed-loop {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .comparison-grid {
+        background: #f9fafb;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 3rem 0;
+    }
+    
+    .comparison-grid h2 {
+        margin-bottom: 1.5rem;
+    }
+    
+    .comparison-row {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+        background: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
+    
+    .comparison-label {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #6b7280;
+    }
+    
+    .comparison-demo {
+        background: #f9fafb;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .comparison-item {
+        font-size: 1.125rem;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+    }
+</style>
