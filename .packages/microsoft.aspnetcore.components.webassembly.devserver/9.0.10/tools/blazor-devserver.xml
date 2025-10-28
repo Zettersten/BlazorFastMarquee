@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>blazor-devserver</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.AspNetCore.Components.WebAssembly.DevServer.Server.Program">
+            <summary>
+            Intended for framework test use only.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Components.WebAssembly.DevServer.Server.Program.BuildWebHost(System.String[])">
+            <summary>
+            Intended for framework test use only.
+            </summary>
+        </member>
+    </members>
+</doc>

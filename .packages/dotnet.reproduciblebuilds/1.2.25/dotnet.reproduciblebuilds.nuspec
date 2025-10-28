@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>DotNet.ReproducibleBuilds</id>
+    <version>1.2.25</version>
+    <authors>.NET Foundation and Contributors</authors>
+    <developmentDependency>true</developmentDependency>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <readme>README.md</readme>
+    <description>Enables reproducible build settings</description>
+    <releaseNotes># Changelog
+
+## [1.2.0]
+
+### Added
+
+- [Support for transitive package references](https://github.com/dotnet/reproducible-builds/pull/16) - thanks @meziantou!
+- [Add RepositoryBranch package metadata when available in the build environment](https://github.com/dotnet/reproducible-builds/pull/27) - thanks @kzu! 
+
+### Removed
+
+- [Remove the automatically provided .NET Framework reference assembly PackageReference, since the SDK provides this already](https://github.com/dotnet/reproducible-builds/pull/33) - thanks @MattKotsenas!</releaseNotes>
+    <copyright>© .NET Foundation</copyright>
+    <repository type="git" url="https://github.com/dotnet/reproducible-builds" commit="714df2e17493c71d0db054727f62a82810eeac7d" />
+  </metadata>
+</package>

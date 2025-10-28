@@ -1,0 +1,562 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "BrowserDebugHost/9.0.10": {
+        "dependencies": {
+          "BrowserDebugProxy": "9.0.10",
+          "Microsoft.CodeAnalysis.Analyzers": "3.11.0-beta1.25173.3",
+          "Microsoft.CodeAnalysis.CSharp.CodeStyle": "4.8.0",
+          "Microsoft.CodeAnalysis.NetAnalyzers": "9.0.0-preview.25173.3",
+          "Microsoft.DotNet.CodeAnalysis": "9.0.0-beta.25475.3",
+          "Microsoft.DotNet.GenAPI": "9.0.0-beta.25475.3",
+          "Microsoft.Net.Compilers.Toolset": "4.12.0-3.25467.18",
+          "StyleCop.Analyzers": "1.2.0-beta.507"
+        },
+        "runtime": {
+          "BrowserDebugHost.dll": {}
+        }
+      },
+      "Microsoft.CodeAnalysis.Analyzers/3.11.0-beta1.25173.3": {},
+      "Microsoft.CodeAnalysis.Common/4.12.0-3.25467.18": {
+        "dependencies": {
+          "Microsoft.CodeAnalysis.Analyzers": "3.11.0-beta1.25173.3",
+          "System.Collections.Immutable": "8.0.0",
+          "System.Reflection.Metadata": "8.0.0"
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.CodeAnalysis.dll": {
+            "assemblyVersion": "4.12.0.0",
+            "fileVersion": "4.1200.25.46718"
+          }
+        },
+        "resources": {
+          "lib/net8.0/cs/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "cs"
+          },
+          "lib/net8.0/de/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "de"
+          },
+          "lib/net8.0/es/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "es"
+          },
+          "lib/net8.0/fr/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "fr"
+          },
+          "lib/net8.0/it/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "it"
+          },
+          "lib/net8.0/ja/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "ja"
+          },
+          "lib/net8.0/ko/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "ko"
+          },
+          "lib/net8.0/pl/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "pl"
+          },
+          "lib/net8.0/pt-BR/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "pt-BR"
+          },
+          "lib/net8.0/ru/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "ru"
+          },
+          "lib/net8.0/tr/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "tr"
+          },
+          "lib/net8.0/zh-Hans/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "zh-Hans"
+          },
+          "lib/net8.0/zh-Hant/Microsoft.CodeAnalysis.resources.dll": {
+            "locale": "zh-Hant"
+          }
+        }
+      },
+      "Microsoft.CodeAnalysis.CSharp/4.12.0-3.25467.18": {
+        "dependencies": {
+          "Microsoft.CodeAnalysis.Analyzers": "3.11.0-beta1.25173.3",
+          "Microsoft.CodeAnalysis.Common": "4.12.0-3.25467.18",
+          "System.Collections.Immutable": "8.0.0",
+          "System.Reflection.Metadata": "8.0.0"
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.CodeAnalysis.CSharp.dll": {
+            "assemblyVersion": "4.12.0.0",
+            "fileVersion": "4.1200.25.46718"
+          }
+        },
+        "resources": {
+          "lib/net8.0/cs/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "cs"
+          },
+          "lib/net8.0/de/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "de"
+          },
+          "lib/net8.0/es/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "es"
+          },
+          "lib/net8.0/fr/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "fr"
+          },
+          "lib/net8.0/it/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "it"
+          },
+          "lib/net8.0/ja/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "ja"
+          },
+          "lib/net8.0/ko/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "ko"
+          },
+          "lib/net8.0/pl/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "pl"
+          },
+          "lib/net8.0/pt-BR/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "pt-BR"
+          },
+          "lib/net8.0/ru/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "ru"
+          },
+          "lib/net8.0/tr/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "tr"
+          },
+          "lib/net8.0/zh-Hans/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "zh-Hans"
+          },
+          "lib/net8.0/zh-Hant/Microsoft.CodeAnalysis.CSharp.resources.dll": {
+            "locale": "zh-Hant"
+          }
+        }
+      },
+      "Microsoft.CodeAnalysis.CSharp.CodeStyle/4.8.0": {},
+      "Microsoft.CodeAnalysis.CSharp.Scripting/4.12.0-3.25467.18": {
+        "dependencies": {
+          "Microsoft.CSharp": "4.7.0",
+          "Microsoft.CodeAnalysis.Analyzers": "3.11.0-beta1.25173.3",
+          "Microsoft.CodeAnalysis.CSharp": "4.12.0-3.25467.18",
+          "Microsoft.CodeAnalysis.Common": "4.12.0-3.25467.18",
+          "Microsoft.CodeAnalysis.Scripting.Common": "4.12.0-3.25467.18",
+          "System.Collections.Immutable": "8.0.0",
+          "System.Reflection.Metadata": "8.0.0"
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.CodeAnalysis.CSharp.Scripting.dll": {
+            "assemblyVersion": "4.12.0.0",
+            "fileVersion": "4.1200.25.46718"
+          }
+        },
+        "resources": {
+          "lib/net8.0/cs/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "cs"
+          },
+          "lib/net8.0/de/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "de"
+          },
+          "lib/net8.0/es/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "es"
+          },
+          "lib/net8.0/fr/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "fr"
+          },
+          "lib/net8.0/it/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "it"
+          },
+          "lib/net8.0/ja/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "ja"
+          },
+          "lib/net8.0/ko/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "ko"
+          },
+          "lib/net8.0/pl/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "pl"
+          },
+          "lib/net8.0/pt-BR/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "pt-BR"
+          },
+          "lib/net8.0/ru/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "ru"
+          },
+          "lib/net8.0/tr/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "tr"
+          },
+          "lib/net8.0/zh-Hans/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "zh-Hans"
+          },
+          "lib/net8.0/zh-Hant/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll": {
+            "locale": "zh-Hant"
+          }
+        }
+      },
+      "Microsoft.CodeAnalysis.NetAnalyzers/9.0.0-preview.25173.3": {},
+      "Microsoft.CodeAnalysis.Scripting.Common/4.12.0-3.25467.18": {
+        "dependencies": {
+          "Microsoft.CodeAnalysis.Analyzers": "3.11.0-beta1.25173.3",
+          "Microsoft.CodeAnalysis.Common": "4.12.0-3.25467.18",
+          "System.Collections.Immutable": "8.0.0",
+          "System.Reflection.Metadata": "8.0.0"
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.CodeAnalysis.Scripting.dll": {
+            "assemblyVersion": "4.12.0.0",
+            "fileVersion": "4.1200.25.46718"
+          }
+        },
+        "resources": {
+          "lib/net8.0/cs/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "cs"
+          },
+          "lib/net8.0/de/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "de"
+          },
+          "lib/net8.0/es/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "es"
+          },
+          "lib/net8.0/fr/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "fr"
+          },
+          "lib/net8.0/it/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "it"
+          },
+          "lib/net8.0/ja/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "ja"
+          },
+          "lib/net8.0/ko/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "ko"
+          },
+          "lib/net8.0/pl/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "pl"
+          },
+          "lib/net8.0/pt-BR/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "pt-BR"
+          },
+          "lib/net8.0/ru/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "ru"
+          },
+          "lib/net8.0/tr/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "tr"
+          },
+          "lib/net8.0/zh-Hans/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "zh-Hans"
+          },
+          "lib/net8.0/zh-Hant/Microsoft.CodeAnalysis.Scripting.resources.dll": {
+            "locale": "zh-Hant"
+          }
+        }
+      },
+      "Microsoft.CSharp/4.7.0": {},
+      "Microsoft.DotNet.CodeAnalysis/9.0.0-beta.25475.3": {},
+      "Microsoft.DotNet.GenAPI/9.0.0-beta.25475.3": {},
+      "Microsoft.Extensions.Configuration/3.1.7": {
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "3.1.7"
+        }
+      },
+      "Microsoft.Extensions.Configuration.Abstractions/3.1.7": {
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "3.1.7"
+        }
+      },
+      "Microsoft.Extensions.Configuration.Binder/3.1.7": {
+        "dependencies": {
+          "Microsoft.Extensions.Configuration": "3.1.7"
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection/3.1.7": {
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.7"
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions/3.1.7": {},
+      "Microsoft.Extensions.Logging/3.1.7": {
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Binder": "3.1.7",
+          "Microsoft.Extensions.DependencyInjection": "3.1.7",
+          "Microsoft.Extensions.Logging.Abstractions": "3.1.7",
+          "Microsoft.Extensions.Options": "3.1.7"
+        }
+      },
+      "Microsoft.Extensions.Logging.Abstractions/3.1.7": {},
+      "Microsoft.Extensions.Options/3.1.7": {
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.7",
+          "Microsoft.Extensions.Primitives": "3.1.7"
+        }
+      },
+      "Microsoft.Extensions.Primitives/3.1.7": {},
+      "Microsoft.FileFormats/1.0.406601": {
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.FileFormats.dll": {
+            "assemblyVersion": "1.0.8.6601",
+            "fileVersion": "1.0.8.6601"
+          }
+        }
+      },
+      "Microsoft.Net.Compilers.Toolset/4.12.0-3.25467.18": {},
+      "Microsoft.SymbolStore/1.0.406601": {
+        "dependencies": {
+          "Microsoft.FileFormats": "1.0.406601",
+          "System.Reflection.Metadata": "8.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.SymbolStore.dll": {
+            "assemblyVersion": "1.0.8.6601",
+            "fileVersion": "1.0.8.6601"
+          }
+        }
+      },
+      "Newtonsoft.Json/13.0.3": {
+        "runtime": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.3.27908"
+          }
+        }
+      },
+      "StyleCop.Analyzers/1.2.0-beta.507": {
+        "dependencies": {
+          "StyleCop.Analyzers.Unstable": "1.2.0.507"
+        }
+      },
+      "StyleCop.Analyzers.Unstable/1.2.0.507": {},
+      "System.Collections.Immutable/8.0.0": {},
+      "System.Reflection.Metadata/8.0.0": {
+        "dependencies": {
+          "System.Collections.Immutable": "8.0.0"
+        }
+      },
+      "BrowserDebugProxy/9.0.10": {
+        "dependencies": {
+          "Microsoft.CodeAnalysis.CSharp": "4.12.0-3.25467.18",
+          "Microsoft.CodeAnalysis.CSharp.Scripting": "4.12.0-3.25467.18",
+          "Microsoft.Extensions.Logging": "3.1.7",
+          "Microsoft.NET.WebAssembly.Webcil": "9.0.10-servicing.25475.15",
+          "Microsoft.SymbolStore": "1.0.406601",
+          "Newtonsoft.Json": "13.0.3"
+        },
+        "runtime": {
+          "BrowserDebugProxy.dll": {
+            "assemblyVersion": "9.0.10",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      },
+      "Microsoft.NET.WebAssembly.Webcil/9.0.10-servicing.25475.15": {
+        "runtime": {
+          "Microsoft.NET.WebAssembly.Webcil.dll": {
+            "assemblyVersion": "9.0.10-servicing.25475.15",
+            "fileVersion": "9.0.1025.47515"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "BrowserDebugHost/9.0.10": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.CodeAnalysis.Analyzers/3.11.0-beta1.25173.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-jmPnRqmEWz75FVDKiqkziVa708Dk6ucU0zCIDD6N34MMylulmC1t8iPvZ9CCAj2ZSJD8+6IsLzriQ0LKLMXb+w==",
+      "path": "microsoft.codeanalysis.analyzers/3.11.0-beta1.25173.3",
+      "hashPath": "microsoft.codeanalysis.analyzers.3.11.0-beta1.25173.3.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.Common/4.12.0-3.25467.18": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-KFE+WsiqTGNHf5dZ0XoUqcap53CAl7UjHg5eqrrIZbBw1tWcmf7qmMV0HVWQnwX7oYIYtAzOUgaZ4hT+2cKxPg==",
+      "path": "microsoft.codeanalysis.common/4.12.0-3.25467.18",
+      "hashPath": "microsoft.codeanalysis.common.4.12.0-3.25467.18.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.CSharp/4.12.0-3.25467.18": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WgnlcVWvTjvuMIF1CNkBPOHYMbc7keTqVoLGpa9jUCHJvHdGGuDiab3WSGMw9gW8gKrp42UayP8LG32OIoaoLg==",
+      "path": "microsoft.codeanalysis.csharp/4.12.0-3.25467.18",
+      "hashPath": "microsoft.codeanalysis.csharp.4.12.0-3.25467.18.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.CSharp.CodeStyle/4.8.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-2pncXyyEtesl8EzmDfT7lKeOQoiuW+30zy3EozCFb4CMnGGsTe3COoRRCk3tqVk27LfRjCdJv+zK+JTEMmF3lw==",
+      "path": "microsoft.codeanalysis.csharp.codestyle/4.8.0",
+      "hashPath": "microsoft.codeanalysis.csharp.codestyle.4.8.0.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.CSharp.Scripting/4.12.0-3.25467.18": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-VnO2rgEXxpQg5qfqU5SBFjIsQd1/ku+DK2LYUWG2u+BivPG4bPcB1U1V3qOUJgtbzCZk9ramvKmeQJ1T0HSnbQ==",
+      "path": "microsoft.codeanalysis.csharp.scripting/4.12.0-3.25467.18",
+      "hashPath": "microsoft.codeanalysis.csharp.scripting.4.12.0-3.25467.18.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.NetAnalyzers/9.0.0-preview.25173.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-OSvEQbTGZ2exyBZf43DaIxLH+ma4eXn0JSuJoGv4RoTRY4W6fDAuOEM3/7GJag5CXrlgTmMC4QyikclXfdMZTw==",
+      "path": "microsoft.codeanalysis.netanalyzers/9.0.0-preview.25173.3",
+      "hashPath": "microsoft.codeanalysis.netanalyzers.9.0.0-preview.25173.3.nupkg.sha512"
+    },
+    "Microsoft.CodeAnalysis.Scripting.Common/4.12.0-3.25467.18": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-J3w6BKw7N1XWRo1GEyPZn/fIA0Z2VjSc2iAGzNUJ4lfkQQySLZABDFrVQKV5gSs/vluXXTd+6Oea0PqiPkAnHg==",
+      "path": "microsoft.codeanalysis.scripting.common/4.12.0-3.25467.18",
+      "hashPath": "microsoft.codeanalysis.scripting.common.4.12.0-3.25467.18.nupkg.sha512"
+    },
+    "Microsoft.CSharp/4.7.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pTj+D3uJWyN3My70i2Hqo+OXixq3Os2D1nJ2x92FFo6sk8fYS1m1WLNTs0Dc1uPaViH0YvEEwvzddQ7y4rhXmA==",
+      "path": "microsoft.csharp/4.7.0",
+      "hashPath": "microsoft.csharp.4.7.0.nupkg.sha512"
+    },
+    "Microsoft.DotNet.CodeAnalysis/9.0.0-beta.25475.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-38wjPAW84GBUjBe9mIGjkmovTGsIq6orJBtRhd3AWkPAsGYf3C5fw74lMX2vJnSRH0j9Ht5enI/5+j/kyHSvaQ==",
+      "path": "microsoft.dotnet.codeanalysis/9.0.0-beta.25475.3",
+      "hashPath": "microsoft.dotnet.codeanalysis.9.0.0-beta.25475.3.nupkg.sha512"
+    },
+    "Microsoft.DotNet.GenAPI/9.0.0-beta.25475.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Neb0m4DugvJ6J4f1cSL5S0BMGsCDhDjdExkgDirOewXltTZodD/o4MMwpuJ6FqTjf0sguOWcVau/mNWG8AGggA==",
+      "path": "microsoft.dotnet.genapi/9.0.0-beta.25475.3",
+      "hashPath": "microsoft.dotnet.genapi.9.0.0-beta.25475.3.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Configuration/3.1.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-JCVsQYNZNGeLXWMw6tkCZ8Wa2IQKF9AiLKeq9Ff2XvGJTMzhYEHAzF/FvHdeBBhPiOf+Kl1t6mdcHL93kUz6MA==",
+      "path": "microsoft.extensions.configuration/3.1.7",
+      "hashPath": "microsoft.extensions.configuration.3.1.7.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Configuration.Abstractions/3.1.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WJEbrrIgly95D9rM8Gwr4w8sbYla6/iOcCZ0UE7+Qg/Q8NnQJwAJ60Lq1A26zbNE8Fm1fkbGU90LDl8e+BoRSQ==",
+      "path": "microsoft.extensions.configuration.abstractions/3.1.7",
+      "hashPath": "microsoft.extensions.configuration.abstractions.3.1.7.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Configuration.Binder/3.1.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-FYQ64i7DwYO6XDdOFi+VkoRDDzel570I+X/vTYt6mVJWNj1SAstXwZ71P5d6P2Cei+cT950NiScOwj4F8EUeTA==",
+      "path": "microsoft.extensions.configuration.binder/3.1.7",
+      "hashPath": "microsoft.extensions.configuration.binder.3.1.7.nupkg.sha512"
+    },
+    "Microsoft.Extensions.DependencyInjection/3.1.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-yp38AFc5tJQZkjINjXBcxq+dANU06lo27D84duitZthtRPsgKJL87uf9RWRsDdRsWd+kXflmdMWFLKFjyKx6Pw==",
+      "path": "microsoft.extensions.dependencyinjection/3.1.7",
+      "hashPath": "microsoft.extensions.dependencyinjection.3.1.7.nupkg.sha512"
+    },
+    "Microsoft.Extensions.DependencyInjection.Abstractions/3.1.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-oKL2yNtTN1/cOp+cbdyv5TeLzO+GkO9B3fvbcPzKWTNCkDoH3ccYS3FWC1p4KSYe9frW4WsyfSTeM8X+xftOig==",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/3.1.7",
+      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.3.1.7.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Logging/3.1.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-p68Hvr8S+t+bGUeXRX6wcjlkK961w0YRXWy8O6pkTsucdNpnzB8mwLIgcnQ7oj0biw8S1Ftv4PREzPIwo1UwpA==",
+      "path": "microsoft.extensions.logging/3.1.7",
+      "hashPath": "microsoft.extensions.logging.3.1.7.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Logging.Abstractions/3.1.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-oD7LQbMuaqq/yAz8PKX0hl4+H/vDFTQHo8rxbKB36P1/bG8FG7JUVKBoHkSt1MaJUtgyiHrH1AlAhaucKUKyEg==",
+      "path": "microsoft.extensions.logging.abstractions/3.1.7",
+      "hashPath": "microsoft.extensions.logging.abstractions.3.1.7.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Options/3.1.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-O5TXu1D79hbaZuKCIK4mswSP86MtmiIQjuOZnVhPdbjOVILsoQwZUtnmU2xRfX1E0QWuFEI0umhw3mDDn6dNHw==",
+      "path": "microsoft.extensions.options/3.1.7",
+      "hashPath": "microsoft.extensions.options.3.1.7.nupkg.sha512"
+    },
+    "Microsoft.Extensions.Primitives/3.1.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-sa17s3vDAXTuIVGxuJcK713i0B0iaUoiwY4Sl2SLHhMqM8snznn0YVGiZAVkoKEUFWjvIg1Z/JNmAicBamI4mg==",
+      "path": "microsoft.extensions.primitives/3.1.7",
+      "hashPath": "microsoft.extensions.primitives.3.1.7.nupkg.sha512"
+    },
+    "Microsoft.FileFormats/1.0.406601": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-emfnR+MqKLQ3+uZEvUBVtpOVRtW/6WyMz46u4VwyKixWcjOWUSbupMU+LvPMPXsKGPgSuQ50Tb/W2rTdjD77ZQ==",
+      "path": "microsoft.fileformats/1.0.406601",
+      "hashPath": "microsoft.fileformats.1.0.406601.nupkg.sha512"
+    },
+    "Microsoft.Net.Compilers.Toolset/4.12.0-3.25467.18": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7ZBQvFOglAhacmoHQvK4Qq1T00W4GPQ8ueZC2oq8DSV3P/Uia+Ljo6HCch0NYJpEb0EuLjKjYCZ9FFrxCEBdXw==",
+      "path": "microsoft.net.compilers.toolset/4.12.0-3.25467.18",
+      "hashPath": "microsoft.net.compilers.toolset.4.12.0-3.25467.18.nupkg.sha512"
+    },
+    "Microsoft.SymbolStore/1.0.406601": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-CK0E7idkIq91nqo0Y4d0X2Tumukeip6u1k2HAOL3IMihsRUMERsV/E4DT+Kfuw+mgr6h8LyvU53gHZcwwLuuOg==",
+      "path": "microsoft.symbolstore/1.0.406601",
+      "hashPath": "microsoft.symbolstore.1.0.406601.nupkg.sha512"
+    },
+    "Newtonsoft.Json/13.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ==",
+      "path": "newtonsoft.json/13.0.3",
+      "hashPath": "newtonsoft.json.13.0.3.nupkg.sha512"
+    },
+    "StyleCop.Analyzers/1.2.0-beta.507": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/FtugDT66cKJJ+GGH7rNpG6UDrT4iIWz45M6lrXXHobDUFDHw+q5VgkbiR+6ffTO564ge7w6fQh/eoQhVdJO8Q==",
+      "path": "stylecop.analyzers/1.2.0-beta.507",
+      "hashPath": "stylecop.analyzers.1.2.0-beta.507.nupkg.sha512"
+    },
+    "StyleCop.Analyzers.Unstable/1.2.0.507": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-gTY3IQdRqDJ4hbhSA3e/R48oE8b/OiKfvwkt1QdNVfrJK2gMHBV8ldaHJ885jxWZfllK66soa/sdcjh9bX49Tw==",
+      "path": "stylecop.analyzers.unstable/1.2.0.507",
+      "hashPath": "stylecop.analyzers.unstable.1.2.0.507.nupkg.sha512"
+    },
+    "System.Collections.Immutable/8.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-AurL6Y5BA1WotzlEvVaIDpqzpIPvYnnldxru8oXJU2yFxFUy3+pNXjXd1ymO+RA0rq0+590Q8gaz2l3Sr7fmqg==",
+      "path": "system.collections.immutable/8.0.0",
+      "hashPath": "system.collections.immutable.8.0.0.nupkg.sha512"
+    },
+    "System.Reflection.Metadata/8.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ptvgrFh7PvWI8bcVqG5rsA/weWM09EnthFHR5SCnS6IN+P4mj6rE1lBDC4U8HL9/57htKAqy4KQ3bBj84cfYyQ==",
+      "path": "system.reflection.metadata/8.0.0",
+      "hashPath": "system.reflection.metadata.8.0.0.nupkg.sha512"
+    },
+    "BrowserDebugProxy/9.0.10": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.NET.WebAssembly.Webcil/9.0.10-servicing.25475.15": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
