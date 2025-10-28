@@ -1,119 +1,53 @@
 name: Deploy Demo to GitHub Pages
 
-# IMPORTANT: Before this workflow can succeed, you must:
-# 1. Go to Repository Settings → Pages
-# 2. Under "Build and deployment" → "Source"
-# 3. Select "GitHub Actions"
-# Without this configuration, the deployment will fail with a 404 error.
-
 on:
   push:
-    branches: [ "main", "master" ]
-    paths:
-      - 'samples/BlazorFastMarquee.Demo/**'
-      - 'Components/**'
-      - 'wwwroot/**'
-      - '*.cs'
-      - '*.razor'
-      - 'BlazorFastMarquee.csproj'
-      - '.github/workflows/deploy-demo.yml'
+    branches: [ main ]
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment
+# Allow one concurrent deployment
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout repository
+    - name: Checkout
       uses: actions/checkout@v4
-      
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '9.0.x'
-        
+
     - name: Restore dependencies
       run: dotnet restore samples/BlazorFastMarquee.Demo/BlazorFastMarquee.Demo.csproj
-      
-    - name: Build library
-      run: dotnet build BlazorFastMarquee.csproj --configuration Release --no-restore
-      
-    - name: Publish WASM app
+
+    - name: Publish for GitHub Pages
       run: |
-        dotnet publish samples/BlazorFastMarquee.Demo/BlazorFastMarquee.Demo.csproj -c Release -o output
-        echo "✅ Published to: output/wwwroot"
-        ls -la output/wwwroot
-      
-    - name: Update base path for GitHub Pages
-      run: |
-        # Update base href for GitHub Pages (repo name will be the path)
-        REPO_NAME="${GITHUB_REPOSITORY#*/}"
-        echo "📝 Updating base href to /${REPO_NAME}/"
-        sed -i "s|<base href=\"/\" />|<base href=\"/${REPO_NAME}/\" />|g" output/wwwroot/index.html
-        sed -i "s|<base href=\"/\">|<base href=\"/${REPO_NAME}/\">|g" output/wwwroot/index.html
-        echo "✅ Base href updated in index.html"
-        grep "base href" output/wwwroot/index.html
-        echo ""
-        echo "📝 Note: 404.html uses dynamic path detection and doesn't need updating"
-        
-    - name: Verify build output
-      run: |
-        echo "📦 Checking build artifacts..."
-        if [ ! -f "output/wwwroot/index.html" ]; then
-          echo "❌ Error: index.html not found!"
-          exit 1
-        fi
-        if [ ! -f "output/wwwroot/.nojekyll" ]; then
-          echo "⚠️  Warning: .nojekyll not found, creating it..."
-          touch output/wwwroot/.nojekyll
-        fi
-        if [ ! -d "output/wwwroot/_framework" ]; then
-          echo "❌ Error: _framework directory not found!"
-          exit 1
-        fi
-        echo "✅ All required files present"
-        echo ""
-        echo "📊 Build output size:"
-        du -sh output/wwwroot
-        echo ""
-        echo "📁 Directory structure:"
-        find output/wwwroot -type f -name "*.html" -o -name "*.js" -o -name ".nojekyll" | head -20
-      
+        dotnet publish samples/BlazorFastMarquee.Demo/BlazorFastMarquee.Demo.csproj \
+          --configuration Release \
+          -p:BaseHref="/BlazorFastMarquee/"
+
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: output/wwwroot
+        path: 'samples/BlazorFastMarquee.Demo/bin/Release/net9.0/publish/wwwroot'
 
   deploy:
+    needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    
     steps:
-    - name: Setup Pages (info)
-      run: |
-        echo "🚀 Deploying to GitHub Pages..."
-        echo ""
-        echo "ℹ️  If this step fails with a 404 error, it means GitHub Pages is not configured."
-        echo "   Please follow these steps:"
-        echo "   1. Go to https://github.com/${{ github.repository }}/settings/pages"
-        echo "   2. Under 'Build and deployment' → 'Source'"
-        echo "   3. Select 'GitHub Actions'"
-        echo ""
-        
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
