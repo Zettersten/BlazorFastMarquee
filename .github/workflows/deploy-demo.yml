@@ -1,5 +1,11 @@
 name: Deploy Demo to GitHub Pages
 
+# IMPORTANT: Before this workflow can succeed, you must:
+# 1. Go to Repository Settings → Pages
+# 2. Under "Build and deployment" → "Source"
+# 3. Select "GitHub Actions"
+# Without this configuration, the deployment will fail with a 404 error.
+
 on:
   push:
     branches: [ "main", "master" ]
@@ -44,18 +50,43 @@ jobs:
       run: dotnet build BlazorFastMarquee.csproj --configuration Release --no-restore
       
     - name: Publish WASM app
-      run: dotnet publish samples/BlazorFastMarquee.Demo/BlazorFastMarquee.Demo.csproj -c Release -o output
+      run: |
+        dotnet publish samples/BlazorFastMarquee.Demo/BlazorFastMarquee.Demo.csproj -c Release -o output
+        echo "✅ Published to: output/wwwroot"
+        ls -la output/wwwroot
       
     - name: Update base path in index.html
       run: |
         # Update base href for GitHub Pages (repo name will be the path)
         REPO_NAME="${GITHUB_REPOSITORY#*/}"
+        echo "📝 Updating base href to /${REPO_NAME}/"
         sed -i "s|<base href=\"/\" />|<base href=\"/${REPO_NAME}/\" />|g" output/wwwroot/index.html
         sed -i "s|<base href=\"/\">|<base href=\"/${REPO_NAME}/\">|g" output/wwwroot/index.html
-        echo "Updated base href to /${REPO_NAME}/"
+        echo "✅ Base href updated"
+        grep "base href" output/wwwroot/index.html
         
-    - name: Add .nojekyll file
-      run: touch output/wwwroot/.nojekyll
+    - name: Verify build output
+      run: |
+        echo "📦 Checking build artifacts..."
+        if [ ! -f "output/wwwroot/index.html" ]; then
+          echo "❌ Error: index.html not found!"
+          exit 1
+        fi
+        if [ ! -f "output/wwwroot/.nojekyll" ]; then
+          echo "⚠️  Warning: .nojekyll not found, creating it..."
+          touch output/wwwroot/.nojekyll
+        fi
+        if [ ! -d "output/wwwroot/_framework" ]; then
+          echo "❌ Error: _framework directory not found!"
+          exit 1
+        fi
+        echo "✅ All required files present"
+        echo ""
+        echo "📊 Build output size:"
+        du -sh output/wwwroot
+        echo ""
+        echo "📁 Directory structure:"
+        find output/wwwroot -type f -name "*.html" -o -name "*.js" -o -name ".nojekyll" | head -20
       
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
@@ -70,6 +101,17 @@ jobs:
     needs: build
     
     steps:
+    - name: Setup Pages (info)
+      run: |
+        echo "🚀 Deploying to GitHub Pages..."
+        echo ""
+        echo "ℹ️  If this step fails with a 404 error, it means GitHub Pages is not configured."
+        echo "   Please follow these steps:"
+        echo "   1. Go to https://github.com/${{ github.repository }}/settings/pages"
+        echo "   2. Under 'Build and deployment' → 'Source'"
+        echo "   3. Select 'GitHub Actions'"
+        echo ""
+        
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
