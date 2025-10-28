@@ -40,7 +40,12 @@
   </ItemGroup>
   
   <ItemGroup>
-    <!-- Blazor framework references -->
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- Support both Server and WASM Blazor hosting models -->
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <!-- Package references for Blazor components (works with both Server and WASM) -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0" />
   </ItemGroup>
 </Project>
