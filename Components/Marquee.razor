@@ -38,6 +38,81 @@
     </div>
 </div>
 
+<style>
+    .bfm-marquee-container {
+        position: relative;
+        display: flex;
+        overflow: hidden;
+        width: var(--width, 100%);
+        transform: var(--container-transform, none);
+        transform-origin: center;
+     isolation: isolate;
+    }
+
+    .bfm-marquee-container:hover .bfm-marquee {
+        animation-play-state: var(--pause-on-hover, running);
+    }
+
+    .bfm-marquee-container:active .bfm-marquee {
+      animation-play-state: var(--pause-on-click, running);
+    }
+
+    .bfm-marquee {
+  display: flex;
+        align-items: center;
+   flex: 0 0 auto;
+        min-width: var(--min-width, 100%);
+     animation-name: bfm-marquee-scroll;
+        animation-timing-function: linear;
+  animation-duration: var(--duration, 0s);
+        animation-iteration-count: var(--iteration-count, infinite);
+     animation-direction: var(--direction, normal);
+     animation-play-state: var(--play-state, running);
+        animation-delay: var(--delay, 0s);
+        will-change: transform;
+    }
+
+    .bfm-marquee + .bfm-marquee {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .bfm-initial-child-container {
+     display: flex;
+        flex: 0 0 auto;
+        min-width: var(--min-width, 100%);
+    }
+
+    .bfm-child {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        transform: var(--child-transform, none);
+    }
+
+ .bfm-overlay {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+    background: linear-gradient(90deg,
+   var(--gradient-color, white) 0,
+ rgba(255, 255, 255, 0) var(--gradient-width, 200px),
+       rgba(255, 255, 255, 0) calc(100% - var(--gradient-width, 200px)),
+        var(--gradient-color, white) 100%);
+        z-index: 1;
+    }
+
+    @@keyframes bfm-marquee-scroll {
+     0% {
+   transform: translate3d(0, 0, 0);
+ }
+        100% {
+         transform: translate3d(-100%, 0, 0);
+        }
+    }
+</style>
+
 @code {
     #region Constants and Static Fields
 
@@ -68,6 +143,7 @@
     private ElementReference _marqueeAnimationRef;
     private IJSObjectReference? _module;
     private IJSObjectReference? _observer;
+    private IJSObjectReference? _animationHandler;
 
     // Lifecycle tracking
     private bool _isDisposed;
@@ -266,11 +342,11 @@
         // Only render if parameters actually changed
         // This prevents cascade renders from parent components
         var shouldRender =
-            _classInvalidated ||
-            _containerStyleInvalidated ||
-            _gradientStyleInvalidated ||
-            _marqueeStyleInvalidated ||
-            _childStyleInvalidated;
+     _classInvalidated ||
+           _containerStyleInvalidated ||
+              _gradientStyleInvalidated ||
+   _marqueeStyleInvalidated ||
+        _childStyleInvalidated;
 
         return shouldRender;
     }
@@ -293,6 +369,7 @@
                 return;
 
             await EnsureObserverAsync();
+            await EnsureAnimationHandlerAsync();
             await MeasureAsync();
 
             if (firstRender && OnMount.HasDelegate && !_onMountInvoked)
@@ -335,6 +412,50 @@
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Called from JavaScript when animation iteration event occurs
+    /// </summary>
+    [JSInvokable]
+    public Task HandleAnimationIteration()
+    {
+        if (_isDisposed || !OnCycleComplete.HasDelegate)
+            return Task.CompletedTask;
+
+        return InvokeAsync(async () =>
+        {
+            try
+            {
+                await OnCycleComplete.InvokeAsync();
+            }
+            catch (Exception)
+            {
+                // Suppress exceptions from user callbacks to prevent component crash
+            }
+        });
+    }
+
+    /// <summary>
+    /// Called from JavaScript when animation end event occurs
+    /// </summary>
+    [JSInvokable]
+    public Task HandleAnimationEnd()
+    {
+        if (_isDisposed || Loop <= 0 || !OnFinish.HasDelegate)
+            return Task.CompletedTask;
+
+        return InvokeAsync(async () =>
+        {
+            try
+            {
+                await OnFinish.InvokeAsync();
+            }
+            catch (Exception)
+            {
+                // Suppress exceptions from user callbacks to prevent component crash
+            }
+        });
+    }
+
     private async ValueTask<bool> EnsureModuleAsync()
     {
         if (_module is not null || _isDisposed)
@@ -342,7 +463,7 @@
 
         try
         {
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", ModulePath, _cts!.Token);
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", ModulePath);
             return true;
         }
         catch (JSDisconnectedException)
@@ -369,22 +490,47 @@
             if (_observer is null)
             {
                 _observer = await _module.InvokeAsync<IJSObjectReference>(
-                    "observe",
-                    _cts!.Token,
-                    _containerRef,
-                    _marqueeRef,
-                    isVertical,
-                    _dotNetRef);
+                  "observe",
+                       _containerRef,
+                           _marqueeRef,
+                isVertical,
+                   _dotNetRef);
             }
             else
             {
-                await _observer.InvokeVoidAsync("update", _cts!.Token, isVertical);
+                await _observer.InvokeVoidAsync("update", isVertical);
             }
         }
         catch (JSDisconnectedException)
         {
             // Circuit disconnected - cleanup
             _observer = null;
+        }
+        catch (TaskCanceledException)
+        {
+            // Expected during disposal
+        }
+    }
+
+    private async Task EnsureAnimationHandlerAsync()
+    {
+        if (_module is null || _isDisposed)
+            return;
+
+        try
+        {
+            if (_animationHandler is null)
+            {
+                _animationHandler = await _module.InvokeAsync<IJSObjectReference>(
+            "setupAnimationEvents",
+                   _marqueeAnimationRef,
+             _dotNetRef);
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit disconnected - cleanup
+            _animationHandler = null;
         }
         catch (TaskCanceledException)
         {
@@ -401,11 +547,10 @@
         {
             var isVertical = IsVertical(Direction);
             var measurement = await _module.InvokeAsync<MarqueeMeasurement>(
-                "measure",
-                _cts!.Token,
-                _containerRef,
-                _marqueeRef,
-                isVertical);
+                     "measure",
+                 _containerRef,
+            _marqueeRef,
+             isVertical);
 
             if (ApplyLayout(measurement.ContainerSpan, measurement.MarqueeSpan))
             {
@@ -420,40 +565,6 @@
         catch (TaskCanceledException)
         {
             // Expected during disposal
-        }
-    }
-
-    #endregion
-
-    #region Event Handlers
-
-    private async Task HandleIteration()
-    {
-        if (_isDisposed || !OnCycleComplete.HasDelegate)
-            return;
-
-        try
-        {
-            await OnCycleComplete.InvokeAsync();
-        }
-        catch (Exception)
-        {
-            // Suppress exceptions from user callbacks to prevent component crash
-        }
-    }
-
-    private async Task HandleAnimationEnd()
-    {
-        if (_isDisposed || Loop <= 0 || !OnFinish.HasDelegate)
-            return;
-
-        try
-        {
-            await OnFinish.InvokeAsync();
-        }
-        catch (Exception)
-        {
-            // Suppress exceptions from user callbacks to prevent component crash
         }
     }
 
@@ -605,10 +716,10 @@
         }
 
         if (_prevStyle != Style ||
-            _prevPlay != Play ||
-            _prevPauseOnHover != PauseOnHover ||
-            _prevPauseOnClick != PauseOnClick ||
-            _prevDirection != Direction)
+        _prevPlay != Play ||
+     _prevPauseOnHover != PauseOnHover ||
+        _prevPauseOnClick != PauseOnClick ||
+     _prevDirection != Direction)
         {
             _containerStyleInvalidated = true;
             _prevStyle = Style;
@@ -619,7 +730,7 @@
         }
 
         if (_prevGradient != Gradient ||
-            _prevGradientColor != GradientColor ||
+ _prevGradientColor != GradientColor ||
             !_prevGradientWidth.Equals(GradientWidth))
         {
             _gradientStyleInvalidated = true;
@@ -629,11 +740,11 @@
         }
 
         if (_prevPlay != Play ||
-            _prevDirection != Direction ||
-            !AreClose(_prevSpeed, Speed) ||
-            !AreClose(_prevDelay, Delay) ||
-            _prevLoop != Loop ||
-            _prevAutoFill != AutoFill)
+   _prevDirection != Direction ||
+      !AreClose(_prevSpeed, Speed) ||
+       !AreClose(_prevDelay, Delay) ||
+      _prevLoop != Loop ||
+         _prevAutoFill != AutoFill)
         {
             _marqueeStyleInvalidated = true;
             _prevSpeed = Speed;
@@ -700,7 +811,7 @@
     }
 
     private static bool IsVertical(MarqueeDirection direction)
-        => direction is MarqueeDirection.Up or MarqueeDirection.Down;
+           => direction is MarqueeDirection.Up or MarqueeDirection.Down;
 
     private static bool AreClose(double left, double right)
         => Math.Abs(left - right) < 0.1d;
@@ -779,12 +890,48 @@
         _dotNetRef?.Dispose();
 
         // Cleanup JS interop resources
+        await DisposeAnimationHandlerAsync();
         await DisposeObserverAsync();
         await DisposeModuleAsync();
 
         // Dispose cancellation token
         _cts?.Dispose();
         _cts = null;
+    }
+
+    private async ValueTask DisposeAnimationHandlerAsync()
+    {
+        if (_animationHandler is null)
+            return;
+
+        try
+        {
+            await _animationHandler.InvokeVoidAsync("dispose");
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit already disconnected - expected
+        }
+        catch (ObjectDisposedException)
+        {
+            // Already disposed - expected
+        }
+        catch
+        {
+            // Suppress other errors during disposal
+        }
+        finally
+        {
+            try
+            {
+                await _animationHandler.DisposeAsync();
+            }
+            catch
+            {
+                // Suppress disposal errors
+            }
+            _animationHandler = null;
+        }
     }
 
     private async ValueTask DisposeObserverAsync()
