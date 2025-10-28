@@ -1,72 +1,87 @@
 .bfm-marquee-container {
     position: relative;
     display: flex;
+    flex-direction: row;
     overflow: hidden;
     width: var(--width, 100%);
     transform: var(--container-transform, none);
-    transform-origin: center;
-    isolation: isolate;
 }
 
-.bfm-marquee-container:hover .bfm-marquee {
-    animation-play-state: var(--pause-on-hover, running);
-}
+    .bfm-marquee-container:hover .bfm-marquee {
+        animation-play-state: var(--pause-on-hover, running);
+    }
 
-.bfm-marquee-container:active .bfm-marquee {
-    animation-play-state: var(--pause-on-click, running);
-}
-
-.bfm-marquee {
-    display: flex;
-    align-items: center;
-    flex: 0 0 auto;
-    min-width: var(--min-width, 100%);
-    animation-name: bfm-marquee-scroll;
-    animation-timing-function: linear;
-    animation-duration: var(--duration, 0s);
-    animation-iteration-count: var(--iteration-count, infinite);
-    animation-direction: var(--direction, normal);
-    animation-play-state: var(--play-state, running);
-    animation-delay: var(--delay, 0s);
-    will-change: transform;
-}
-
-.bfm-marquee + .bfm-marquee {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.bfm-initial-child-container {
-    display: flex;
-    flex: 0 0 auto;
-    min-width: var(--min-width, 100%);
-}
-
-.bfm-child {
-    display: inline-flex;
-    flex: 0 0 auto;
-    align-items: center;
-    transform: var(--child-transform, none);
-}
+    .bfm-marquee-container:active .bfm-marquee {
+        animation-play-state: var(--pause-on-click, running);
+    }
 
 .bfm-overlay {
     position: absolute;
-    inset: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
-    background: linear-gradient(90deg,
-            var(--gradient-color, white) 0,
-            rgba(255, 255, 255, 0) var(--gradient-width, 200px),
-            rgba(255, 255, 255, 0) calc(100% - var(--gradient-width, 200px)),
-            var(--gradient-color, white) 100%);
-    z-index: 1;
+    z-index: 2;
 }
 
-@keyframes bfm-marquee-scroll {
-    0% {
-        transform: translate3d(0, 0, 0);
+    .bfm-overlay::before,
+    .bfm-overlay::after {
+        content: "";
+        height: 100%;
+        position: absolute;
+        width: var(--gradient-width, 200px);
+        z-index: 2;
+        pointer-events: none;
+        background: linear-gradient(to right, var(--gradient-color, white), rgba(255, 255, 255, 0));
     }
+
+    .bfm-overlay::before {
+        left: 0;
+        top: 0;
+    }
+
+    .bfm-overlay::after {
+        right: 0;
+        top: 0;
+        transform: rotateZ(180deg);
+    }
+
+.bfm-marquee {
+    flex: 0 0 auto;
+    min-width: var(--min-width, 100%);
+    z-index: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    animation: bfm-scroll var(--duration, 0s) linear var(--delay, 0s) var(--iteration-count, infinite);
+    animation-play-state: var(--play-state, running);
+    animation-direction: var(--direction, normal);
+    will-change: transform;
+}
+
+    .bfm-marquee:nth-child(2) {
+        position: absolute;
+        top: 0;
+        animation-delay: calc(var(--duration, 0s) / -2);
+    }
+
+.bfm-initial-child-container {
+    flex: 0 0 auto;
+    display: flex;
+    min-width: auto;
+    flex-direction: row;
+    align-items: center;
+}
+
+.bfm-child {
+    transform: var(--child-transform, none);
+}
+
+@keyframes bfm-scroll {
+    0% {
+        transform: translateX(0%);
+    }
+
     100% {
-        transform: translate3d(-100%, 0, 0);
+        transform: translateX(-100%);
     }
 }
