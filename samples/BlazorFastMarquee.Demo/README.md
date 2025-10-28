@@ -4,17 +4,34 @@ A comprehensive showcase application demonstrating all the capabilities of the B
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### View Live Demo
+
+The demo is automatically deployed to GitHub Pages: **[View Live Demo](https://Zettersten.github.io/BlazorFastMarquee/)**
+
+### Running Locally
+
+**Prerequisites:**
 - .NET 9.0 SDK or later
 
-### Running the Demo
-
+**Steps:**
 ```bash
 cd samples/BlazorFastMarquee.Demo
 dotnet run
 ```
 
 Then open your browser to `https://localhost:5001` (or the URL shown in the console).
+
+### Deploying to GitHub Pages
+
+**⚠️ Important:** Before the GitHub Actions workflow can deploy successfully, GitHub Pages must be configured:
+
+1. Go to **Repository Settings → Pages**
+2. Under "Build and deployment" → "Source"
+3. Select **"GitHub Actions"**
+
+For detailed setup instructions, see [`.github/PAGES_SETUP.md`](../../.github/PAGES_SETUP.md)
+
+The demo automatically deploys to GitHub Pages on every push to `main` that affects the demo or component files.
 
 ## 📑 Pages Overview
 
