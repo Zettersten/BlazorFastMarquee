@@ -518,7 +518,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     {
         var builder = GetStringBuilder(256);
 
-        // Use pre-allocated strings to avoid allocations
+        // Use CSS variable names that match React Fast Marquee
         var pauseOnHover = (!Play || PauseOnHover) ? AnimationPaused : AnimationRunning;
         var pauseOnClick =
             (!Play || PauseOnClick || (PauseOnHover && !PauseOnClick))
@@ -530,7 +530,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
         AppendCssVariable(builder, "pause-on-hover", pauseOnHover);
         AppendCssVariable(builder, "pause-on-click", pauseOnClick);
         AppendCssVariable(builder, "width", width);
-        AppendCssVariable(builder, "container-transform", transform);
+        AppendCssVariable(builder, "transform", transform);
         AppendRawStyle(builder, Style);
         AppendRawStyle(builder, _additionalStyle);
 
@@ -554,7 +554,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     {
         var builder = GetStringBuilder(256);
 
-        // Use pre-allocated strings
+        // Use CSS variable names that match React Fast Marquee
         var playState = Play ? AnimationRunning : AnimationPaused;
         var direction =
             (Direction is MarqueeDirection.Left or MarqueeDirection.Up)
@@ -564,7 +564,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
         var iterationCount =
             Loop > 0 ? Loop.ToString(CultureInfo.InvariantCulture) : IterationInfinite;
 
-        AppendCssVariable(builder, "play-state", playState);
+        AppendCssVariable(builder, "play", playState);
         AppendCssVariable(builder, "direction", direction);
         AppendCssVariableNumber(builder, "duration", GetDuration());
         AppendCssVariableNumber(builder, "delay", Math.Max(0, Delay));
@@ -579,7 +579,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
         var builder = GetStringBuilder(64);
         var transform = GetChildTransform(Direction);
 
-        AppendCssVariable(builder, "child-transform", transform);
+        AppendCssVariable(builder, "transform", transform);
 
         return builder.ToString();
     }
