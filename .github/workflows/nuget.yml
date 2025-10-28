@@ -39,25 +39,33 @@ jobs:
     - name: Build library (Release)
       run: dotnet build BlazorFastMarquee.csproj --configuration Release --no-restore
       
+    - name: Restore test dependencies
+      run: dotnet restore tests/BlazorFastMarquee.Tests/BlazorFastMarquee.Tests.csproj
+      
+    - name: Build tests
+      run: dotnet build tests/BlazorFastMarquee.Tests/BlazorFastMarquee.Tests.csproj --configuration Release --no-restore
+      
     - name: Run tests
       run: dotnet test tests/BlazorFastMarquee.Tests/BlazorFastMarquee.Tests.csproj --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
       
     - name: Publish test results
       uses: dorny/test-reporter@v1
-      if: always()
+      if: success() || failure()
       with:
         name: Test Results
         path: '**/test-results.trx'
         reporter: dotnet-trx
         fail-on-error: true
+        fail-on-empty: true
         
     - name: Upload test results artifact
-      if: always()
+      if: success() || failure()
       uses: actions/upload-artifact@v4
       with:
         name: test-results
         path: '**/test-results.trx'
         retention-days: 30
+        if-no-files-found: warn
 
   package:
     name: Pack NuGet Package
