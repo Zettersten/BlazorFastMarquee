@@ -10,7 +10,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
   #region Constants and Static Fields
 
   private static readonly string ModulePath =
-    $"./_content/{typeof(Marquee).Assembly.GetName().Name}/js/marquee.js";
+    $"./_content/{typeof(Marquee).Assembly.GetName().Name}/Components/{nameof(Marquee)}.razor.js";
 
   private static readonly string BaseClassName = "bfm-marquee-container";
 
