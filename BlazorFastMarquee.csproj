@@ -26,4 +26,26 @@
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <!-- Exclude test files from main project -->
+    <Compile Remove="tests/**/*.cs" />
+    <Content Remove="tests/**/*" />
+    <None Remove="tests/**/*" />
+    
+    <!-- Exclude sample/demo files from main project -->
+    <Compile Remove="samples/**/*.cs" />
+    <Content Remove="samples/**/*" />
+    <None Remove="samples/**/*" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <!-- Support both Server and WASM Blazor hosting models -->
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <!-- Package references for Blazor components (works with both Server and WASM) -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0" />
+  </ItemGroup>
 </Project>

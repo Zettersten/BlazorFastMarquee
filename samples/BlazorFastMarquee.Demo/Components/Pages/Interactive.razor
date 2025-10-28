@@ -1,0 +1,329 @@
+@page "/interactive"
+@using BlazorFastMarquee
+
+<PageTitle>Interactive - BlazorFastMarquee Demo</PageTitle>
+
+<h1>👆 Interactive Controls</h1>
+<p class="page-subtitle">Pause on hover, click, or control playback dynamically</p>
+
+<section class="demo-section">
+    <h2>Pause on Hover</h2>
+    <p>Hover over the marquee to pause the animation</p>
+    
+    <div class="demo-container hover-indicator">
+        <Marquee Speed="50" PauseOnHover="true" Gradient="true">
+            <div class="interactive-content">
+                <span class="interactive-item">🖱️ Hover to Pause</span>
+                <span class="interactive-item">⏸️ Mouse Over Me</span>
+                <span class="interactive-item">🎯 Try It!</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee PauseOnHover="true"&gt;
+    &lt;!-- Pauses when mouse hovers --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Pause on Click</h2>
+    <p>Click the marquee to pause, click again to resume</p>
+    
+    <div class="demo-container click-indicator">
+        <Marquee Speed="50" PauseOnClick="true" Gradient="true">
+            <div class="interactive-content">
+                <span class="interactive-item interactive-click">👆 Click to Pause</span>
+                <span class="interactive-item interactive-click">⏯️ Click Again to Resume</span>
+                <span class="interactive-item interactive-click">🎮 Interactive!</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee PauseOnClick="true"&gt;
+    &lt;!-- Pauses/resumes on click --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Both Hover and Click</h2>
+    <p>Combine both pause behaviors for maximum control</p>
+    
+    <div class="demo-container both-indicator">
+        <Marquee Speed="50" PauseOnHover="true" PauseOnClick="true" Gradient="true">
+            <div class="interactive-content">
+                <span class="interactive-item interactive-both">🖱️ Hover OR Click</span>
+                <span class="interactive-item interactive-both">⏸️ Maximum Control</span>
+                <span class="interactive-item interactive-both">🎯 User Friendly</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee PauseOnHover="true" PauseOnClick="true"&gt;
+    &lt;!-- Pauses on hover OR click --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Programmatic Control</h2>
+    <p>Control playback state with buttons</p>
+    
+    <div class="control-panel">
+        <button class="control-btn" @onclick="Play">▶️ Play</button>
+        <button class="control-btn" @onclick="Pause">⏸️ Pause</button>
+    </div>
+    
+    <div class="demo-container">
+        <Marquee Speed="50" Play="@_isPlaying" Gradient="true">
+            <div class="interactive-content">
+                <span class="interactive-item interactive-controlled">@(_isPlaying ? "▶️ Playing" : "⏸️ Paused")</span>
+                <span class="interactive-item interactive-controlled">🎮 Button Controlled</span>
+                <span class="interactive-item interactive-controlled">⚡ Programmatic</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>@@code {
+    private bool _isPlaying = true;
+}
+
+&lt;button @@onclick="() => _isPlaying = !_isPlaying"&gt;
+    Toggle
+&lt;/button&gt;
+
+&lt;Marquee Play="@@_isPlaying"&gt;
+    &lt;!-- Controlled by Play parameter --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Speed Control</h2>
+    <p>Dynamically change speed with controls</p>
+    
+    <div class="speed-control-panel">
+        <label>Speed: @_speed px/s</label>
+        <input type="range" min="10" max="200" step="10" @bind="_speed" @bind:event="oninput" class="speed-slider" />
+        <div class="speed-markers">
+            <span>Slow</span>
+            <span>Normal</span>
+            <span>Fast</span>
+        </div>
+    </div>
+    
+    <div class="demo-container">
+        <Marquee Speed="@_speed" Gradient="true">
+            <div class="interactive-content">
+                <span class="interactive-item interactive-speed">⚡ Speed: @_speed</span>
+                <span class="interactive-item interactive-speed">🎚️ Adjustable</span>
+                <span class="interactive-item interactive-speed">🔧 Dynamic</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>@@code {
+    private double _speed = 50;
+}
+
+&lt;input type="range" @@bind="_speed" /&gt;
+
+&lt;Marquee Speed="@@_speed"&gt;
+    &lt;!-- Speed changes dynamically --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="info-box">
+    <h3>💡 Interactive Use Cases</h3>
+    <div class="use-cases">
+        <div class="use-case">
+            <strong>📰 News Ticker:</strong> Users can pause to read details
+        </div>
+        <div class="use-case">
+            <strong>🖼️ Image Gallery:</strong> Pause to examine images
+        </div>
+        <div class="use-case">
+            <strong>💬 Testimonials:</strong> Read reviews at own pace
+        </div>
+        <div class="use-case">
+            <strong>🏢 Logo Showcase:</strong> Click to visit company website
+        </div>
+    </div>
+</section>
+
+@code {
+    private bool _isPlaying = true;
+    private double _speed = 50;
+    
+    private void Play() => _isPlaying = true;
+    private void Pause() => _isPlaying = false;
+}
+
+<style>
+    .interactive-content {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .interactive-item {
+        font-size: 1.25rem;
+        font-weight: 600;
+        padding: 1rem 2rem;
+        color: white;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .interactive-click {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        cursor: pointer;
+    }
+    
+    .interactive-both {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        cursor: pointer;
+    }
+    
+    .interactive-controlled {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .interactive-speed {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .hover-indicator {
+        position: relative;
+    }
+    
+    .hover-indicator::before {
+        content: "👆 Try hovering!";
+        position: absolute;
+        top: -2rem;
+        right: 1rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 600;
+    }
+    
+    .control-panel {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        justify-content: center;
+    }
+    
+    .control-btn {
+        padding: 0.75rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .control-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .control-btn:active {
+        transform: translateY(0);
+    }
+    
+    .speed-control-panel {
+        background: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .speed-control-panel label {
+        display: block;
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin-bottom: 1rem;
+        color: #1f2937;
+    }
+    
+    .speed-slider {
+        width: 100%;
+        height: 8px;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        outline: none;
+        appearance: none;
+    }
+    
+    .speed-slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #667eea;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .speed-slider::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #667eea;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .speed-markers {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 3rem 0;
+    }
+    
+    .info-box h3 {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.5rem;
+    }
+    
+    .use-cases {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .use-case {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        line-height: 1.6;
+    }
+    
+    .use-case strong {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+</style>

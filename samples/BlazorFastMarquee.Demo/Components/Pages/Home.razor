@@ -1,0 +1,350 @@
+@page "/"
+@using BlazorFastMarquee
+
+<PageTitle>Home - BlazorFastMarquee Demo</PageTitle>
+
+<div class="hero">
+    <h1>⚡ BlazorFastMarquee</h1>
+    <p class="tagline">High-performance, zero-allocation marquee component for Blazor</p>
+    
+    <div class="hero-marquee">
+        <Marquee Speed="80" Gradient="true" GradientColor="#6366f1">
+            <div class="hero-items">
+                <span class="hero-item">🚀 Zero Allocation</span>
+                <span class="hero-item">⚡ Lightning Fast</span>
+                <span class="hero-item">🎨 Fully Customizable</span>
+                <span class="hero-item">📱 Responsive</span>
+                <span class="hero-item">♿ Accessible</span>
+                <span class="hero-item">🌐 SSR Compatible</span>
+            </div>
+        </Marquee>
+    </div>
+</div>
+
+<section class="features">
+    <h2>Key Features</h2>
+    
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>High Performance</h3>
+            <p>CSS-based animations with GPU acceleration. Zero JavaScript overhead during animation.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Zero Allocation</h3>
+            <p>Aggressively optimized for minimal memory allocations. ~95% reduction in GC pressure.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>Fully Customizable</h3>
+            <p>Control speed, direction, gradients, and behavior. Style with CSS as you wish.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🌐</div>
+            <h3>Platform Compatible</h3>
+            <p>Works seamlessly with SSR, Blazor Server, and WebAssembly.</p>
+        </div>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Basic Example</h2>
+    <p>The simplest marquee - just add content and go!</p>
+    
+    <div class="demo-container">
+        <Marquee>
+            <div class="basic-content">
+                <span>🎉 Welcome to BlazorFastMarquee!</span>
+                <span>✨ Creating beautiful scrolling content has never been easier!</span>
+                <span>🚀 Get started in seconds!</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee&gt;
+    &lt;div class="basic-content"&gt;
+        &lt;span&gt;🎉 Welcome to BlazorFastMarquee!&lt;/span&gt;
+        &lt;span&gt;✨ Creating beautiful scrolling content...&lt;/span&gt;
+        &lt;span&gt;🚀 Get started in seconds!&lt;/span&gt;
+    &lt;/div&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>With Gradient Overlay</h2>
+    <p>Add smooth edge fading for a professional look</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="60" Gradient="true" GradientColor="#ffffff">
+            <div class="gradient-content">
+                <div class="gradient-item">🌟 Seamless</div>
+                <div class="gradient-item">💎 Professional</div>
+                <div class="gradient-item">🎨 Beautiful</div>
+                <div class="gradient-item">✨ Elegant</div>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Speed="60" Gradient="true" GradientColor="#ffffff"&gt;
+    &lt;!-- Your content --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>AutoFill Mode</h2>
+    <p>Automatically duplicates content to fill the container</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="40" AutoFill="true" Gradient="true">
+            <div class="autofill-content">
+                <div class="logo-item">ACME</div>
+                <div class="logo-item">TechCo</div>
+                <div class="logo-item">Innovate</div>
+                <div class="logo-item">Digital</div>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Speed="40" AutoFill="true" Gradient="true"&gt;
+    &lt;!-- Content automatically duplicated --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="cta">
+    <h2>Ready to Get Started?</h2>
+    <p>Explore the examples in the sidebar to see all the amazing features!</p>
+    
+    <div class="cta-buttons">
+        <a href="/directions" class="btn btn-primary">View Examples</a>
+        <a href="https://github.com/example/BlazorFastMarquee" class="btn btn-secondary">Documentation</a>
+    </div>
+</section>
+
+<style>
+    .hero {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 1rem;
+        margin-bottom: 3rem;
+    }
+    
+    .hero h1 {
+        font-size: 3.5rem;
+        margin: 0 0 1rem 0;
+        font-weight: 800;
+    }
+    
+    .tagline {
+        font-size: 1.25rem;
+        opacity: 0.95;
+        margin-bottom: 2rem;
+    }
+    
+    .hero-marquee {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .hero-items {
+        display: flex;
+        gap: 3rem;
+    }
+    
+    .hero-item {
+        font-size: 1.25rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .features {
+        margin: 4rem 0;
+    }
+    
+    .features h2 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .feature-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-card h3 {
+        font-size: 1.5rem;
+        margin: 0 0 0.5rem 0;
+        color: #1f2937;
+    }
+    
+    .feature-card p {
+        color: #6b7280;
+        line-height: 1.6;
+    }
+    
+    .demo-section {
+        margin: 4rem 0;
+        padding: 2rem;
+        background: #f9fafb;
+        border-radius: 1rem;
+    }
+    
+    .demo-section h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .demo-section > p {
+        color: #6b7280;
+        margin-bottom: 2rem;
+    }
+    
+    .demo-container {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 2rem;
+        margin: 2rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .basic-content {
+        display: flex;
+        gap: 3rem;
+        font-size: 1.25rem;
+    }
+    
+    .basic-content span {
+        white-space: nowrap;
+    }
+    
+    .gradient-content {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .gradient-item {
+        font-size: 1.5rem;
+        font-weight: 600;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .autofill-content {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .logo-item {
+        font-size: 1.5rem;
+        font-weight: 700;
+        padding: 1.5rem 3rem;
+        background: #1f2937;
+        color: white;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .code-block {
+        background: #1f2937;
+        color: #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        overflow-x: auto;
+    }
+    
+    .code-block pre {
+        margin: 0;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+    
+    .cta {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border-radius: 1rem;
+        margin: 4rem 0;
+    }
+    
+    .cta h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .cta p {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+    }
+    
+    .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        display: inline-block;
+        padding: 1rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-primary {
+        background: white;
+        color: #f5576c;
+    }
+    
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid white;
+    }
+</style>

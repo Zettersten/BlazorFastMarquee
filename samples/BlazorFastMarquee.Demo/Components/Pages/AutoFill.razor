@@ -1,0 +1,260 @@
+@page "/autofill"
+@using BlazorFastMarquee
+
+<PageTitle>AutoFill - BlazorFastMarquee Demo</PageTitle>
+
+<h1>📐 AutoFill Mode</h1>
+<p class="page-subtitle">Automatically duplicate content to fill the container width</p>
+
+<section class="demo-section">
+    <h2>Without AutoFill</h2>
+    <p>Content scrolls with gaps when smaller than container</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="50" AutoFill="false">
+            <div class="autofill-content">
+                <span class="autofill-item">Item 1</span>
+                <span class="autofill-item">Item 2</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee AutoFill="false"&gt;
+    &lt;!-- May show gaps if content is small --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>With AutoFill</h2>
+    <p>Content automatically duplicated to fill entire width</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="50" AutoFill="true" Gradient="true">
+            <div class="autofill-content">
+                <span class="autofill-item autofill-active">Item 1</span>
+                <span class="autofill-item autofill-active">Item 2</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee AutoFill="true"&gt;
+    &lt;!-- Content duplicated automatically --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Logo Showcase (AutoFill)</h2>
+    <p>Perfect for displaying logos that automatically fill the space</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="40" AutoFill="true" Gradient="true" GradientColor="#ffffff">
+            <div class="logo-showcase">
+                <div class="logo-box">
+                    <span class="logo-text">ACME Inc</span>
+                </div>
+                <div class="logo-box">
+                    <span class="logo-text">TechCorp</span>
+                </div>
+                <div class="logo-box">
+                    <span class="logo-text">Innovate</span>
+                </div>
+                <div class="logo-box">
+                    <span class="logo-text">Digital+</span>
+                </div>
+            </div>
+        </Marquee>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Single Item AutoFill</h2>
+    <p>Even a single item gets duplicated to fill the space</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="60" AutoFill="true" Gradient="true">
+            <div class="single-item-content">
+                <div class="single-item">
+                    ⭐ This single item is duplicated many times! ⭐
+                </div>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee AutoFill="true"&gt;
+    &lt;div&gt;Single item gets duplicated&lt;/div&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Responsive Behavior</h2>
+    <p>AutoFill automatically adjusts to container size changes</p>
+    
+    <div class="responsive-demo">
+        <div class="responsive-container" style="width: 100%;">
+            <Marquee Speed="50" AutoFill="true" Gradient="true" GradientColor="#f9fafb">
+                <div class="responsive-content">
+                    <span class="responsive-item">📱</span>
+                    <span class="responsive-item">💻</span>
+                    <span class="responsive-item">🖥️</span>
+                </div>
+            </Marquee>
+        </div>
+        
+        <div class="responsive-container" style="width: 75%;">
+            <Marquee Speed="50" AutoFill="true" Gradient="true" GradientColor="#f9fafb">
+                <div class="responsive-content">
+                    <span class="responsive-item">📱</span>
+                    <span class="responsive-item">💻</span>
+                    <span class="responsive-item">🖥️</span>
+                </div>
+            </Marquee>
+        </div>
+        
+        <div class="responsive-container" style="width: 50%;">
+            <Marquee Speed="50" AutoFill="true" Gradient="true" GradientColor="#f9fafb">
+                <div class="responsive-content">
+                    <span class="responsive-item">📱</span>
+                    <span class="responsive-item">💻</span>
+                    <span class="responsive-item">🖥️</span>
+                </div>
+            </Marquee>
+        </div>
+    </div>
+</section>
+
+<section class="info-box">
+    <h3>💡 How It Works</h3>
+    <p>AutoFill calculates how many copies are needed to fill the container width and automatically duplicates your content. It even responds to window resizing in real-time!</p>
+    
+    <div class="feature-list">
+        <div class="feature-item">✅ No gaps in scrolling</div>
+        <div class="feature-item">✅ Responsive to container size</div>
+        <div class="feature-item">✅ Works with any content</div>
+        <div class="feature-item">✅ Zero configuration needed</div>
+    </div>
+</section>
+
+<style>
+    .autofill-content {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .autofill-item {
+        font-size: 1.25rem;
+        font-weight: 600;
+        padding: 1.5rem 3rem;
+        background: #e5e7eb;
+        color: #1f2937;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .autofill-active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .logo-showcase {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .logo-box {
+        width: 180px;
+        height: 100px;
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .logo-text {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+    
+    .single-item-content {
+        display: flex;
+    }
+    
+    .single-item {
+        font-size: 1.5rem;
+        font-weight: 600;
+        padding: 1.5rem 3rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .responsive-demo {
+        background: #f9fafb;
+        padding: 2rem;
+        border-radius: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .responsive-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .responsive-content {
+        display: flex;
+        gap: 1.5rem;
+    }
+    
+    .responsive-item {
+        font-size: 2.5rem;
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 0.5rem;
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 3rem 0;
+    }
+    
+    .info-box h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.5rem;
+    }
+    
+    .info-box p {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.125rem;
+        opacity: 0.95;
+    }
+    
+    .feature-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .feature-item {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+    }
+</style>
