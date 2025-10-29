@@ -278,8 +278,6 @@ function createDragHandler(container, marqueeElement, vertical) {
     isDragging: false,
     startX: 0,
     startY: 0,
-    currentX: 0,
-    currentY: 0,
     dragOffset: 0,
     persistentOffset: 0, // Cumulative offset that persists between drags
     pointerDownHandler: null,
@@ -357,7 +355,7 @@ function createDragHandler(container, marqueeElement, vertical) {
   state.pointerDownHandler = (e) => {
     if (state.disposed) return;
 
-    console.log('Pointer down event triggered');
+    console.log('Pointer down event triggered, vertical:', state.vertical);
 
     // Support both mouse and touch events
     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
@@ -366,8 +364,20 @@ function createDragHandler(container, marqueeElement, vertical) {
     console.log('Start position:', { clientX, clientY });
 
     state.isDragging = true;
-    state.startX = clientX - state.currentX;
-    state.startY = clientY - state.currentY;
+    
+    // For vertical marquees, the container is rotated
+    // So we need to swap X and Y coordinates
+    if (state.vertical) {
+      // Vertical marquee: user drags up/down, which is X in rotated space
+      state.startY = clientY - state.persistentOffset;
+      state.startX = clientX;
+    } else {
+      // Horizontal marquee: user drags left/right
+      state.startX = clientX - state.persistentOffset;
+      state.startY = clientY;
+    }
+
+    console.log('Start offsets set:', { startX: state.startX, startY: state.startY, persistentOffset: state.persistentOffset });
 
     pauseAnimation();
 
@@ -392,13 +402,13 @@ function createDragHandler(container, marqueeElement, vertical) {
     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
 
     if (state.vertical) {
-      state.currentY = clientY - state.startY;
-      state.dragOffset = state.currentY;
-      console.log('Vertical drag - Y offset:', state.dragOffset);
+      // For vertical marquees: Y movement on screen
+      state.dragOffset = clientY - state.startY;
+      console.log('Vertical drag - Y offset:', state.dragOffset, 'clientY:', clientY, 'startY:', state.startY);
     } else {
-      state.currentX = clientX - state.startX;
-      state.dragOffset = state.currentX;
-      console.log('Horizontal drag - X offset:', state.dragOffset);
+      // For horizontal marquees: X movement on screen
+      state.dragOffset = clientX - state.startX;
+      console.log('Horizontal drag - X offset:', state.dragOffset, 'clientX:', clientX, 'startX:', state.startX);
     }
 
     applyDragTransform();
@@ -422,9 +432,9 @@ function createDragHandler(container, marqueeElement, vertical) {
     console.log('New persistent offset:', state.persistentOffset);
 
     // Reset current drag state
-    state.currentX = 0;
-    state.currentY = 0;
     state.dragOffset = 0;
+    state.startX = 0;
+    state.startY = 0;
 
     // Remove inline transform (applied during drag)
     state.marqueeElements.forEach(el => {
