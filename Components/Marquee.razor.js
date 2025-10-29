@@ -253,7 +253,7 @@ export function setupAnimationEvents(marqueeElement, dotnetRef) {
 
 /**
  * Creates a drag handler for pan/drag functionality.
- * CSS-first approach: Update CSS variables, let animation handle positioning.
+ * Scrubs through the animation timeline based on drag movement.
  * @param {HTMLElement} container - Container element
  * @param {HTMLElement} marqueeElement - First marquee element (used for reference)
  * @param {boolean} vertical - Whether to enable vertical dragging
@@ -273,22 +273,21 @@ function createDragHandler(container, marqueeElement, vertical) {
     vertical: Boolean(vertical),
     disposed: false,
     isDragging: false,
-    dragStartX: 0,
-    dragStartY: 0,
-    dragOffsetPercent: 0, // Current drag offset as percentage of marquee size
+    lastX: 0,
+    lastY: 0,
     pointerDownHandler: null,
     pointerMoveHandler: null,
     pointerUpHandler: null,
     pointerCancelHandler: null
   };
 
-  // Get marquee dimensions for calculating percentage
+  // Get marquee width/height for percentage calculations
   const getMarqueeSize = () => {
     if (state.marqueeElements.length > 0) {
       const rect = state.marqueeElements[0].getBoundingClientRect();
       return state.vertical ? rect.height : rect.width;
     }
-    return 0;
+    return 1; // Avoid division by zero
   };
 
   // Handle pointer down (mouse/touch start)
@@ -299,8 +298,13 @@ function createDragHandler(container, marqueeElement, vertical) {
     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
 
     state.isDragging = true;
-    state.dragStartX = clientX;
-    state.dragStartY = clientY;
+    state.lastX = clientX;
+    state.lastY = clientY;
+
+    // Pause animation during drag so we can scrub through it manually
+    state.marqueeElements.forEach(el => {
+      el.style.animationPlayState = 'paused';
+    });
 
     state.container.style.cursor = 'grabbing';
     state.container.style.userSelect = 'none';
@@ -314,21 +318,42 @@ function createDragHandler(container, marqueeElement, vertical) {
     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
 
-    // How far we've dragged in pixels
-    const dragPixels = state.vertical 
-      ? (clientY - state.dragStartY)
-      : (clientX - state.dragStartX);
+    // Calculate movement delta
+    const deltaX = clientX - state.lastX;
+    const deltaY = clientY - state.lastY;
+    const delta = state.vertical ? deltaY : deltaX;
 
-    // Convert pixels to percentage of marquee size
+    state.lastX = clientX;
+    state.lastY = clientY;
+
+    // Convert delta to percentage of marquee size
     const marqueeSize = getMarqueeSize();
-    if (marqueeSize > 0) {
-      // Calculate percentage and wrap it within -100% to 100%
-      let percent = (dragPixels / marqueeSize) * 100;
-      percent = percent % 100;
-      
-      state.dragOffsetPercent = percent;
-      state.container.style.setProperty('--drag-offset-percent', `${percent}`);
-    }
+    const percentChange = (delta / marqueeSize) * 100;
+
+    // Scrub through the animation by adjusting each element's animation progress
+    state.marqueeElements.forEach(el => {
+      // Get current animation state
+      const animations = el.getAnimations();
+      if (animations.length > 0) {
+        const anim = animations[0];
+        const duration = anim.effect.getTiming().duration;
+        
+        // Current time in the animation (milliseconds)
+        let currentTime = anim.currentTime || 0;
+        
+        // Adjust current time based on drag
+        // Dragging right/down (positive delta) = rewind (go backwards in time)
+        // Dragging left/up (negative delta) = advance (go forwards in time)
+        currentTime -= (percentChange / 100) * duration;
+        
+        // Wrap around the animation duration
+        if (duration > 0) {
+          currentTime = ((currentTime % duration) + duration) % duration;
+        }
+        
+        anim.currentTime = currentTime;
+      }
+    });
 
     e.preventDefault();
   };
@@ -341,8 +366,10 @@ function createDragHandler(container, marqueeElement, vertical) {
     state.container.style.cursor = 'grab';
     state.container.style.userSelect = '';
 
-    // Keep the drag offset - animation continues from the new position
-    // Using negative animation-delay with the percentage offset
+    // Resume animation from wherever we scrubbed to
+    state.marqueeElements.forEach(el => {
+      el.style.animationPlayState = '';
+    });
   };
 
   // Handle pointer cancel (touch cancel)
@@ -392,8 +419,6 @@ function createDragHandler(container, marqueeElement, vertical) {
         state.container.style.userSelect = '';
       }
 
-      // Clean up CSS variables from container
-      state.container.style.removeProperty('--drag-offset-percent');
 
       // Remove event listeners
       if (state.container && state.pointerDownHandler) {
