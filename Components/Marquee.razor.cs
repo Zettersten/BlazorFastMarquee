@@ -41,6 +41,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
   private IJSObjectReference? _module;
   private IJSObjectReference? _observer;
   private IJSObjectReference? _animationHandler;
+  private IJSObjectReference? _dragHandler;
 
   // Lifecycle tracking
   private bool _isDisposed;
@@ -84,6 +85,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
   private bool _prevPlay;
   private bool _prevPauseOnHover;
   private bool _prevPauseOnClick;
+  private bool _prevEnableDrag;
   private MarqueeDirection _prevDirection;
   private double _prevSpeed;
   private double _prevDelay;
@@ -132,6 +134,10 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
   /// <summary>Pauses animation on click.</summary>
   [Parameter]
   public bool PauseOnClick { get; set; }
+
+  /// <summary>Enables drag to pan the marquee (respects direction).</summary>
+  [Parameter]
+  public bool EnableDrag { get; set; }
 
   /// <summary>Direction of marquee animation.</summary>
   [Parameter]
@@ -291,6 +297,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
 
       await EnsureObserverAsync();
       await EnsureAnimationHandlerAsync();
+      await EnsureDragHandlerAsync();
       await MeasureAsync();
 
       if (firstRender && OnMount.HasDelegate && !_onMountInvoked)
@@ -454,6 +461,44 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     {
       // Circuit disconnected - cleanup
       _animationHandler = null;
+    }
+    catch (TaskCanceledException)
+    {
+      // Expected during disposal
+    }
+  }
+
+  private async Task EnsureDragHandlerAsync()
+  {
+    if (_module is null || _isDisposed)
+      return;
+
+    var isVertical = IsVertical(Direction);
+
+    try
+    {
+      if (_dragHandler is null && EnableDrag)
+      {
+        _dragHandler = await _module.InvokeAsync<IJSObjectReference>(
+          "setupDragHandler",
+          _containerRef,
+          _marqueeAnimationRef,
+          isVertical
+        );
+      }
+      else if (_dragHandler is not null && EnableDrag)
+      {
+        await _dragHandler.InvokeVoidAsync("update", isVertical);
+      }
+      else if (_dragHandler is not null && !EnableDrag)
+      {
+        await DisposeDragHandlerAsync();
+      }
+    }
+    catch (JSDisconnectedException)
+    {
+      // Circuit disconnected - cleanup
+      _dragHandler = null;
     }
     catch (TaskCanceledException)
     {
@@ -661,6 +706,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
       || _prevPlay != Play
       || _prevPauseOnHover != PauseOnHover
       || _prevPauseOnClick != PauseOnClick
+      || _prevEnableDrag != EnableDrag
       || _prevDirection != Direction
     )
     {
@@ -669,6 +715,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
       _prevPlay = Play;
       _prevPauseOnHover = PauseOnHover;
       _prevPauseOnClick = PauseOnClick;
+      _prevEnableDrag = EnableDrag;
       _prevDirection = Direction;
     }
 
@@ -840,6 +887,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     _dotNetRef?.Dispose();
 
     // Cleanup JS interop resources
+    await DisposeDragHandlerAsync();
     await DisposeAnimationHandlerAsync();
     await DisposeObserverAsync();
     await DisposeModuleAsync();
@@ -847,6 +895,41 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     // Dispose cancellation token
     _cts?.Dispose();
     _cts = null;
+  }
+
+  private async ValueTask DisposeDragHandlerAsync()
+  {
+    if (_dragHandler is null)
+      return;
+
+    try
+    {
+      await _dragHandler.InvokeVoidAsync("dispose");
+    }
+    catch (JSDisconnectedException)
+    {
+      // Circuit already disconnected - expected
+    }
+    catch (ObjectDisposedException)
+    {
+      // Already disposed - expected
+    }
+    catch
+    {
+      // Suppress other errors during disposal
+    }
+    finally
+    {
+      try
+      {
+        await _dragHandler.DisposeAsync();
+      }
+      catch
+      {
+        // Suppress disposal errors
+      }
+      _dragHandler = null;
+    }
   }
 
   private async ValueTask DisposeAnimationHandlerAsync()

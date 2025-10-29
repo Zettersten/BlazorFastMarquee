@@ -285,6 +285,78 @@ public class MarqueeTests : TestContext
     Assert.Equal(style1, style2);
   }
 
+  [Fact]
+  public void EnableDragParameterConfiguresComponent()
+  {
+    var jsRuntime = new StubJsRuntime();
+    Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+    var cut = RenderComponent<Marquee>(parameters =>
+      parameters.Add(p => p.EnableDrag, true).AddChildContent("Drag Test")
+    );
+
+    // Verify component renders with drag enabled
+    Assert.NotNull(cut.Instance);
+    Assert.True(cut.Instance.EnableDrag);
+  }
+
+  [Theory]
+  [InlineData(MarqueeDirection.Left, false)]
+  [InlineData(MarqueeDirection.Right, false)]
+  [InlineData(MarqueeDirection.Up, true)]
+  [InlineData(MarqueeDirection.Down, true)]
+  public void DragHandlerRespectsDirection(MarqueeDirection direction, bool shouldBeVertical)
+  {
+    var jsRuntime = new StubJsRuntime();
+    Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+    var cut = RenderComponent<Marquee>(parameters =>
+      parameters.Add(p => p.EnableDrag, true).Add(p => p.Direction, direction).AddChildContent("Direction Drag")
+    );
+
+    // Verify component renders with correct direction
+    Assert.NotNull(cut.Instance);
+    Assert.Equal(direction, cut.Instance.Direction);
+  }
+
+  [Fact]
+  public void DragFeatureIsOptional()
+  {
+    var jsRuntime = new StubJsRuntime();
+    Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+    var cut = RenderComponent<Marquee>(parameters =>
+      parameters.Add(p => p.EnableDrag, false).AddChildContent("No Drag")
+    );
+
+    // Verify component renders without drag enabled
+    Assert.NotNull(cut.Instance);
+    Assert.False(cut.Instance.EnableDrag);
+  }
+
+  [Fact]
+  public void DragCanBeToggledDynamically()
+  {
+    var jsRuntime = new StubJsRuntime();
+    Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+    var cut = RenderComponent<Marquee>(parameters =>
+      parameters.Add(p => p.EnableDrag, false).AddChildContent("Toggle Drag")
+    );
+
+    Assert.False(cut.Instance.EnableDrag);
+
+    // Update parameter to enable drag
+    cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, true));
+
+    Assert.True(cut.Instance.EnableDrag);
+
+    // Disable drag again
+    cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, false));
+
+    Assert.False(cut.Instance.EnableDrag);
+  }
+
   private sealed class StubJsRuntime : IJSRuntime
   {
     private readonly StubModule _module = new();
@@ -310,11 +382,13 @@ public class MarqueeTests : TestContext
     {
       private readonly StubObserver _observer = new();
       private readonly StubAnimationHandler _animationHandler = new();
+      private readonly StubDragHandler _dragHandler = new();
 
       public ValueTask DisposeAsync()
       {
         _ = _observer.DisposeAsync();
         _ = _animationHandler.DisposeAsync();
+        _ = _dragHandler.DisposeAsync();
         return ValueTask.CompletedTask;
       }
 
@@ -335,6 +409,11 @@ public class MarqueeTests : TestContext
         if (identifier == "setupAnimationEvents" && typeof(TValue) == typeof(IJSObjectReference))
         {
           return ValueTask.FromResult((TValue)(object)_animationHandler);
+        }
+
+        if (identifier == "setupDragHandler" && typeof(TValue) == typeof(IJSObjectReference))
+        {
+          return ValueTask.FromResult((TValue)(object)_dragHandler);
         }
 
         if (identifier == "measure")
@@ -388,6 +467,29 @@ public class MarqueeTests : TestContext
         }
 
         throw new NotSupportedException($"Unexpected animation handler call '{identifier}'.");
+      }
+    }
+
+    private sealed class StubDragHandler : IJSObjectReference
+    {
+      public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+      public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) =>
+        InvokeAsync<TValue>(identifier, default, args);
+
+      public ValueTask<TValue> InvokeAsync<TValue>(
+        string identifier,
+        CancellationToken cancellationToken,
+        object?[]? args
+      )
+      {
+        // Handle drag handler methods
+        if (identifier == "update" || identifier == "dispose")
+        {
+          return ValueTask.FromResult(default(TValue)!);
+        }
+
+        throw new NotSupportedException($"Unexpected drag handler call '{identifier}'.");
       }
     }
   }

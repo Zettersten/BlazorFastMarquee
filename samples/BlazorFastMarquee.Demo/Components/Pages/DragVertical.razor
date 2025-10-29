@@ -1,0 +1,361 @@
+@page "/drag-vertical"
+@using BlazorFastMarquee
+
+<PageTitle>Vertical Drag - BlazorFastMarquee Demo</PageTitle>
+
+<h1>↕️ Vertical Drag</h1>
+<p class="page-subtitle">Drag up and down to pan the marquee with your mouse or touch</p>
+
+<section class="demo-section">
+    <h2>Drag Up Direction</h2>
+    <p>Click and drag vertically to pan the marquee. Release to resume animation.</p>
+    
+    <div class="vertical-container">
+        <div class="vertical-demo drag-indicator">
+            <Marquee Speed="50" EnableDrag="true" Direction="MarqueeDirection.Up" Gradient="true">
+                <div class="drag-content-vertical">
+                    <div class="drag-item-vertical drag-up">🖱️ Drag Me Vertically!</div>
+                    <div class="drag-item-vertical drag-up">👆 Click & Hold</div>
+                    <div class="drag-item-vertical drag-up">↕️ Pan Up/Down</div>
+                    <div class="drag-item-vertical drag-up">⏸️ Auto Pauses</div>
+                    <div class="drag-item-vertical drag-up">🎯 Interactive</div>
+                    <div class="drag-item-vertical drag-up">✨ Smooth Motion</div>
+                </div>
+            </Marquee>
+        </div>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee EnableDrag="true" Direction="MarqueeDirection.Up"&gt;
+    &lt;!-- Drag up/down to pan --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Drag Down Direction</h2>
+    <p>Works the same with down-scrolling marquees</p>
+    
+    <div class="vertical-container">
+        <div class="vertical-demo">
+            <Marquee Speed="50" EnableDrag="true" Direction="MarqueeDirection.Down" Gradient="true" GradientColor="#f0f0f0">
+                <div class="drag-content-vertical">
+                    <div class="drag-item-vertical drag-down">⬆️ Scroll Down</div>
+                    <div class="drag-item-vertical drag-down">🖱️ Drag Enabled</div>
+                    <div class="drag-item-vertical drag-down">🎮 Full Control</div>
+                    <div class="drag-item-vertical drag-down">✨ Smooth</div>
+                    <div class="drag-item-vertical drag-down">📱 Touch Support</div>
+                </div>
+            </Marquee>
+        </div>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee EnableDrag="true" Direction="MarqueeDirection.Down"&gt;
+    &lt;!-- Drag vertically in any direction --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Side-by-Side Comparison</h2>
+    <p>Compare up and down directions with drag enabled</p>
+    
+    <div class="side-by-side">
+        <div class="comparison-item">
+            <h3>Scroll Up ⬆️</h3>
+            <div class="vertical-demo-compact">
+                <Marquee Speed="40" EnableDrag="true" Direction="MarqueeDirection.Up" Gradient="true">
+                    <div class="drag-content-vertical">
+                        <div class="drag-item-vertical-compact">📝 Item 1</div>
+                        <div class="drag-item-vertical-compact">📝 Item 2</div>
+                        <div class="drag-item-vertical-compact">📝 Item 3</div>
+                        <div class="drag-item-vertical-compact">📝 Item 4</div>
+                    </div>
+                </Marquee>
+            </div>
+        </div>
+        
+        <div class="comparison-item">
+            <h3>Scroll Down ⬇️</h3>
+            <div class="vertical-demo-compact">
+                <Marquee Speed="40" EnableDrag="true" Direction="MarqueeDirection.Down" Gradient="true">
+                    <div class="drag-content-vertical">
+                        <div class="drag-item-vertical-compact">📝 Item A</div>
+                        <div class="drag-item-vertical-compact">📝 Item B</div>
+                        <div class="drag-item-vertical-compact">📝 Item C</div>
+                        <div class="drag-item-vertical-compact">📝 Item D</div>
+                    </div>
+                </Marquee>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Toggle Drag Dynamically</h2>
+    <p>Enable or disable vertical drag functionality on the fly</p>
+    
+    <div class="control-panel">
+        <button class="control-btn @(_dragEnabled ? "active" : "")" @onclick="ToggleDrag">
+            @(_dragEnabled ? "🔓 Drag Enabled" : "🔒 Drag Disabled")
+        </button>
+    </div>
+    
+    <div class="vertical-container">
+        <div class="vertical-demo">
+            <Marquee Speed="50" EnableDrag="@_dragEnabled" Direction="MarqueeDirection.Up" Gradient="true">
+                <div class="drag-content-vertical">
+                    <div class="drag-item-vertical drag-toggle">
+                        @(_dragEnabled ? "🖱️ Try Dragging!" : "🔒 Drag Disabled")
+                    </div>
+                    <div class="drag-item-vertical drag-toggle">
+                        @(_dragEnabled ? "✅ Interactive" : "❌ Locked")
+                    </div>
+                    <div class="drag-item-vertical drag-toggle">
+                        @(_dragEnabled ? "🎮 Control" : "▶️ Auto-Play")
+                    </div>
+                </div>
+            </Marquee>
+        </div>
+    </div>
+</section>
+
+<section class="info-box">
+    <h3>💡 How Vertical Drag Works</h3>
+    <div class="info-content">
+        <div class="info-item">
+            <strong>🖱️ Mouse Support:</strong>
+            <p>Click and hold, then drag up or down to pan the vertical marquee.</p>
+        </div>
+        <div class="info-item">
+            <strong>📱 Touch Support:</strong>
+            <p>Works seamlessly on mobile devices with vertical swipe gestures.</p>
+        </div>
+        <div class="info-item">
+            <strong>⏸️ Auto Pause:</strong>
+            <p>Animation automatically pauses while dragging and resumes on release.</p>
+        </div>
+        <div class="info-item">
+            <strong>↕️ Direction Aware:</strong>
+            <p>Only allows vertical dragging for up/down marquee directions.</p>
+        </div>
+    </div>
+</section>
+
+<section class="info-box use-cases-box">
+    <h3>🎯 Use Cases</h3>
+    <div class="use-cases">
+        <div class="use-case">
+            <strong>📱 Mobile Apps:</strong> Natural vertical scrolling experience on mobile devices
+        </div>
+        <div class="use-case">
+            <strong>📜 Timeline Display:</strong> Users can scrub through events manually
+        </div>
+        <div class="use-case">
+            <strong>📊 Vertical Stats:</strong> Explore data by dragging through vertical content
+        </div>
+        <div class="use-case">
+            <strong>🎨 Content Feed:</strong> Manual control over content feed scrolling
+        </div>
+    </div>
+</section>
+
+@code {
+    private bool _dragEnabled = true;
+    
+    private void ToggleDrag() => _dragEnabled = !_dragEnabled;
+}
+
+<style>
+    .vertical-container {
+        display: flex;
+        justify-content: center;
+        margin: 1.25rem 0;
+    }
+    
+    .vertical-demo {
+        width: 100%;
+        max-width: 300px;
+        height: 400px;
+        background: #f9fafb;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+    
+    .vertical-demo-compact {
+        width: 100%;
+        height: 300px;
+        background: #f9fafb;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .drag-content-vertical {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .drag-item-vertical {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        color: white;
+        border-radius: 0.5rem;
+        text-align: center;
+        white-space: nowrap;
+    }
+    
+    .drag-item-vertical-compact {
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+        color: white;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 0.5rem;
+        text-align: center;
+    }
+    
+    .drag-up {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .drag-down {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .drag-toggle {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .drag-indicator::before {
+        content: "👆 Click and drag vertically!";
+        position: absolute;
+        top: -2.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .side-by-side {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin: 1.25rem 0;
+    }
+    
+    .comparison-item {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .comparison-item h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.125rem;
+        text-align: center;
+        color: #1f2937;
+    }
+    
+    .control-panel {
+        display: flex;
+        gap: 0.875rem;
+        margin-bottom: 1.25rem;
+        justify-content: center;
+    }
+    
+    .control-btn {
+        padding: 0.625rem 1.5rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .control-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .control-btn:active {
+        transform: translateY(0);
+    }
+    
+    .control-btn.active {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        margin: 1.75rem 0;
+    }
+    
+    .info-box h3 {
+        margin: 0 0 1.25rem 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+    
+    .info-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+    
+    .info-item {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
+    
+    .info-item strong {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+    
+    .info-item p {
+        margin: 0;
+        line-height: 1.5;
+        font-size: 0.9375rem;
+        opacity: 0.95;
+    }
+    
+    .use-cases-box {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+    
+    .use-cases {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 0.875rem;
+    }
+    
+    .use-case {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        line-height: 1.5;
+        font-size: 0.9375rem;
+    }
+    
+    .use-case strong {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+</style>

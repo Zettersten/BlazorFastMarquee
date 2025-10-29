@@ -5,7 +5,13 @@
   position: relative;
   width: var(--width);
   transform: var(--transform);
+  touch-action: pan-y; /* Default: allow vertical scrolling */
 }
+
+  /* When drag is enabled, cursor is set via JavaScript */
+  .bfm-marquee-container[style*="cursor: grab"] {
+    touch-action: none; /* Disable default touch behavior when draggable */
+  }
 
   .bfm-marquee-container:hover div {
     animation-play-state: var(--pause-on-hover);
