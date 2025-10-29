@@ -294,11 +294,6 @@ function createDragHandler(container, marqueeElement, vertical) {
     state.dragStartX = clientX;
     state.dragStartY = clientY;
 
-    // Pause animation during drag
-    state.marqueeElements.forEach(el => {
-      el.style.animationPlayState = 'paused';
-    });
-
     state.container.style.cursor = 'grabbing';
     state.container.style.userSelect = 'none';
     e.preventDefault();
@@ -315,19 +310,18 @@ function createDragHandler(container, marqueeElement, vertical) {
     const currentDragX = clientX - state.dragStartX;
     const currentDragY = clientY - state.dragStartY;
 
-    // Update CSS variables - let the animation handle positioning
+    // Update CSS variables on the CONTAINER (not individual marquee elements)
+    // The variables cascade down and are used by the animation
     const totalX = state.cumulativeOffsetX + currentDragX;
     const totalY = state.cumulativeOffsetY + currentDragY;
 
-    state.marqueeElements.forEach(el => {
-      if (state.vertical) {
-        el.style.setProperty('--user-drag-x', '0px');
-        el.style.setProperty('--user-drag-y', `${totalY}px`);
-      } else {
-        el.style.setProperty('--user-drag-x', `${totalX}px`);
-        el.style.setProperty('--user-drag-y', '0px');
-      }
-    });
+    if (state.vertical) {
+      state.container.style.setProperty('--user-drag-x', '0px');
+      state.container.style.setProperty('--user-drag-y', `${totalY}px`);
+    } else {
+      state.container.style.setProperty('--user-drag-x', `${totalX}px`);
+      state.container.style.setProperty('--user-drag-y', '0px');
+    }
 
     e.preventDefault();
   };
@@ -350,10 +344,7 @@ function createDragHandler(container, marqueeElement, vertical) {
     state.container.style.cursor = 'grab';
     state.container.style.userSelect = '';
 
-    // Resume animation - it now includes the drag offset via CSS variables
-    state.marqueeElements.forEach(el => {
-      el.style.animationPlayState = '';
-    });
+    // CSS variables stay set - animation continues with offset applied
   };
 
   // Handle pointer cancel (touch cancel)
@@ -403,12 +394,9 @@ function createDragHandler(container, marqueeElement, vertical) {
         state.container.style.userSelect = '';
       }
 
-      // Clean up CSS variables and inline styles
-      state.marqueeElements.forEach(el => {
-        el.style.removeProperty('--user-drag-x');
-        el.style.removeProperty('--user-drag-y');
-        el.style.animationPlayState = '';
-      });
+      // Clean up CSS variables from container
+      state.container.style.removeProperty('--user-drag-x');
+      state.container.style.removeProperty('--user-drag-y');
 
       // Remove event listeners
       if (state.container && state.pointerDownHandler) {

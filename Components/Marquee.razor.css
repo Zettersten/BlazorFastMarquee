@@ -6,6 +6,9 @@
   width: var(--width);
   transform: var(--transform);
   touch-action: pan-y; /* Default: allow vertical scrolling */
+  /* Drag offset variables - defined at container level and inherited by children */
+  --user-drag-x: 0px;
+  --user-drag-y: 0px;
 }
 
   /* When drag is enabled, cursor is set via JavaScript */
@@ -62,8 +65,6 @@
   animation-play-state: var(--play);
   animation-delay: var(--delay);
   animation-direction: var(--direction);
-  --user-drag-x: 0px;
-  --user-drag-y: 0px;
 }
 
 @keyframes bfm-scroll {
