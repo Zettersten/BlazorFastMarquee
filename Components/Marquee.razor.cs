@@ -480,7 +480,6 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     {
       if (_dragHandler is null && EnableDrag)
       {
-        Console.WriteLine($"[Marquee] Creating drag handler (vertical: {isVertical}, reversed: {isReversed})");
         _dragHandler = await _module.InvokeAsync<IJSObjectReference>(
           "setupDragHandler",
           _containerRef,
@@ -488,34 +487,24 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
           isVertical,
           isReversed
         );
-        Console.WriteLine("[Marquee] Drag handler created successfully");
       }
       else if (_dragHandler is not null && EnableDrag)
       {
-        Console.WriteLine($"[Marquee] Updating drag handler (vertical: {isVertical}, reversed: {isReversed})");
         await _dragHandler.InvokeVoidAsync("update", isVertical, isReversed);
       }
       else if (_dragHandler is not null && !EnableDrag)
       {
-        Console.WriteLine("[Marquee] EnableDrag is false, disposing drag handler");
         await DisposeDragHandlerAsync();
-        Console.WriteLine("[Marquee] Drag handler disposed");
       }
     }
     catch (JSDisconnectedException)
     {
       // Circuit disconnected - cleanup
-      Console.WriteLine("[Marquee] JS disconnected during drag handler setup");
       _dragHandler = null;
     }
     catch (TaskCanceledException)
     {
       // Expected during disposal
-      Console.WriteLine("[Marquee] Task cancelled during drag handler setup");
-    }
-    catch (Exception ex)
-    {
-      Console.WriteLine($"[Marquee] Error in EnsureDragHandlerAsync: {ex.Message}");
     }
   }
 
@@ -719,7 +708,6 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
       || _prevPlay != Play
       || _prevPauseOnHover != PauseOnHover
       || _prevPauseOnClick != PauseOnClick
-      || _prevEnableDrag != EnableDrag
       || _prevDirection != Direction
     )
     {
@@ -728,8 +716,14 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
       _prevPlay = Play;
       _prevPauseOnHover = PauseOnHover;
       _prevPauseOnClick = PauseOnClick;
-      _prevEnableDrag = EnableDrag;
       _prevDirection = Direction;
+    }
+
+    // Track EnableDrag separately to ensure proper drag handler lifecycle
+    if (_prevEnableDrag != EnableDrag)
+    {
+      _containerStyleInvalidated = true; // Force a re-render
+      _prevEnableDrag = EnableDrag;
     }
 
     if (

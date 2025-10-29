@@ -13,10 +13,7 @@ const noop = () => { };
  * @returns {{containerSpan: number, marqueeSpan: number}} Measurement results
  */
 function measureSpan(container, marquee, vertical) {
-  console.log('measureSpan called', { container, marquee, vertical });
-
   if (!container || !marquee) {
-    console.log('measureSpan: missing container or marquee');
     return { containerSpan: 0, marqueeSpan: 0 };
   }
 
@@ -25,7 +22,6 @@ function measureSpan(container, marquee, vertical) {
   const containerSpan = vertical ? containerRect.height : containerRect.width;
   const marqueeSpan = vertical ? marqueeRect.height : marqueeRect.width;
 
-  console.log('measureSpan results', { containerSpan, marqueeSpan });
   return { containerSpan, marqueeSpan };
 }
 
@@ -34,10 +30,7 @@ function measureSpan(container, marquee, vertical) {
  * @param {Object} state - Observer state
  */
 function notify(state) {
-  console.log('notify called', { state: state?.disposed, hasRef: !!state?.dotnetRef });
-
   if (!state.dotnetRef || state.disposed) {
-    console.log('notify: skipping due to disposed or no dotnetRef');
     return;
   }
 
@@ -47,10 +40,9 @@ function notify(state) {
     state.vertical
   );
 
-  console.log('notify: calling UpdateLayout with', { containerSpan, marqueeSpan });
   state.dotnetRef
     .invokeMethodAsync('UpdateLayout', containerSpan, marqueeSpan)
-    .catch(err => console.error('notify error:', err));
+    .catch(() => {});
 }
 
 /**
@@ -59,13 +51,11 @@ function notify(state) {
  * @returns {Object} Observer handle with update/dispose methods
  */
 function createResizeHandle(state) {
-  console.log('createResizeHandle called');
   let resizeObserver = null;
   let resizeHandler = null;
 
   // Use ResizeObserver for efficient resize detection
   if (typeof ResizeObserver !== 'undefined') {
-    console.log('Using ResizeObserver');
     resizeHandler = () => notify(state);
     resizeObserver = new ResizeObserver(resizeHandler);
     resizeObserver.observe(state.container);
@@ -78,7 +68,6 @@ function createResizeHandle(state) {
       }
     };
   } else {
-    console.log('Using window resize fallback');
     // Fallback to window resize for older browsers
     resizeHandler = () => notify(state);
     window.addEventListener('resize', resizeHandler, { passive: true });
@@ -100,7 +89,6 @@ function createResizeHandle(state) {
        * @param {boolean} vertical - Whether to measure vertically
 */
     update(vertical) {
-      console.log('observer update called', vertical);
       if (state.disposed) return;
       state.vertical = Boolean(vertical);
       notify(state);
@@ -110,7 +98,6 @@ function createResizeHandle(state) {
     * Disposes the observer and cleans up resources.
          */
     dispose() {
-      console.log('observer dispose called');
       if (state.disposed) return;
 
       state.disposed = true;
@@ -134,10 +121,7 @@ function createResizeHandle(state) {
  * @returns {Object} Animation handler with dispose method
  */
 function createAnimationHandler(marqueeElement, dotnetRef) {
-  console.log('createAnimationHandler called', { marqueeElement, dotnetRef });
-
   if (!marqueeElement || !dotnetRef) {
-    console.log('createAnimationHandler: missing element or dotnetRef');
     return null;
   }
 
@@ -151,26 +135,23 @@ function createAnimationHandler(marqueeElement, dotnetRef) {
 
   // Animation iteration event handler
   state.iterationHandler = () => {
-    console.log('Animation iteration event fired');
     if (state.disposed || !state.dotnetRef) return;
 
     state.dotnetRef
       .invokeMethodAsync('HandleAnimationIteration')
-      .catch(err => console.error('Animation iteration error:', err));
+      .catch(() => {});
   };
 
   // Animation end event handler
   state.endHandler = () => {
-    console.log('Animation end event fired');
     if (state.disposed || !state.dotnetRef) return;
 
     state.dotnetRef
       .invokeMethodAsync('HandleAnimationEnd')
-      .catch(err => console.error('Animation end error:', err));
+      .catch(() => {});
   };
 
   // Add event listeners
-  console.log('Adding animation event listeners');
   marqueeElement.addEventListener('animationiteration', state.iterationHandler, { passive: true });
   marqueeElement.addEventListener('animationend', state.endHandler, { passive: true });
 
@@ -179,7 +160,6 @@ function createAnimationHandler(marqueeElement, dotnetRef) {
      * Disposes the animation event listeners.
      */
     dispose() {
-      console.log('animation handler dispose called');
       if (state.disposed) return;
 
       state.disposed = true;
@@ -208,7 +188,6 @@ function createAnimationHandler(marqueeElement, dotnetRef) {
  * @returns {{containerSpan: number, marqueeSpan: number}} Measurement results
  */
 export function measure(container, marquee, vertical) {
-  console.log('measure function called');
   return measureSpan(container, marquee, Boolean(vertical));
 }
 
@@ -221,10 +200,7 @@ export function measure(container, marquee, vertical) {
  * @returns {Object|null} Observer handle or null if invalid parameters
  */
 export function observe(container, marquee, vertical, dotnetRef) {
-  console.log('observe function called', { container, marquee, vertical, dotnetRef });
-
   if (!container || !marquee || !dotnetRef) {
-    console.log('observe: invalid parameters');
     return null;
   }
 
@@ -247,7 +223,6 @@ export function observe(container, marquee, vertical, dotnetRef) {
  * @returns {Object|null} Animation handler or null if invalid parameters
  */
 export function setupAnimationEvents(marqueeElement, dotnetRef) {
-  console.log('setupAnimationEvents function called');
   return createAnimationHandler(marqueeElement, dotnetRef);
 }
 
@@ -424,43 +399,45 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
       if (state.disposed) return;
       state.disposed = true;
 
-      console.log('Disposing drag handler');
-
       // Clean up any active drag state
       if (state.isDragging) {
         state.isDragging = false;
-        state.container.style.removeProperty('cursor');
-        state.container.style.removeProperty('user-select');
+        if (state.container) {
+          state.container.style.removeProperty('cursor');
+          state.container.style.removeProperty('user-select');
+        }
+        
+        // Resume animation if it was paused
+        state.marqueeElements.forEach(el => {
+          if (el) {
+            el.style.removeProperty('animation-play-state');
+          }
+        });
       }
 
       // Remove event listeners from container
       if (state.container && state.pointerDownHandler) {
-        console.log('Removing container event listeners');
         state.container.removeEventListener('mousedown', state.pointerDownHandler);
         state.container.removeEventListener('touchstart', state.pointerDownHandler);
       }
 
       // Remove event listeners from document
       if (state.pointerMoveHandler) {
-        console.log('Removing document move listeners');
         document.removeEventListener('mousemove', state.pointerMoveHandler);
         document.removeEventListener('touchmove', state.pointerMoveHandler);
       }
 
       if (state.pointerUpHandler) {
-        console.log('Removing document up/end listeners');
         document.removeEventListener('mouseup', state.pointerUpHandler);
         document.removeEventListener('touchend', state.pointerUpHandler);
       }
 
       if (state.pointerCancelHandler) {
-        console.log('Removing touch cancel listener');
         document.removeEventListener('touchcancel', state.pointerCancelHandler);
       }
 
       // Remove inline cursor style (set by setupDragHandler)
       if (state.container) {
-        console.log('Removing cursor style from container');
         state.container.style.removeProperty('cursor');
       }
 
@@ -471,8 +448,6 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
       state.pointerMoveHandler = null;
       state.pointerUpHandler = null;
       state.pointerCancelHandler = null;
-      
-      console.log('Drag handler disposed successfully');
     }
   };
 }
@@ -486,8 +461,5 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
  * @returns {Object|null} Drag handler or null if invalid parameters
  */
 export function setupDragHandler(container, marqueeElement, vertical, reversed) {
-  console.log('setupDragHandler function called');
   return createDragHandler(container, marqueeElement, Boolean(vertical), Boolean(reversed));
 }
-
-console.log('Marquee JavaScript module loaded');
