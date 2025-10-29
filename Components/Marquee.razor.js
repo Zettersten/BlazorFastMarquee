@@ -253,17 +253,14 @@ export function setupAnimationEvents(marqueeElement, dotnetRef) {
 
 /**
  * Creates a drag handler for pan/drag functionality.
+ * Simple approach: just track offset and apply it directly.
  * @param {HTMLElement} container - Container element
  * @param {HTMLElement} marqueeElement - First marquee element (used for reference)
  * @param {boolean} vertical - Whether to enable vertical dragging
  * @returns {Object|null} Drag handler or null if invalid parameters
  */
 function createDragHandler(container, marqueeElement, vertical) {
-  console.log('createDragHandler called', { container, marqueeElement, vertical });
-  console.log('Vertical mode:', Boolean(vertical));
-
   if (!container || !marqueeElement) {
-    console.log('createDragHandler: missing container or marqueeElement');
     return null;
   }
 
@@ -276,17 +273,15 @@ function createDragHandler(container, marqueeElement, vertical) {
     vertical: Boolean(vertical),
     disposed: false,
     isDragging: false,
-    startX: 0,
-    startY: 0,
-    offsetX: 0,
-    offsetY: 0,
+    dragStartX: 0,
+    dragStartY: 0,
+    cumulativeOffsetX: 0, // Total offset from all drags
+    cumulativeOffsetY: 0,
     pointerDownHandler: null,
     pointerMoveHandler: null,
     pointerUpHandler: null,
     pointerCancelHandler: null
   };
-
-  console.log('Drag handler initialized, vertical:', state.vertical);
 
   // Handle pointer down (mouse/touch start)
   state.pointerDownHandler = (e) => {
@@ -296,14 +291,12 @@ function createDragHandler(container, marqueeElement, vertical) {
     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
 
     state.isDragging = true;
-    state.startX = clientX;
-    state.startY = clientY;
-    
-    console.log('Drag started at', clientX, clientY);
+    state.dragStartX = clientX;
+    state.dragStartY = clientY;
 
-    // Pause animation
+    // Pause animation during drag
     state.marqueeElements.forEach(el => {
-      el.style.setProperty('animation-play-state', 'paused', 'important');
+      el.style.animationPlayState = 'paused';
     });
 
     state.container.style.cursor = 'grabbing';
@@ -318,20 +311,18 @@ function createDragHandler(container, marqueeElement, vertical) {
     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
 
-    // Calculate drag distance from start
-    const dragX = clientX - state.startX;
-    const dragY = clientY - state.startY;
+    // How far we've dragged in this single drag gesture
+    const currentDragX = clientX - state.dragStartX;
+    const currentDragY = clientY - state.dragStartY;
 
-    console.log('Dragging, delta:', dragX, dragY);
-
-    // Apply transform
+    // Apply: cumulative offset from past + current drag
     state.marqueeElements.forEach(el => {
       if (state.vertical) {
-        const totalY = state.offsetY + dragY;
-        el.style.setProperty('transform', `translateY(${totalY}px)`, 'important');
+        const totalY = state.cumulativeOffsetY + currentDragY;
+        el.style.transform = `translateY(${totalY}px)`;
       } else {
-        const totalX = state.offsetX + dragX;
-        el.style.setProperty('transform', `translateX(${totalX}px)`, 'important');
+        const totalX = state.cumulativeOffsetX + currentDragX;
+        el.style.transform = `translateX(${totalX}px)`;
       }
     });
 
@@ -342,28 +333,23 @@ function createDragHandler(container, marqueeElement, vertical) {
   state.pointerUpHandler = (e) => {
     if (!state.isDragging || state.disposed) return;
 
-    const clientX = e.type.includes('touch') ? (e.changedTouches?.[0]?.clientX ?? state.startX) : e.clientX;
-    const clientY = e.type.includes('touch') ? (e.changedTouches?.[0]?.clientY ?? state.startY) : e.clientY;
+    const clientX = e.type.includes('touch') ? (e.changedTouches?.[0]?.clientX ?? state.dragStartX) : e.clientX;
+    const clientY = e.type.includes('touch') ? (e.changedTouches?.[0]?.clientY ?? state.dragStartY) : e.clientY;
 
-    // Update offset for next drag
-    const dragX = clientX - state.startX;
-    const dragY = clientY - state.startY;
+    // Add this drag's distance to cumulative
+    const currentDragX = clientX - state.dragStartX;
+    const currentDragY = clientY - state.dragStartY;
     
-    if (state.vertical) {
-      state.offsetY += dragY;
-    } else {
-      state.offsetX += dragX;
-    }
-
-    console.log('Drag ended, total offset:', state.offsetX, state.offsetY);
+    state.cumulativeOffsetX += currentDragX;
+    state.cumulativeOffsetY += currentDragY;
 
     state.isDragging = false;
     state.container.style.cursor = 'grab';
     state.container.style.userSelect = '';
 
-    // Resume animation while keeping transform
+    // Resume animation (it continues, but transform overrides visual position)
     state.marqueeElements.forEach(el => {
-      el.style.removeProperty('animation-play-state');
+      el.style.animationPlayState = '';
     });
   };
 
@@ -376,14 +362,10 @@ function createDragHandler(container, marqueeElement, vertical) {
   // Set initial cursor
   state.container.style.cursor = 'grab';
 
-  console.log('Adding event listeners to container and document');
-
   // Add mouse event listeners
   state.container.addEventListener('mousedown', state.pointerDownHandler, { passive: false });
   document.addEventListener('mousemove', state.pointerMoveHandler, { passive: false });
   document.addEventListener('mouseup', state.pointerUpHandler, { passive: true });
-
-  console.log('Mouse event listeners added');
 
   // Add touch event listeners for mobile support
   state.container.addEventListener('touchstart', state.pointerDownHandler, { passive: false });
@@ -391,19 +373,13 @@ function createDragHandler(container, marqueeElement, vertical) {
   document.addEventListener('touchend', state.pointerUpHandler, { passive: true });
   document.addEventListener('touchcancel', state.pointerCancelHandler, { passive: true });
 
-  console.log('Touch event listeners added');
-  console.log('Drag handler setup complete for', state.marqueeElements.length, 'marquee elements');
-
   return {
     /**
      * Updates the drag orientation.
-     * @param {boolean} vertical - Whether to enable vertical dragging
      */
     update(vertical) {
       if (state.disposed) return;
-      
       state.vertical = Boolean(vertical);
-      console.log('Drag orientation updated to:', state.vertical ? 'vertical' : 'horizontal');
       
       // End any active drag when orientation changes
       if (state.isDragging) {
@@ -415,23 +391,19 @@ function createDragHandler(container, marqueeElement, vertical) {
      * Disposes the drag handler and cleans up event listeners.
      */
     dispose() {
-      console.log('drag handler dispose called');
       if (state.disposed) return;
-
       state.disposed = true;
 
       // Clean up any active drag state
       if (state.isDragging) {
         state.container.style.cursor = '';
         state.container.style.userSelect = '';
-        state.marqueeElements.forEach(el => {
-          el.style.removeProperty('animation-play-state');
-        });
       }
 
-      // Clean up transforms
+      // Clean up inline styles
       state.marqueeElements.forEach(el => {
-        el.style.removeProperty('transform');
+        el.style.transform = '';
+        el.style.animationPlayState = '';
       });
 
       // Remove event listeners
