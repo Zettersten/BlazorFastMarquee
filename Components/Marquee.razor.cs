@@ -86,6 +86,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
   private bool _prevPauseOnHover;
   private bool _prevPauseOnClick;
   private bool _prevEnableDrag;
+  private bool _enableDragChanged;
   private MarqueeDirection _prevDirection;
   private double _prevSpeed;
   private double _prevDelay;
@@ -272,7 +273,8 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
       || _containerStyleInvalidated
       || _gradientStyleInvalidated
       || _marqueeStyleInvalidated
-      || _childStyleInvalidated;
+      || _childStyleInvalidated
+      || _enableDragChanged;
 
     return shouldRender;
   }
@@ -297,7 +299,13 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
 
       await EnsureObserverAsync();
       await EnsureAnimationHandlerAsync();
+      
+      // Always ensure drag handler is in correct state
       await EnsureDragHandlerAsync();
+      
+      // Reset the enableDragChanged flag after handling
+      _enableDragChanged = false;
+      
       await MeasureAsync();
 
       if (firstRender && OnMount.HasDelegate && !_onMountInvoked)
@@ -722,6 +730,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     // Track EnableDrag separately to ensure proper drag handler lifecycle
     if (_prevEnableDrag != EnableDrag)
     {
+      _enableDragChanged = true; // Flag that drag state changed
       _containerStyleInvalidated = true; // Force a re-render
       _prevEnableDrag = EnableDrag;
     }

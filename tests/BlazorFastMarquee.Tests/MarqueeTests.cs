@@ -348,18 +348,19 @@ public class MarqueeTests : TestContext
 
     // Update parameter to enable drag
     cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, true));
-
     Assert.True(cut.Instance.EnableDrag);
 
-    // Disable drag again - should dispose the drag handler
+    // Disable drag again - should dispose the drag handler and trigger re-render
     cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, false));
-
     Assert.False(cut.Instance.EnableDrag);
     
     // Re-enable to verify it can be toggled multiple times
     cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, true));
-    
     Assert.True(cut.Instance.EnableDrag);
+    
+    // Disable one more time to verify repeated toggling works
+    cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, false));
+    Assert.False(cut.Instance.EnableDrag);
   }
 
   [Theory]
