@@ -488,6 +488,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     {
       if (_dragHandler is null && EnableDrag)
       {
+        System.Diagnostics.Debug.WriteLine($"[Marquee] Creating drag handler - EnableDrag: {EnableDrag}");
         _dragHandler = await _module.InvokeAsync<IJSObjectReference>(
           "setupDragHandler",
           _containerRef,
@@ -495,24 +496,34 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
           isVertical,
           isReversed
         );
+        System.Diagnostics.Debug.WriteLine($"[Marquee] Drag handler created: {_dragHandler != null}");
       }
       else if (_dragHandler is not null && EnableDrag)
       {
+        System.Diagnostics.Debug.WriteLine($"[Marquee] Updating drag handler - EnableDrag: {EnableDrag}");
         await _dragHandler.InvokeVoidAsync("update", isVertical, isReversed);
       }
       else if (_dragHandler is not null && !EnableDrag)
       {
+        System.Diagnostics.Debug.WriteLine($"[Marquee] Disposing drag handler - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
         await DisposeDragHandlerAsync();
+        System.Diagnostics.Debug.WriteLine($"[Marquee] Drag handler disposed - _dragHandler is now: {_dragHandler == null}");
+      }
+      else
+      {
+        System.Diagnostics.Debug.WriteLine($"[Marquee] No action - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
       }
     }
     catch (JSDisconnectedException)
     {
       // Circuit disconnected - cleanup
+      System.Diagnostics.Debug.WriteLine("[Marquee] JS disconnected");
       _dragHandler = null;
     }
     catch (TaskCanceledException)
     {
       // Expected during disposal
+      System.Diagnostics.Debug.WriteLine("[Marquee] Task cancelled");
     }
   }
 
@@ -730,6 +741,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     // Track EnableDrag separately to ensure proper drag handler lifecycle
     if (_prevEnableDrag != EnableDrag)
     {
+      System.Diagnostics.Debug.WriteLine($"[Marquee] EnableDrag changed from {_prevEnableDrag} to {EnableDrag}");
       _enableDragChanged = true; // Flag that drag state changed
       _containerStyleInvalidated = true; // Force a re-render
       _prevEnableDrag = EnableDrag;

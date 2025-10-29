@@ -364,6 +364,7 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
   };
 
   // Set initial cursor
+  console.log('[DragHandler] Setting up drag handler, adding grab cursor');
   state.container.style.cursor = 'grab';
 
   // Add mouse event listeners
@@ -396,11 +397,13 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
      * Disposes the drag handler and cleans up event listeners.
      */
     dispose() {
+      console.log('[DragHandler] Dispose called, disposed:', state.disposed);
       if (state.disposed) return;
       state.disposed = true;
 
       // Clean up any active drag state
       if (state.isDragging) {
+        console.log('[DragHandler] Cleaning up active drag state');
         state.isDragging = false;
         if (state.container) {
           state.container.style.removeProperty('cursor');
@@ -415,29 +418,34 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
         });
       }
 
-      // Remove event listeners from container
+      // Remove event listeners from container (options must match addEventListener)
       if (state.container && state.pointerDownHandler) {
-        state.container.removeEventListener('mousedown', state.pointerDownHandler);
-        state.container.removeEventListener('touchstart', state.pointerDownHandler);
+        console.log('[DragHandler] Removing container event listeners');
+        state.container.removeEventListener('mousedown', state.pointerDownHandler, { passive: false });
+        state.container.removeEventListener('touchstart', state.pointerDownHandler, { passive: false });
       }
 
-      // Remove event listeners from document
+      // Remove event listeners from document (options must match addEventListener)
       if (state.pointerMoveHandler) {
-        document.removeEventListener('mousemove', state.pointerMoveHandler);
-        document.removeEventListener('touchmove', state.pointerMoveHandler);
+        console.log('[DragHandler] Removing document move listeners');
+        document.removeEventListener('mousemove', state.pointerMoveHandler, { passive: false });
+        document.removeEventListener('touchmove', state.pointerMoveHandler, { passive: false });
       }
 
       if (state.pointerUpHandler) {
-        document.removeEventListener('mouseup', state.pointerUpHandler);
-        document.removeEventListener('touchend', state.pointerUpHandler);
+        console.log('[DragHandler] Removing document up/end listeners');
+        document.removeEventListener('mouseup', state.pointerUpHandler, { passive: true });
+        document.removeEventListener('touchend', state.pointerUpHandler, { passive: true });
       }
 
       if (state.pointerCancelHandler) {
-        document.removeEventListener('touchcancel', state.pointerCancelHandler);
+        console.log('[DragHandler] Removing touch cancel listener');
+        document.removeEventListener('touchcancel', state.pointerCancelHandler, { passive: true });
       }
 
       // Remove inline cursor style (set by setupDragHandler)
       if (state.container) {
+        console.log('[DragHandler] Removing cursor from container');
         state.container.style.removeProperty('cursor');
       }
 
@@ -448,6 +456,8 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
       state.pointerMoveHandler = null;
       state.pointerUpHandler = null;
       state.pointerCancelHandler = null;
+      
+      console.log('[DragHandler] Dispose complete');
     }
   };
 }
