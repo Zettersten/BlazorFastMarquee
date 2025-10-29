@@ -62,18 +62,15 @@
   animation-play-state: var(--play);
   animation-delay: var(--delay);
   animation-direction: var(--direction);
-  /* Apply persistent drag offset */
-  --drag-offset-x: 0px;
-  --drag-offset-y: 0px;
 }
 
 @keyframes bfm-scroll {
   from {
-    transform: translate(var(--drag-offset-x, 0px), var(--drag-offset-y, 0px)) translateX(0%);
+    transform: translate(var(--drag-offset-x, 0), var(--drag-offset-y, 0)) translateX(0%);
   }
 
   to {
-    transform: translate(var(--drag-offset-x, 0px), var(--drag-offset-y, 0px)) translateX(-100%);
+    transform: translate(var(--drag-offset-x, 0), var(--drag-offset-y, 0)) translateX(-100%);
   }
 }
 
