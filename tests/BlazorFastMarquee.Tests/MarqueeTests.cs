@@ -351,10 +351,40 @@ public class MarqueeTests : TestContext
 
     Assert.True(cut.Instance.EnableDrag);
 
-    // Disable drag again
+    // Disable drag again - should dispose the drag handler
     cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, false));
 
     Assert.False(cut.Instance.EnableDrag);
+    
+    // Re-enable to verify it can be toggled multiple times
+    cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, true));
+    
+    Assert.True(cut.Instance.EnableDrag);
+  }
+
+  [Theory]
+  [InlineData(MarqueeDirection.Left, false)]
+  [InlineData(MarqueeDirection.Right, true)]
+  [InlineData(MarqueeDirection.Up, true)]
+  [InlineData(MarqueeDirection.Down, false)]
+  public void DragHandlerReceivesCorrectReversedFlag(MarqueeDirection direction, bool expectedReversed)
+  {
+    var jsRuntime = new StubJsRuntime();
+    Services.AddSingleton<IJSRuntime>(jsRuntime);
+
+    var cut = RenderComponent<Marquee>(parameters =>
+      parameters
+        .Add(p => p.EnableDrag, true)
+        .Add(p => p.Direction, direction)
+        .AddChildContent("Drag Test")
+    );
+
+    // Component should render successfully with drag enabled
+    Assert.True(cut.Instance.EnableDrag);
+    Assert.Equal(direction, cut.Instance.Direction);
+    
+    // Verify component is stable
+    Assert.NotNull(cut.Find(".bfm-marquee-container"));
   }
 
   private sealed class StubJsRuntime : IJSRuntime

@@ -474,6 +474,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
       return;
 
     var isVertical = IsVertical(Direction);
+    var isReversed = IsReversedDirection(Direction);
 
     try
     {
@@ -483,12 +484,13 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
           "setupDragHandler",
           _containerRef,
           _marqueeAnimationRef,
-          isVertical
+          isVertical,
+          isReversed
         );
       }
       else if (_dragHandler is not null && EnableDrag)
       {
-        await _dragHandler.InvokeVoidAsync("update", isVertical);
+        await _dragHandler.InvokeVoidAsync("update", isVertical, isReversed);
       }
       else if (_dragHandler is not null && !EnableDrag)
       {
@@ -808,6 +810,9 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
 
   private static bool IsVertical(MarqueeDirection direction) =>
     direction is MarqueeDirection.Up or MarqueeDirection.Down;
+
+  private static bool IsReversedDirection(MarqueeDirection direction) =>
+    direction is MarqueeDirection.Right or MarqueeDirection.Up;
 
   private static bool AreClose(double left, double right) => Math.Abs(left - right) < 0.1d;
 

@@ -257,9 +257,10 @@ export function setupAnimationEvents(marqueeElement, dotnetRef) {
  * @param {HTMLElement} container - Container element
  * @param {HTMLElement} marqueeElement - First marquee element (used for reference)
  * @param {boolean} vertical - Whether to enable vertical dragging
+ * @param {boolean} reversed - Whether the animation direction is reversed (Right/Up)
  * @returns {Object|null} Drag handler or null if invalid parameters
  */
-function createDragHandler(container, marqueeElement, vertical) {
+function createDragHandler(container, marqueeElement, vertical, reversed) {
   if (!container || !marqueeElement) {
     return null;
   }
@@ -271,6 +272,7 @@ function createDragHandler(container, marqueeElement, vertical) {
     container,
     marqueeElements: Array.from(marqueeElements),
     vertical: Boolean(vertical),
+    reversed: Boolean(reversed),
     disposed: false,
     isDragging: false,
     lastX: 0,
@@ -319,8 +321,16 @@ function createDragHandler(container, marqueeElement, vertical) {
     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
 
     // Calculate movement delta
-    const deltaX = clientX - state.lastX;
-    const deltaY = clientY - state.lastY;
+    let deltaX = clientX - state.lastX;
+    let deltaY = clientY - state.lastY;
+    
+    // Invert delta for reversed directions (Right/Up)
+    // This makes dragging feel natural with the animation direction
+    if (state.reversed) {
+      deltaX = -deltaX;
+      deltaY = -deltaY;
+    }
+    
     const delta = state.vertical ? deltaY : deltaX;
 
     state.lastX = clientX;
@@ -394,11 +404,12 @@ function createDragHandler(container, marqueeElement, vertical) {
 
   return {
     /**
-     * Updates the drag orientation.
+     * Updates the drag orientation and direction.
      */
-    update(vertical) {
+    update(vertical, reversed) {
       if (state.disposed) return;
       state.vertical = Boolean(vertical);
+      state.reversed = Boolean(reversed);
       
       // End any active drag when orientation changes
       if (state.isDragging) {
@@ -460,11 +471,12 @@ function createDragHandler(container, marqueeElement, vertical) {
  * @param {HTMLElement} container - Container element
  * @param {HTMLElement} marqueeElement - Marquee element to manipulate
  * @param {boolean} vertical - Whether to enable vertical dragging
+ * @param {boolean} reversed - Whether the animation direction is reversed (Right/Up)
  * @returns {Object|null} Drag handler or null if invalid parameters
  */
-export function setupDragHandler(container, marqueeElement, vertical) {
+export function setupDragHandler(container, marqueeElement, vertical, reversed) {
   console.log('setupDragHandler function called');
-  return createDragHandler(container, marqueeElement, Boolean(vertical));
+  return createDragHandler(container, marqueeElement, Boolean(vertical), Boolean(reversed));
 }
 
 console.log('Marquee JavaScript module loaded');
