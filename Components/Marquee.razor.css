@@ -1,5 +1,5 @@
 .bfm-marquee-container {
-  overflow-x: hidden;
+  overflow: hidden; /* Hide overflow in both directions */
   display: flex;
   flex-direction: row;
   position: relative;
@@ -62,15 +62,18 @@
   animation-play-state: var(--play);
   animation-delay: var(--delay);
   animation-direction: var(--direction);
+  /* Apply persistent drag offset */
+  --drag-offset-x: 0px;
+  --drag-offset-y: 0px;
 }
 
 @keyframes bfm-scroll {
   0% {
-    transform: translateX(0%);
+    transform: translate(var(--drag-offset-x, 0px), var(--drag-offset-y, 0px)) translateX(0%);
   }
 
   100% {
-    transform: translateX(-100%);
+    transform: translate(var(--drag-offset-x, 0px), var(--drag-offset-y, 0px)) translateX(-100%);
   }
 }
 
