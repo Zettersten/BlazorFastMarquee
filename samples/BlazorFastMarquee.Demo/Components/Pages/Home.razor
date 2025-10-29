@@ -120,6 +120,52 @@
     </div>
 </section>
 
+<section class="demo-section drag-showcase">
+    <h2>🖱️ Interactive Drag</h2>
+    <p>Click and drag to manually control the marquee - animation pauses while you drag!</p>
+    
+    <div class="drag-demo-container">
+        <Marquee Speed="50" EnableDrag="true" PauseOnHover="true" Gradient="true" GradientColor="#ffffff">
+            <div class="drag-demo-content">
+                <div class="drag-demo-item" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="drag-demo-icon">🖱️</div>
+                    <div class="drag-demo-text">Drag Me!</div>
+                </div>
+                <div class="drag-demo-item" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="drag-demo-icon">👆</div>
+                    <div class="drag-demo-text">Click & Hold</div>
+                </div>
+                <div class="drag-demo-item" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="drag-demo-icon">⏸️</div>
+                    <div class="drag-demo-text">Auto Pauses</div>
+                </div>
+                <div class="drag-demo-item" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <div class="drag-demo-icon">▶️</div>
+                    <div class="drag-demo-text">Resumes After</div>
+                </div>
+                <div class="drag-demo-item" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <div class="drag-demo-icon">📱</div>
+                    <div class="drag-demo-text">Touch Support</div>
+                </div>
+                <div class="drag-demo-item" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                    <div class="drag-demo-icon">✨</div>
+                    <div class="drag-demo-text">Smooth Motion</div>
+                </div>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee Speed="50" EnableDrag="true" PauseOnHover="true"&gt;
+    &lt;!-- Drag left/right to pan --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+    
+    <div class="drag-tip">
+        💡 <strong>Tip:</strong> Check out the <a href="/drag-horizontal">Horizontal Drag</a> and <a href="/drag-vertical">Vertical Drag</a> pages for more examples!
+    </div>
+</section>
+
 <section class="cta">
     <h2>Ready to Get Started?</h2>
     <p>Explore the examples in the sidebar to see all the amazing features!</p>
@@ -315,5 +361,84 @@
         background: rgba(255, 255, 255, 0.2);
         color: white;
         border: 2px solid white;
+    }
+    
+    /* Drag Demo Styles */
+    .drag-showcase {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        padding: 2rem;
+        border-radius: 1rem;
+        border: 2px solid #667eea;
+    }
+    
+    .drag-demo-container {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+    }
+    
+    .drag-demo-content {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .drag-demo-item {
+        min-width: 180px;
+        height: 140px;
+        border-radius: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        cursor: grab;
+        transition: transform 0.2s;
+        gap: 0.75rem;
+    }
+    
+    .drag-demo-item:active {
+        cursor: grabbing;
+    }
+    
+    .drag-demo-item:hover {
+        transform: scale(1.05);
+    }
+    
+    .drag-demo-icon {
+        font-size: 2.5rem;
+    }
+    
+    .drag-demo-text {
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: center;
+    }
+    
+    .drag-tip {
+        background: rgba(102, 126, 234, 0.1);
+        border-left: 4px solid #667eea;
+        padding: 1rem 1.25rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+    }
+    
+    .drag-tip strong {
+        color: #667eea;
+    }
+    
+    .drag-tip a {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+        border-bottom: 1px dashed #667eea;
+    }
+    
+    .drag-tip a:hover {
+        border-bottom-style: solid;
     }
 </style>

@@ -5,7 +5,10 @@
   position: relative;
   width: var(--width);
   transform: var(--transform);
+  transform-origin: center center;
   touch-action: pan-y; /* Default: allow vertical scrolling */
+  /* Center rotated elements to prevent displacement */
+  margin: 0 auto;
 }
 
   /* When drag is enabled, cursor is set via JavaScript */
