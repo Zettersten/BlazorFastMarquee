@@ -62,15 +62,17 @@
   animation-play-state: var(--play);
   animation-delay: var(--delay);
   animation-direction: var(--direction);
+  --user-drag-x: 0px;
+  --user-drag-y: 0px;
 }
 
 @keyframes bfm-scroll {
   from {
-    transform: translateX(0%);
+    transform: translate(var(--user-drag-x), var(--user-drag-y)) translateX(0%);
   }
 
   to {
-    transform: translateX(-100%);
+    transform: translate(var(--user-drag-x), var(--user-drag-y)) translateX(-100%);
   }
 }
 

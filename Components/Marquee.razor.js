@@ -253,7 +253,7 @@ export function setupAnimationEvents(marqueeElement, dotnetRef) {
 
 /**
  * Creates a drag handler for pan/drag functionality.
- * Simple approach: just track offset and apply it directly.
+ * CSS-first approach: Update CSS variables, let animation handle positioning.
  * @param {HTMLElement} container - Container element
  * @param {HTMLElement} marqueeElement - First marquee element (used for reference)
  * @param {boolean} vertical - Whether to enable vertical dragging
@@ -275,7 +275,7 @@ function createDragHandler(container, marqueeElement, vertical) {
     isDragging: false,
     dragStartX: 0,
     dragStartY: 0,
-    cumulativeOffsetX: 0, // Total offset from all drags
+    cumulativeOffsetX: 0,
     cumulativeOffsetY: 0,
     pointerDownHandler: null,
     pointerMoveHandler: null,
@@ -315,14 +315,17 @@ function createDragHandler(container, marqueeElement, vertical) {
     const currentDragX = clientX - state.dragStartX;
     const currentDragY = clientY - state.dragStartY;
 
-    // Apply: cumulative offset from past + current drag
+    // Update CSS variables - let the animation handle positioning
+    const totalX = state.cumulativeOffsetX + currentDragX;
+    const totalY = state.cumulativeOffsetY + currentDragY;
+
     state.marqueeElements.forEach(el => {
       if (state.vertical) {
-        const totalY = state.cumulativeOffsetY + currentDragY;
-        el.style.transform = `translateY(${totalY}px)`;
+        el.style.setProperty('--user-drag-x', '0px');
+        el.style.setProperty('--user-drag-y', `${totalY}px`);
       } else {
-        const totalX = state.cumulativeOffsetX + currentDragX;
-        el.style.transform = `translateX(${totalX}px)`;
+        el.style.setProperty('--user-drag-x', `${totalX}px`);
+        el.style.setProperty('--user-drag-y', '0px');
       }
     });
 
@@ -347,7 +350,7 @@ function createDragHandler(container, marqueeElement, vertical) {
     state.container.style.cursor = 'grab';
     state.container.style.userSelect = '';
 
-    // Resume animation (it continues, but transform overrides visual position)
+    // Resume animation - it now includes the drag offset via CSS variables
     state.marqueeElements.forEach(el => {
       el.style.animationPlayState = '';
     });
@@ -400,9 +403,10 @@ function createDragHandler(container, marqueeElement, vertical) {
         state.container.style.userSelect = '';
       }
 
-      // Clean up inline styles
+      // Clean up CSS variables and inline styles
       state.marqueeElements.forEach(el => {
-        el.style.transform = '';
+        el.style.removeProperty('--user-drag-x');
+        el.style.removeProperty('--user-drag-y');
         el.style.animationPlayState = '';
       });
 
