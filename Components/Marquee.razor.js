@@ -277,24 +277,11 @@ function createDragHandler(container, marqueeElement, vertical) {
     dragStartY: 0,
     cumulativeOffsetX: 0,
     cumulativeOffsetY: 0,
-    marqueeBoundary: 0, // Width or height of the marquee content for wrapping
     pointerDownHandler: null,
     pointerMoveHandler: null,
     pointerUpHandler: null,
     pointerCancelHandler: null
   };
-
-  // Get the boundary size for wrapping (width for horizontal, height for vertical)
-  const updateBoundary = () => {
-    if (state.marqueeElements.length > 0) {
-      const firstMarquee = state.marqueeElements[0];
-      const rect = firstMarquee.getBoundingClientRect();
-      state.marqueeBoundary = state.vertical ? rect.height : rect.width;
-    }
-  };
-
-  // Initialize boundary
-  updateBoundary();
 
   // Handle pointer down (mouse/touch start)
   state.pointerDownHandler = (e) => {
@@ -323,20 +310,9 @@ function createDragHandler(container, marqueeElement, vertical) {
     const currentDragX = clientX - state.dragStartX;
     const currentDragY = clientY - state.dragStartY;
 
-    // Calculate total offset
-    let totalX = state.cumulativeOffsetX + currentDragX;
-    let totalY = state.cumulativeOffsetY + currentDragY;
-
-    // Wrap the offset when it exceeds the marquee boundary
-    if (state.marqueeBoundary > 0) {
-      if (state.vertical) {
-        // For vertical: wrap Y offset
-        totalY = totalY % state.marqueeBoundary;
-      } else {
-        // For horizontal: wrap X offset
-        totalX = totalX % state.marqueeBoundary;
-      }
-    }
+    // Calculate total offset (no wrapping - let it accumulate)
+    const totalX = state.cumulativeOffsetX + currentDragX;
+    const totalY = state.cumulativeOffsetY + currentDragY;
 
     // Update CSS variables on the CONTAINER
     if (state.vertical) {
@@ -354,30 +330,18 @@ function createDragHandler(container, marqueeElement, vertical) {
   state.pointerUpHandler = (e) => {
     if (!state.isDragging || state.disposed) return;
 
-    const clientX = e.type.includes('touch') ? (e.changedTouches?.[0]?.clientX ?? state.dragStartX) : e.clientX;
-    const clientY = e.type.includes('touch') ? (e.changedTouches?.[0]?.clientY ?? state.dragStartY) : e.clientY;
-
-    // Add this drag's distance to cumulative
-    const currentDragX = clientX - state.dragStartX;
-    const currentDragY = clientY - state.dragStartY;
-    
-    state.cumulativeOffsetX += currentDragX;
-    state.cumulativeOffsetY += currentDragY;
-
-    // Wrap the cumulative offset to keep it within bounds
-    if (state.marqueeBoundary > 0) {
-      if (state.vertical) {
-        state.cumulativeOffsetY = state.cumulativeOffsetY % state.marqueeBoundary;
-      } else {
-        state.cumulativeOffsetX = state.cumulativeOffsetX % state.marqueeBoundary;
-      }
-    }
-
     state.isDragging = false;
     state.container.style.cursor = 'grab';
     state.container.style.userSelect = '';
 
-    // CSS variables stay set - animation continues with offset applied
+    // Reset drag offset to 0 - don't persist it
+    // This allows the seamless loop to work correctly
+    state.cumulativeOffsetX = 0;
+    state.cumulativeOffsetY = 0;
+    state.container.style.setProperty('--user-drag-x', '0px');
+    state.container.style.setProperty('--user-drag-y', '0px');
+
+    // Animation continues from its natural position
   };
 
   // Handle pointer cancel (touch cancel)
@@ -407,9 +371,6 @@ function createDragHandler(container, marqueeElement, vertical) {
     update(vertical) {
       if (state.disposed) return;
       state.vertical = Boolean(vertical);
-      
-      // Update boundary when orientation changes
-      updateBoundary();
       
       // End any active drag when orientation changes
       if (state.isDragging) {
