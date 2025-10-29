@@ -309,20 +309,24 @@ function createDragHandler(container, marqueeElement, vertical) {
 
   // Apply transform during active drag
   const applyDragTransform = () => {
-    const totalOffset = state.persistentOffset + state.dragOffset;
+    // IMPORTANT: Only apply the current drag offset, not the persistent offset
+    // The persistent offset is already applied via CSS variables in the animation
+    // Combining them would cause double offset (jumping)
     
     state.marqueeElements.forEach((el, index) => {
-      // Don't use base transform during drag - causes jumping
-      // Instead, just apply the total accumulated offset
-      
       let transformValue;
       if (state.vertical) {
-        transformValue = `translateY(${totalOffset}px)`;
+        // Apply both: persistent offset + current drag offset
+        const totalY = state.persistentOffset + state.dragOffset;
+        transformValue = `translate(0px, ${totalY}px)`;
       } else {
-        transformValue = `translateX(${totalOffset}px)`;
+        // Apply both: persistent offset + current drag offset
+        const totalX = state.persistentOffset + state.dragOffset;
+        transformValue = `translate(${totalX}px, 0px)`;
       }
       
-      console.log(`Applying drag transform to element ${index}:`, transformValue);
+      console.log(`Element ${index} transform:`, transformValue, 
+                  '(persistent:', state.persistentOffset, '+ drag:', state.dragOffset, ')');
       
       // Apply with !important to override animation during drag
       el.style.setProperty('transform', transformValue, 'important');
@@ -331,21 +335,24 @@ function createDragHandler(container, marqueeElement, vertical) {
 
   // Apply persistent offset after drag ends (allows animation to resume)
   const applyPersistentOffset = () => {
-    console.log('Applying persistent offset:', state.persistentOffset);
+    console.log('Applying persistent offset to CSS vars:', state.persistentOffset);
     
-    state.marqueeElements.forEach(el => {
+    state.marqueeElements.forEach((el, index) => {
       if (state.persistentOffset === 0) {
-        // No offset, remove the custom property
+        // No offset, remove the custom properties
         el.style.removeProperty('--drag-offset-x');
         el.style.removeProperty('--drag-offset-y');
+        console.log(`Element ${index}: cleared CSS variables`);
       } else {
         // Set CSS variables for persistent offset
         if (state.vertical) {
           el.style.setProperty('--drag-offset-x', '0px');
           el.style.setProperty('--drag-offset-y', `${state.persistentOffset}px`);
+          console.log(`Element ${index}: set --drag-offset-y = ${state.persistentOffset}px`);
         } else {
           el.style.setProperty('--drag-offset-x', `${state.persistentOffset}px`);
           el.style.setProperty('--drag-offset-y', '0px');
+          console.log(`Element ${index}: set --drag-offset-x = ${state.persistentOffset}px`);
         }
       }
     });
@@ -356,6 +363,7 @@ function createDragHandler(container, marqueeElement, vertical) {
     if (state.disposed) return;
 
     console.log('Pointer down event triggered, vertical:', state.vertical);
+    console.log('Current persistentOffset:', state.persistentOffset);
 
     // Support both mouse and touch events
     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
@@ -365,27 +373,18 @@ function createDragHandler(container, marqueeElement, vertical) {
 
     state.isDragging = true;
     
-    // For vertical marquees, the container is rotated
-    // So we need to swap X and Y coordinates
-    if (state.vertical) {
-      // Vertical marquee: user drags up/down, which is X in rotated space
-      state.startY = clientY - state.persistentOffset;
-      state.startX = clientX;
-    } else {
-      // Horizontal marquee: user drags left/right
-      state.startX = clientX - state.persistentOffset;
-      state.startY = clientY;
-    }
+    // Store the starting cursor position without any offset adjustment
+    // The CSS variables already handle the persistent offset
+    state.startX = clientX;
+    state.startY = clientY;
 
-    console.log('Start offsets set:', { startX: state.startX, startY: state.startY, persistentOffset: state.persistentOffset });
+    console.log('Start offsets set:', { startX: state.startX, startY: state.startY });
 
     pauseAnimation();
 
     // Add grabbing cursor
     state.container.style.cursor = 'grabbing';
     state.container.style.userSelect = 'none';
-
-    console.log('Drag state initialized, isDragging:', state.isDragging);
 
     // Prevent text selection during drag
     e.preventDefault();
