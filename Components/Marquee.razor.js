@@ -260,6 +260,7 @@ export function setupAnimationEvents(marqueeElement, dotnetRef) {
  */
 function createDragHandler(container, marqueeElement, vertical) {
   console.log('createDragHandler called', { container, marqueeElement, vertical });
+  console.log('Vertical mode:', Boolean(vertical));
 
   if (!container || !marqueeElement) {
     console.log('createDragHandler: missing container or marqueeElement');
@@ -281,73 +282,52 @@ function createDragHandler(container, marqueeElement, vertical) {
     currentY: 0,
     dragOffset: 0,
     persistentOffset: 0, // Cumulative offset that persists between drags
-    baseTransforms: [], // Store the animation's current transform when drag starts
-    originalPlayStates: [],
     pointerDownHandler: null,
     pointerMoveHandler: null,
     pointerUpHandler: null,
     pointerCancelHandler: null
   };
 
-  // Store original animation play state and current transform for all marquee elements
-  const savePlayState = () => {
-    state.originalPlayStates = [];
-    state.baseTransforms = [];
-    
-    state.marqueeElements.forEach(el => {
-      const computedStyle = window.getComputedStyle(el);
-      state.originalPlayStates.push(computedStyle.animationPlayState);
-      
-      // Get the current transform from the animation
-      const transform = computedStyle.transform;
-      console.log('Saved base transform:', transform);
-      state.baseTransforms.push(transform);
-    });
-  };
+  console.log('State initialized with vertical:', state.vertical);
+
+  // No longer need to save play state - we just remove the inline style
 
   // Pause animation during drag for all marquee elements
   const pauseAnimation = () => {
+    console.log('Pausing animation');
     state.marqueeElements.forEach(el => {
-      el.style.animationPlayState = 'paused';
+      el.style.setProperty('animation-play-state', 'paused', 'important');
     });
   };
 
   // Restore animation after drag for all marquee elements
   const restoreAnimation = () => {
-    state.marqueeElements.forEach((el, index) => {
-      if (state.originalPlayStates[index]) {
-        el.style.animationPlayState = state.originalPlayStates[index];
-      }
+    console.log('Restoring animation');
+    state.marqueeElements.forEach(el => {
+      // Remove the inline style to let CSS take over
+      el.style.removeProperty('animation-play-state');
     });
   };
 
   // Apply transform during active drag
   const applyDragTransform = () => {
     const totalOffset = state.persistentOffset + state.dragOffset;
-    console.log('Applying drag transform, total offset:', totalOffset);
     
     state.marqueeElements.forEach((el, index) => {
-      const baseTransform = state.baseTransforms[index] || 'none';
+      // Don't use base transform during drag - causes jumping
+      // Instead, just apply the total accumulated offset
       
-      // Parse the base transform matrix to get current translation
-      let baseX = 0, baseY = 0;
-      if (baseTransform !== 'none') {
-        const matrixMatch = baseTransform.match(/matrix\(([^)]+)\)/);
-        if (matrixMatch) {
-          const values = matrixMatch[1].split(',').map(v => parseFloat(v.trim()));
-          baseX = values[4] || 0;
-          baseY = values[5] || 0;
-        }
+      let transformValue;
+      if (state.vertical) {
+        transformValue = `translateY(${totalOffset}px)`;
+      } else {
+        transformValue = `translateX(${totalOffset}px)`;
       }
       
-      // Apply total offset (persistent + current drag) on top of base transform
-      const newX = baseX + (state.vertical ? 0 : totalOffset);
-      const newY = baseY + (state.vertical ? totalOffset : 0);
-      
-      const combinedTransform = `translate(${newX}px, ${newY}px)`;
+      console.log(`Applying drag transform to element ${index}:`, transformValue);
       
       // Apply with !important to override animation during drag
-      el.style.setProperty('transform', combinedTransform, 'important');
+      el.style.setProperty('transform', transformValue, 'important');
     });
   };
 
@@ -389,7 +369,6 @@ function createDragHandler(container, marqueeElement, vertical) {
     state.startX = clientX - state.currentX;
     state.startY = clientY - state.currentY;
 
-    savePlayState();
     pauseAnimation();
 
     // Add grabbing cursor
@@ -405,11 +384,8 @@ function createDragHandler(container, marqueeElement, vertical) {
   // Handle pointer move (mouse/touch move)
   state.pointerMoveHandler = (e) => {
     if (!state.isDragging || state.disposed) {
-      if (!state.isDragging) console.log('Move event but not dragging');
       return;
     }
-
-    console.log('Pointer move event, isDragging:', state.isDragging);
 
     // Support both mouse and touch events
     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
@@ -418,12 +394,12 @@ function createDragHandler(container, marqueeElement, vertical) {
     if (state.vertical) {
       state.currentY = clientY - state.startY;
       state.dragOffset = state.currentY;
+      console.log('Vertical drag - Y offset:', state.dragOffset);
     } else {
       state.currentX = clientX - state.startX;
       state.dragOffset = state.currentX;
+      console.log('Horizontal drag - X offset:', state.dragOffset);
     }
-
-    console.log('Calculated drag offset:', state.dragOffset, { currentX: state.currentX, currentY: state.currentY });
 
     applyDragTransform();
     e.preventDefault();
@@ -449,7 +425,6 @@ function createDragHandler(container, marqueeElement, vertical) {
     state.currentX = 0;
     state.currentY = 0;
     state.dragOffset = 0;
-    state.baseTransforms = [];
 
     // Remove inline transform (applied during drag)
     state.marqueeElements.forEach(el => {
