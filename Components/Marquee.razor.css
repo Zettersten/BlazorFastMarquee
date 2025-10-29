@@ -6,9 +6,8 @@
   width: var(--width);
   transform: var(--transform);
   touch-action: pan-y; /* Default: allow vertical scrolling */
-  /* Drag offset variables - defined at container level and inherited by children */
-  --user-drag-x: 0px;
-  --user-drag-y: 0px;
+  /* Drag offset as percentage of animation cycle */
+  --drag-offset-percent: 0%;
 }
 
   /* When drag is enabled, cursor is set via JavaScript */
@@ -61,19 +60,18 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  animation: bfm-scroll var(--duration) linear var(--delay) var(--iteration-count);
+  animation: bfm-scroll var(--duration) linear calc(var(--delay) - var(--drag-offset-percent) * var(--duration) / 100) var(--iteration-count);
   animation-play-state: var(--play);
-  animation-delay: var(--delay);
   animation-direction: var(--direction);
 }
 
 @keyframes bfm-scroll {
   from {
-    transform: translate(var(--user-drag-x), var(--user-drag-y)) translateX(0%);
+    transform: translateX(0%);
   }
 
   to {
-    transform: translate(var(--user-drag-x), var(--user-drag-y)) translateX(-100%);
+    transform: translateX(-100%);
   }
 }
 

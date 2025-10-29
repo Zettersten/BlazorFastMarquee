@@ -275,12 +275,20 @@ function createDragHandler(container, marqueeElement, vertical) {
     isDragging: false,
     dragStartX: 0,
     dragStartY: 0,
-    cumulativeOffsetX: 0,
-    cumulativeOffsetY: 0,
+    dragOffsetPercent: 0, // Current drag offset as percentage of marquee size
     pointerDownHandler: null,
     pointerMoveHandler: null,
     pointerUpHandler: null,
     pointerCancelHandler: null
+  };
+
+  // Get marquee dimensions for calculating percentage
+  const getMarqueeSize = () => {
+    if (state.marqueeElements.length > 0) {
+      const rect = state.marqueeElements[0].getBoundingClientRect();
+      return state.vertical ? rect.height : rect.width;
+    }
+    return 0;
   };
 
   // Handle pointer down (mouse/touch start)
@@ -306,21 +314,20 @@ function createDragHandler(container, marqueeElement, vertical) {
     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
 
-    // How far we've dragged in this single drag gesture
-    const currentDragX = clientX - state.dragStartX;
-    const currentDragY = clientY - state.dragStartY;
+    // How far we've dragged in pixels
+    const dragPixels = state.vertical 
+      ? (clientY - state.dragStartY)
+      : (clientX - state.dragStartX);
 
-    // Calculate total offset (no wrapping - let it accumulate)
-    const totalX = state.cumulativeOffsetX + currentDragX;
-    const totalY = state.cumulativeOffsetY + currentDragY;
-
-    // Update CSS variables on the CONTAINER
-    if (state.vertical) {
-      state.container.style.setProperty('--user-drag-x', '0px');
-      state.container.style.setProperty('--user-drag-y', `${totalY}px`);
-    } else {
-      state.container.style.setProperty('--user-drag-x', `${totalX}px`);
-      state.container.style.setProperty('--user-drag-y', '0px');
+    // Convert pixels to percentage of marquee size
+    const marqueeSize = getMarqueeSize();
+    if (marqueeSize > 0) {
+      // Calculate percentage and wrap it within -100% to 100%
+      let percent = (dragPixels / marqueeSize) * 100;
+      percent = percent % 100;
+      
+      state.dragOffsetPercent = percent;
+      state.container.style.setProperty('--drag-offset-percent', `${percent}`);
     }
 
     e.preventDefault();
@@ -334,14 +341,8 @@ function createDragHandler(container, marqueeElement, vertical) {
     state.container.style.cursor = 'grab';
     state.container.style.userSelect = '';
 
-    // Reset drag offset to 0 - don't persist it
-    // This allows the seamless loop to work correctly
-    state.cumulativeOffsetX = 0;
-    state.cumulativeOffsetY = 0;
-    state.container.style.setProperty('--user-drag-x', '0px');
-    state.container.style.setProperty('--user-drag-y', '0px');
-
-    // Animation continues from its natural position
+    // Keep the drag offset - animation continues from the new position
+    // Using negative animation-delay with the percentage offset
   };
 
   // Handle pointer cancel (touch cancel)
@@ -392,8 +393,7 @@ function createDragHandler(container, marqueeElement, vertical) {
       }
 
       // Clean up CSS variables from container
-      state.container.style.removeProperty('--user-drag-x');
-      state.container.style.removeProperty('--user-drag-y');
+      state.container.style.removeProperty('--drag-offset-percent');
 
       // Remove event listeners
       if (state.container && state.pointerDownHandler) {
