@@ -280,6 +280,7 @@ function createDragHandler(container, marqueeElement, vertical) {
     currentX: 0,
     currentY: 0,
     dragOffset: 0,
+    baseTransforms: [], // Store the animation's current transform when drag starts
     originalPlayStates: [],
     pointerDownHandler: null,
     pointerMoveHandler: null,
@@ -287,11 +288,19 @@ function createDragHandler(container, marqueeElement, vertical) {
     pointerCancelHandler: null
   };
 
-  // Store original animation play state for all marquee elements
+  // Store original animation play state and current transform for all marquee elements
   const savePlayState = () => {
-    state.originalPlayStates = state.marqueeElements.map(el => {
+    state.originalPlayStates = [];
+    state.baseTransforms = [];
+    
+    state.marqueeElements.forEach(el => {
       const computedStyle = window.getComputedStyle(el);
-      return computedStyle.animationPlayState;
+      state.originalPlayStates.push(computedStyle.animationPlayState);
+      
+      // Get the current transform from the animation
+      const transform = computedStyle.transform;
+      console.log('Saved base transform:', transform);
+      state.baseTransforms.push(transform);
     });
   };
 
@@ -313,12 +322,32 @@ function createDragHandler(container, marqueeElement, vertical) {
 
   // Apply transform based on drag offset to all marquee elements
   const applyDragTransform = () => {
-    const transform = state.vertical
-      ? `translateY(${state.dragOffset}px)`
-      : `translateX(${state.dragOffset}px)`;
+    console.log('Applying transform with drag offset:', state.dragOffset);
     
-    state.marqueeElements.forEach(el => {
-      el.style.transform = transform;
+    state.marqueeElements.forEach((el, index) => {
+      const baseTransform = state.baseTransforms[index] || 'none';
+      
+      // Parse the base transform matrix to get current translation
+      let baseX = 0, baseY = 0;
+      if (baseTransform !== 'none') {
+        const matrixMatch = baseTransform.match(/matrix\(([^)]+)\)/);
+        if (matrixMatch) {
+          const values = matrixMatch[1].split(',').map(v => parseFloat(v.trim()));
+          baseX = values[4] || 0;
+          baseY = values[5] || 0;
+          console.log(`Element ${index} base translation:`, { baseX, baseY });
+        }
+      }
+      
+      // Apply drag offset on top of base transform
+      const newX = baseX + (state.vertical ? 0 : state.dragOffset);
+      const newY = baseY + (state.vertical ? state.dragOffset : 0);
+      
+      const combinedTransform = `translate(${newX}px, ${newY}px)`;
+      console.log(`Element ${index} combined transform:`, combinedTransform);
+      
+      // Apply with !important to override animation
+      el.style.setProperty('transform', combinedTransform, 'important');
     });
   };
 
@@ -326,9 +355,13 @@ function createDragHandler(container, marqueeElement, vertical) {
   state.pointerDownHandler = (e) => {
     if (state.disposed) return;
 
+    console.log('Pointer down event triggered');
+
     // Support both mouse and touch events
     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+    console.log('Start position:', { clientX, clientY });
 
     state.isDragging = true;
     state.startX = clientX - state.currentX;
@@ -341,13 +374,20 @@ function createDragHandler(container, marqueeElement, vertical) {
     state.container.style.cursor = 'grabbing';
     state.container.style.userSelect = 'none';
 
+    console.log('Drag state initialized, isDragging:', state.isDragging);
+
     // Prevent text selection during drag
     e.preventDefault();
   };
 
   // Handle pointer move (mouse/touch move)
   state.pointerMoveHandler = (e) => {
-    if (!state.isDragging || state.disposed) return;
+    if (!state.isDragging || state.disposed) {
+      if (!state.isDragging) console.log('Move event but not dragging');
+      return;
+    }
+
+    console.log('Pointer move event, isDragging:', state.isDragging);
 
     // Support both mouse and touch events
     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
@@ -361,6 +401,8 @@ function createDragHandler(container, marqueeElement, vertical) {
       state.dragOffset = state.currentX;
     }
 
+    console.log('Calculated drag offset:', state.dragOffset, { currentX: state.currentX, currentY: state.currentY });
+
     applyDragTransform();
     e.preventDefault();
   };
@@ -369,21 +411,26 @@ function createDragHandler(container, marqueeElement, vertical) {
   state.pointerUpHandler = (e) => {
     if (!state.isDragging || state.disposed) return;
 
+    console.log('Pointer up - ending drag');
+
     state.isDragging = false;
     
     // Reset cursor
     state.container.style.cursor = 'grab';
     state.container.style.userSelect = '';
 
-    // Reset transform and restore animation for all marquee elements
+    // Remove inline transform and restore animation for all marquee elements
     state.marqueeElements.forEach(el => {
-      el.style.transform = '';
+      el.style.removeProperty('transform');
     });
     state.currentX = 0;
     state.currentY = 0;
     state.dragOffset = 0;
+    state.baseTransforms = [];
     
     restoreAnimation();
+    
+    console.log('Drag ended, animation restored');
   };
 
   // Handle pointer cancel (touch cancel)
@@ -395,16 +442,23 @@ function createDragHandler(container, marqueeElement, vertical) {
   // Set initial cursor
   state.container.style.cursor = 'grab';
 
+  console.log('Adding event listeners to container and document');
+
   // Add mouse event listeners
   state.container.addEventListener('mousedown', state.pointerDownHandler, { passive: false });
   document.addEventListener('mousemove', state.pointerMoveHandler, { passive: false });
   document.addEventListener('mouseup', state.pointerUpHandler, { passive: true });
+
+  console.log('Mouse event listeners added');
 
   // Add touch event listeners for mobile support
   state.container.addEventListener('touchstart', state.pointerDownHandler, { passive: false });
   document.addEventListener('touchmove', state.pointerMoveHandler, { passive: false });
   document.addEventListener('touchend', state.pointerUpHandler, { passive: true });
   document.addEventListener('touchcancel', state.pointerCancelHandler, { passive: true });
+
+  console.log('Touch event listeners added');
+  console.log('Drag handler setup complete for', state.marqueeElements.length, 'marquee elements');
 
   return {
     /**
@@ -437,7 +491,7 @@ function createDragHandler(container, marqueeElement, vertical) {
         state.container.style.cursor = '';
         state.container.style.userSelect = '';
         state.marqueeElements.forEach(el => {
-          el.style.transform = '';
+          el.style.removeProperty('transform');
         });
         restoreAnimation();
       }
