@@ -23,11 +23,7 @@
     <PropertyGroup>
       <IndexHtmlPath>$(PublishDir)wwwroot\index.html</IndexHtmlPath>
     </PropertyGroup>
-    <ReplaceFileText
-      InputFilename="$(IndexHtmlPath)"
-      OutputFilename="$(IndexHtmlPath)"
-      MatchExpression='&lt;base href="/" /&gt;'
-      ReplacementText='&lt;base href="$(BaseHref)" /&gt;' />
+    <ReplaceFileText InputFilename="$(IndexHtmlPath)" OutputFilename="$(IndexHtmlPath)" MatchExpression="&lt;base href=&quot;/&quot; /&gt;" ReplacementText="&lt;base href=&quot;$(BaseHref)&quot; /&gt;" />
   </Target>
 
   <!-- Task to replace text in files -->
