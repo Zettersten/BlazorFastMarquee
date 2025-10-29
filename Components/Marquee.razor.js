@@ -254,7 +254,7 @@ export function setupAnimationEvents(marqueeElement, dotnetRef) {
 /**
  * Creates a drag handler for pan/drag functionality.
  * @param {HTMLElement} container - Container element
- * @param {HTMLElement} marqueeElement - Marquee element to manipulate
+ * @param {HTMLElement} marqueeElement - First marquee element (used for reference)
  * @param {boolean} vertical - Whether to enable vertical dragging
  * @returns {Object|null} Drag handler or null if invalid parameters
  */
@@ -266,9 +266,12 @@ function createDragHandler(container, marqueeElement, vertical) {
     return null;
   }
 
+  // Get all marquee elements (there are always 2 for seamless looping)
+  const marqueeElements = container.querySelectorAll('.bfm-marquee');
+  
   const state = {
     container,
-    marqueeElement,
+    marqueeElements: Array.from(marqueeElements),
     vertical: Boolean(vertical),
     disposed: false,
     isDragging: false,
@@ -277,38 +280,46 @@ function createDragHandler(container, marqueeElement, vertical) {
     currentX: 0,
     currentY: 0,
     dragOffset: 0,
-    originalPlayState: null,
+    originalPlayStates: [],
     pointerDownHandler: null,
     pointerMoveHandler: null,
     pointerUpHandler: null,
     pointerCancelHandler: null
   };
 
-  // Store original animation play state
+  // Store original animation play state for all marquee elements
   const savePlayState = () => {
-    const computedStyle = window.getComputedStyle(state.marqueeElement);
-    state.originalPlayState = computedStyle.animationPlayState;
+    state.originalPlayStates = state.marqueeElements.map(el => {
+      const computedStyle = window.getComputedStyle(el);
+      return computedStyle.animationPlayState;
+    });
   };
 
-  // Pause animation during drag
+  // Pause animation during drag for all marquee elements
   const pauseAnimation = () => {
-    state.marqueeElement.style.animationPlayState = 'paused';
+    state.marqueeElements.forEach(el => {
+      el.style.animationPlayState = 'paused';
+    });
   };
 
-  // Restore animation after drag
+  // Restore animation after drag for all marquee elements
   const restoreAnimation = () => {
-    if (state.originalPlayState) {
-      state.marqueeElement.style.animationPlayState = state.originalPlayState;
-    }
+    state.marqueeElements.forEach((el, index) => {
+      if (state.originalPlayStates[index]) {
+        el.style.animationPlayState = state.originalPlayStates[index];
+      }
+    });
   };
 
-  // Apply transform based on drag offset
+  // Apply transform based on drag offset to all marquee elements
   const applyDragTransform = () => {
-    if (state.vertical) {
-      state.marqueeElement.style.transform = `translateY(${state.dragOffset}px)`;
-    } else {
-      state.marqueeElement.style.transform = `translateX(${state.dragOffset}px)`;
-    }
+    const transform = state.vertical
+      ? `translateY(${state.dragOffset}px)`
+      : `translateX(${state.dragOffset}px)`;
+    
+    state.marqueeElements.forEach(el => {
+      el.style.transform = transform;
+    });
   };
 
   // Handle pointer down (mouse/touch start)
@@ -364,8 +375,10 @@ function createDragHandler(container, marqueeElement, vertical) {
     state.container.style.cursor = 'grab';
     state.container.style.userSelect = '';
 
-    // Reset transform and restore animation
-    state.marqueeElement.style.transform = '';
+    // Reset transform and restore animation for all marquee elements
+    state.marqueeElements.forEach(el => {
+      el.style.transform = '';
+    });
     state.currentX = 0;
     state.currentY = 0;
     state.dragOffset = 0;
@@ -423,7 +436,9 @@ function createDragHandler(container, marqueeElement, vertical) {
       if (state.isDragging) {
         state.container.style.cursor = '';
         state.container.style.userSelect = '';
-        state.marqueeElement.style.transform = '';
+        state.marqueeElements.forEach(el => {
+          el.style.transform = '';
+        });
         restoreAnimation();
       }
 
@@ -453,7 +468,7 @@ function createDragHandler(container, marqueeElement, vertical) {
       }
 
       state.container = null;
-      state.marqueeElement = null;
+      state.marqueeElements = [];
       state.pointerDownHandler = null;
       state.pointerMoveHandler = null;
       state.pointerUpHandler = null;
