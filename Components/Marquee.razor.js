@@ -424,44 +424,55 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
       if (state.disposed) return;
       state.disposed = true;
 
+      console.log('Disposing drag handler');
+
       // Clean up any active drag state
       if (state.isDragging) {
-        state.container.style.cursor = '';
-        state.container.style.userSelect = '';
+        state.isDragging = false;
+        state.container.style.removeProperty('cursor');
+        state.container.style.removeProperty('user-select');
       }
 
-
-      // Remove event listeners
+      // Remove event listeners from container
       if (state.container && state.pointerDownHandler) {
+        console.log('Removing container event listeners');
         state.container.removeEventListener('mousedown', state.pointerDownHandler);
         state.container.removeEventListener('touchstart', state.pointerDownHandler);
       }
 
+      // Remove event listeners from document
       if (state.pointerMoveHandler) {
+        console.log('Removing document move listeners');
         document.removeEventListener('mousemove', state.pointerMoveHandler);
         document.removeEventListener('touchmove', state.pointerMoveHandler);
       }
 
       if (state.pointerUpHandler) {
+        console.log('Removing document up/end listeners');
         document.removeEventListener('mouseup', state.pointerUpHandler);
         document.removeEventListener('touchend', state.pointerUpHandler);
       }
 
       if (state.pointerCancelHandler) {
+        console.log('Removing touch cancel listener');
         document.removeEventListener('touchcancel', state.pointerCancelHandler);
       }
 
-      // Reset cursor
+      // Remove inline cursor style (set by setupDragHandler)
       if (state.container) {
-        state.container.style.cursor = '';
+        console.log('Removing cursor style from container');
+        state.container.style.removeProperty('cursor');
       }
 
+      // Clear all state references
       state.container = null;
       state.marqueeElements = [];
       state.pointerDownHandler = null;
       state.pointerMoveHandler = null;
       state.pointerUpHandler = null;
       state.pointerCancelHandler = null;
+      
+      console.log('Drag handler disposed successfully');
     }
   };
 }
