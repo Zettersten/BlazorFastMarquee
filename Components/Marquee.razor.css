@@ -66,11 +66,11 @@
 
 @keyframes bfm-scroll {
   from {
-    transform: translate(var(--drag-offset-x, 0), var(--drag-offset-y, 0)) translateX(0%);
+    transform: translateX(0%);
   }
 
   to {
-    transform: translate(var(--drag-offset-x, 0), var(--drag-offset-y, 0)) translateX(-100%);
+    transform: translateX(-100%);
   }
 }
 
