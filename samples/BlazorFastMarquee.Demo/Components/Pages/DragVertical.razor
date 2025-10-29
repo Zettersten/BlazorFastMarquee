@@ -12,16 +12,18 @@
     
     <div class="vertical-container">
         <div class="vertical-demo drag-indicator">
-            <Marquee Speed="50" EnableDrag="true" Direction="MarqueeDirection.Up" Gradient="true">
-                <div class="drag-content-vertical">
-                    <div class="drag-item-vertical drag-up">🖱️ Drag Me Vertically!</div>
-                    <div class="drag-item-vertical drag-up">👆 Click & Hold</div>
-                    <div class="drag-item-vertical drag-up">↕️ Pan Up/Down</div>
-                    <div class="drag-item-vertical drag-up">⏸️ Auto Pauses</div>
-                    <div class="drag-item-vertical drag-up">🎯 Interactive</div>
-                    <div class="drag-item-vertical drag-up">✨ Smooth Motion</div>
-                </div>
-            </Marquee>
+            <div class="marquee-wrapper">
+                <Marquee Speed="50" EnableDrag="true" Direction="MarqueeDirection.Up" Gradient="true">
+                    <div class="drag-content-vertical">
+                        <div class="drag-item-vertical drag-up">🖱️ Drag Me Vertically!</div>
+                        <div class="drag-item-vertical drag-up">👆 Click & Hold</div>
+                        <div class="drag-item-vertical drag-up">↕️ Pan Up/Down</div>
+                        <div class="drag-item-vertical drag-up">⏸️ Auto Pauses</div>
+                        <div class="drag-item-vertical drag-up">🎯 Interactive</div>
+                        <div class="drag-item-vertical drag-up">✨ Smooth Motion</div>
+                    </div>
+                </Marquee>
+            </div>
         </div>
     </div>
     
@@ -38,15 +40,17 @@
     
     <div class="vertical-container">
         <div class="vertical-demo">
-            <Marquee Speed="50" EnableDrag="true" Direction="MarqueeDirection.Down" Gradient="true" GradientColor="#f0f0f0">
-                <div class="drag-content-vertical">
-                    <div class="drag-item-vertical drag-down">⬆️ Scroll Down</div>
-                    <div class="drag-item-vertical drag-down">🖱️ Drag Enabled</div>
-                    <div class="drag-item-vertical drag-down">🎮 Full Control</div>
-                    <div class="drag-item-vertical drag-down">✨ Smooth</div>
-                    <div class="drag-item-vertical drag-down">📱 Touch Support</div>
-                </div>
-            </Marquee>
+            <div class="marquee-wrapper">
+                <Marquee Speed="50" EnableDrag="true" Direction="MarqueeDirection.Down" Gradient="true" GradientColor="#f0f0f0">
+                    <div class="drag-content-vertical">
+                        <div class="drag-item-vertical drag-down">⬆️ Scroll Down</div>
+                        <div class="drag-item-vertical drag-down">🖱️ Drag Enabled</div>
+                        <div class="drag-item-vertical drag-down">🎮 Full Control</div>
+                        <div class="drag-item-vertical drag-down">✨ Smooth</div>
+                        <div class="drag-item-vertical drag-down">📱 Touch Support</div>
+                    </div>
+                </Marquee>
+            </div>
         </div>
     </div>
     
@@ -65,28 +69,32 @@
         <div class="comparison-item">
             <h3>Scroll Up ⬆️</h3>
             <div class="vertical-demo-compact">
-                <Marquee Speed="40" EnableDrag="true" Direction="MarqueeDirection.Up" Gradient="true">
-                    <div class="drag-content-vertical">
-                        <div class="drag-item-vertical-compact">📝 Item 1</div>
-                        <div class="drag-item-vertical-compact">📝 Item 2</div>
-                        <div class="drag-item-vertical-compact">📝 Item 3</div>
-                        <div class="drag-item-vertical-compact">📝 Item 4</div>
-                    </div>
-                </Marquee>
+                <div class="marquee-wrapper-compact">
+                    <Marquee Speed="40" EnableDrag="true" Direction="MarqueeDirection.Up" Gradient="true">
+                        <div class="drag-content-vertical">
+                            <div class="drag-item-vertical-compact">📝 Item 1</div>
+                            <div class="drag-item-vertical-compact">📝 Item 2</div>
+                            <div class="drag-item-vertical-compact">📝 Item 3</div>
+                            <div class="drag-item-vertical-compact">📝 Item 4</div>
+                        </div>
+                    </Marquee>
+                </div>
             </div>
         </div>
         
         <div class="comparison-item">
             <h3>Scroll Down ⬇️</h3>
             <div class="vertical-demo-compact">
-                <Marquee Speed="40" EnableDrag="true" Direction="MarqueeDirection.Down" Gradient="true">
-                    <div class="drag-content-vertical">
-                        <div class="drag-item-vertical-compact">📝 Item A</div>
-                        <div class="drag-item-vertical-compact">📝 Item B</div>
-                        <div class="drag-item-vertical-compact">📝 Item C</div>
-                        <div class="drag-item-vertical-compact">📝 Item D</div>
-                    </div>
-                </Marquee>
+                <div class="marquee-wrapper-compact">
+                    <Marquee Speed="40" EnableDrag="true" Direction="MarqueeDirection.Down" Gradient="true">
+                        <div class="drag-content-vertical">
+                            <div class="drag-item-vertical-compact">📝 Item A</div>
+                            <div class="drag-item-vertical-compact">📝 Item B</div>
+                            <div class="drag-item-vertical-compact">📝 Item C</div>
+                            <div class="drag-item-vertical-compact">📝 Item D</div>
+                        </div>
+                    </Marquee>
+                </div>
             </div>
         </div>
     </div>
@@ -104,19 +112,21 @@
     
     <div class="vertical-container">
         <div class="vertical-demo">
-            <Marquee Speed="50" EnableDrag="@_dragEnabled" Direction="MarqueeDirection.Up" Gradient="true">
-                <div class="drag-content-vertical">
-                    <div class="drag-item-vertical drag-toggle">
-                        @(_dragEnabled ? "🖱️ Try Dragging!" : "🔒 Drag Disabled")
+            <div class="marquee-wrapper">
+                <Marquee Speed="50" EnableDrag="@_dragEnabled" Direction="MarqueeDirection.Up" Gradient="true">
+                    <div class="drag-content-vertical">
+                        <div class="drag-item-vertical drag-toggle">
+                            @(_dragEnabled ? "🖱️ Try Dragging!" : "🔒 Drag Disabled")
+                        </div>
+                        <div class="drag-item-vertical drag-toggle">
+                            @(_dragEnabled ? "✅ Interactive" : "❌ Locked")
+                        </div>
+                        <div class="drag-item-vertical drag-toggle">
+                            @(_dragEnabled ? "🎮 Control" : "▶️ Auto-Play")
+                        </div>
                     </div>
-                    <div class="drag-item-vertical drag-toggle">
-                        @(_dragEnabled ? "✅ Interactive" : "❌ Locked")
-                    </div>
-                    <div class="drag-item-vertical drag-toggle">
-                        @(_dragEnabled ? "🎮 Control" : "▶️ Auto-Play")
-                    </div>
-                </div>
-            </Marquee>
+                </Marquee>
+            </div>
         </div>
     </div>
 </section>
@@ -184,6 +194,10 @@
         padding: 1rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         position: relative;
+        /* Create a containing block for the rotated marquee */
+        display: flex;
+        align-items: center;
+        justify-content: center;
         overflow: hidden;
     }
     
@@ -195,7 +209,28 @@
         padding: 1rem;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         position: relative;
+        /* Create a containing block for the rotated marquee */
+        display: flex;
+        align-items: center;
+        justify-content: center;
         overflow: hidden;
+    }
+    
+    /* Wrapper to constrain the rotated marquee dimensions */
+    .marquee-wrapper {
+        /* Visual dimensions: 280px wide × 380px tall (accounting for padding) */
+        /* Before rotation: 380px wide × 280px tall */
+        width: 380px;
+        height: 280px;
+        position: relative;
+    }
+    
+    .marquee-wrapper-compact {
+        /* Visual dimensions: ~260px wide × 280px tall (accounting for padding) */
+        /* Before rotation: 280px wide × 260px tall */
+        width: 280px;
+        height: 220px;
+        position: relative;
     }
     
     .drag-content-vertical {
