@@ -296,6 +296,8 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     if (_isDisposed)
       return;
 
+    System.Diagnostics.Debug.WriteLine($"[Marquee] OnAfterRenderAsync called - firstRender: {firstRender}, EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
+
     try
     {
       if (!await EnsureModuleAsync())
@@ -303,13 +305,13 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
 
       await EnsureObserverAsync();
       await EnsureAnimationHandlerAsync();
-
+      
       // Always ensure drag handler is in correct state
       await EnsureDragHandlerAsync();
-
+      
       // Reset the enableDragChanged flag after handling
       _enableDragChanged = false;
-
+      
       await MeasureAsync();
 
       if (firstRender && OnMount.HasDelegate && !_onMountInvoked)
@@ -326,6 +328,8 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     {
       // Component disposed during async operation - expected
     }
+    
+    System.Diagnostics.Debug.WriteLine($"[Marquee] OnAfterRenderAsync complete - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
   }
 
   #endregion Lifecycle Methods
@@ -943,11 +947,19 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
   private async ValueTask DisposeDragHandlerAsync()
   {
     if (_dragHandler is null)
+    {
+      System.Diagnostics.Debug.WriteLine("[Marquee] DisposeDragHandlerAsync called but _dragHandler is already null");
       return;
+    }
+
+    var handlerToDispose = _dragHandler;
+    _dragHandler = null; // Clear immediately to prevent re-entry
+    
+    System.Diagnostics.Debug.WriteLine("[Marquee] DisposeDragHandlerAsync: Setting _dragHandler to null and disposing");
 
     try
     {
-      await _dragHandler.InvokeVoidAsync("dispose");
+      await handlerToDispose.InvokeVoidAsync("dispose");
     }
     catch (JSDisconnectedException)
     {
@@ -957,22 +969,21 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     {
       // Already disposed - expected
     }
-    catch
+    catch (Exception ex)
     {
-      // Suppress other errors during disposal
+      System.Diagnostics.Debug.WriteLine($"[Marquee] Error calling dispose: {ex.Message}");
     }
-    finally
+    
+    try
     {
-      try
-      {
-        await _dragHandler.DisposeAsync();
-      }
-      catch
-      {
-        // Suppress disposal errors
-      }
-      _dragHandler = null;
+      await handlerToDispose.DisposeAsync();
     }
+    catch (Exception ex)
+    {
+      System.Diagnostics.Debug.WriteLine($"[Marquee] Error in DisposeAsync: {ex.Message}");
+    }
+    
+    System.Diagnostics.Debug.WriteLine("[Marquee] DisposeDragHandlerAsync complete, _dragHandler is now null");
   }
 
   private async ValueTask DisposeAnimationHandlerAsync()
