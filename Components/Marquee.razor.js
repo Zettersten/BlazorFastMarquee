@@ -269,8 +269,9 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
 
   // Handle pointer down (mouse/touch start)
   state.pointerDownHandler = (e) => {
+    console.log(`[DragHandler ${state.handlerId || 'unknown'}] pointerDown called - disposed: ${state.disposed}`);
     if (state.disposed) {
-      console.log('[DragHandler] pointerDown called but state is disposed!');
+      console.log(`[DragHandler ${state.handlerId}] BLOCKED: pointerDown called but state is disposed!`);
       return;
     }
 
@@ -366,11 +367,15 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
     state.pointerUpHandler(e);
   };
 
-  // Set initial cursor
-  console.log('[DragHandler] Setting up drag handler, adding grab cursor');
+  // Set initial cursor and add unique ID for tracking
+  const handlerId = 'handler-' + Math.random().toString(36).substr(2, 9);
+  console.log(`[DragHandler ${handlerId}] Setting up drag handler, adding grab cursor`);
+  state.handlerId = handlerId;
   state.container.style.cursor = 'grab';
+  state.container.dataset.dragHandlerId = handlerId;
 
   // Add mouse event listeners
+  console.log(`[DragHandler ${handlerId}] Adding mousedown listener to container`);
   state.container.addEventListener('mousedown', state.pointerDownHandler, { passive: false });
   document.addEventListener('mousemove', state.pointerMoveHandler, { passive: false });
   document.addEventListener('mouseup', state.pointerUpHandler, { passive: true });
@@ -400,7 +405,7 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
      * Disposes the drag handler and cleans up event listeners.
      */
     dispose() {
-      console.log('[DragHandler] Dispose called, disposed:', state.disposed);
+      console.log(`[DragHandler ${state.handlerId || 'unknown'}] Dispose called, disposed: ${state.disposed}`);
       if (state.disposed) return;
       state.disposed = true;
 
@@ -423,14 +428,16 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
 
       // Remove event listeners - omit options to ensure removal regardless of how they were added
       if (state.container && state.pointerDownHandler) {
-        console.log('[DragHandler] Removing container event listeners', {
+        console.log(`[DragHandler ${state.handlerId}] Removing container event listeners`, {
           hasContainer: !!state.container,
           hasHandler: !!state.pointerDownHandler,
-          handlerType: typeof state.pointerDownHandler
+          handlerType: typeof state.pointerDownHandler,
+          containerHasDataAttr: state.container.dataset.dragHandlerId
         });
         state.container.removeEventListener('mousedown', state.pointerDownHandler);
         state.container.removeEventListener('touchstart', state.pointerDownHandler);
-        console.log('[DragHandler] Container listeners removed');
+        delete state.container.dataset.dragHandlerId;
+        console.log(`[DragHandler ${state.handlerId}] Container listeners removed`);
       }
 
       // Remove event listeners from document

@@ -494,15 +494,19 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     if (_module is null || _isDisposed)
       return;
 
+    // Capture EnableDrag at the start to prevent race conditions
+    var enableDragSnapshot = EnableDrag;
+    
     // Use semaphore to prevent concurrent execution from multiple render cycles
     await _dragHandlerLock.WaitAsync();
     try
     {
-      System.Diagnostics.Debug.WriteLine($"[Marquee] EnsureDragHandlerAsync LOCKED - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
+      System.Diagnostics.Debug.WriteLine($"[Marquee] >>> LOCKED - EnableDrag snapshot: {enableDragSnapshot}, current: {EnableDrag}, _dragHandler: {_dragHandler != null}");
       
       var isVertical = IsVertical(Direction);
       var isReversed = IsReversedDirection(Direction);
 
+      // Always re-check EnableDrag after acquiring lock, use current value not snapshot
       if (_dragHandler is null && EnableDrag)
       {
         System.Diagnostics.Debug.WriteLine($"[Marquee] Creating drag handler - EnableDrag: {EnableDrag}");
@@ -531,7 +535,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
         System.Diagnostics.Debug.WriteLine($"[Marquee] No action - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
       }
       
-      System.Diagnostics.Debug.WriteLine($"[Marquee] EnsureDragHandlerAsync UNLOCKING - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
+      System.Diagnostics.Debug.WriteLine($"[Marquee] <<< UNLOCKING - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
     }
     catch (JSDisconnectedException)
     {
