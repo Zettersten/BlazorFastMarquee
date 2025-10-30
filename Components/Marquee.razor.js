@@ -418,29 +418,29 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
         });
       }
 
-      // Remove event listeners from container (options must match addEventListener)
+      // Remove event listeners - omit options to ensure removal regardless of how they were added
       if (state.container && state.pointerDownHandler) {
         console.log('[DragHandler] Removing container event listeners');
-        state.container.removeEventListener('mousedown', state.pointerDownHandler, { passive: false });
-        state.container.removeEventListener('touchstart', state.pointerDownHandler, { passive: false });
+        state.container.removeEventListener('mousedown', state.pointerDownHandler);
+        state.container.removeEventListener('touchstart', state.pointerDownHandler);
       }
 
-      // Remove event listeners from document (options must match addEventListener)
+      // Remove event listeners from document
       if (state.pointerMoveHandler) {
         console.log('[DragHandler] Removing document move listeners');
-        document.removeEventListener('mousemove', state.pointerMoveHandler, { passive: false });
-        document.removeEventListener('touchmove', state.pointerMoveHandler, { passive: false });
+        document.removeEventListener('mousemove', state.pointerMoveHandler);
+        document.removeEventListener('touchmove', state.pointerMoveHandler);
       }
 
       if (state.pointerUpHandler) {
         console.log('[DragHandler] Removing document up/end listeners');
-        document.removeEventListener('mouseup', state.pointerUpHandler, { passive: true });
-        document.removeEventListener('touchend', state.pointerUpHandler, { passive: true });
+        document.removeEventListener('mouseup', state.pointerUpHandler);
+        document.removeEventListener('touchend', state.pointerUpHandler);
       }
 
       if (state.pointerCancelHandler) {
         console.log('[DragHandler] Removing touch cancel listener');
-        document.removeEventListener('touchcancel', state.pointerCancelHandler, { passive: true });
+        document.removeEventListener('touchcancel', state.pointerCancelHandler);
       }
 
       // Remove inline cursor style (set by setupDragHandler)
