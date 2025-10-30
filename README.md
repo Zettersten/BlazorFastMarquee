@@ -21,6 +21,7 @@ Blazor Fast Marquee is a high-performance marquee component for Blazor inspired 
 ## Highlights
 
 - ⚡ **API parity with React Fast Marquee.** Drop-in familiar parameters such as `speed`, `gradientColor`, `pauseOnHover`, and lifecycle callbacks like `onCycleComplete`.
+- 🖱️ **Interactive drag support.** Enable drag-to-pan for desktop and mobile with `EnableDrag`. Automatically respects direction (horizontal for left/right, vertical for up/down).
 - 🪶 **Trimming-friendly by design.** The library is marked as trimmable, ships without reflection, and has analyzers enabled so you can confidently publish with `PublishTrimmed=true`.
 - 🚀 **AOT ready.** `RunAOTCompilation` is enabled so the component is validated against Native AOT constraints during publish.
 - 🧭 **Deterministic layout.** A lightweight JavaScript module only measures the rendered width/height and falls back gracefully when observers are unavailable.
@@ -65,7 +66,7 @@ builder.Services.AddRazorComponents()
 
 ### Usage
 
-Include the component in your Razor file:
+**Basic example:**
 
 ```razor
 @page "/marquee-demo"
@@ -75,6 +76,16 @@ Include the component in your Razor file:
     <div class="marquee-chip">🚀 Blazor Fast Marquee</div>
     <div class="marquee-chip">🔥 AOT-ready animations</div>
     <div class="marquee-chip">🧭 Deterministic layout</div>
+</Marquee>
+```
+
+**With drag support:**
+
+```razor
+<Marquee Speed="50" EnableDrag="true" Direction="MarqueeDirection.Left" Gradient>
+    <div class="marquee-chip">🖱️ Drag me!</div>
+    <div class="marquee-chip">👆 Click & hold to pan</div>
+    <div class="marquee-chip">📱 Touch support included</div>
 </Marquee>
 ```
 
@@ -109,6 +120,7 @@ The library opts into invariant globalization to minimize ICU payload size. If y
 | `Play`            | `bool`                                 | `true`   | Whether the marquee animation is running.
 | `PauseOnHover`    | `bool`                                 | `false`  | Pause the marquee while the pointer hovers over it.
 | `PauseOnClick`    | `bool`                                 | `false`  | Pause the marquee when the container is pressed.
+| `EnableDrag`      | `bool`                                 | `false`  | Enable drag-to-pan functionality. Users can click/touch and drag to manually pan the marquee (respects direction). Animation pauses during drag.
 | `Direction`       | `MarqueeDirection` (`Left`, `Right`, `Up`, `Down`) | `MarqueeDirection.Left` | Direction of travel. Vertical marquees rotate content to maintain orientation.
 | `Speed`           | `double`                               | `50`     | Speed in pixels per second.
 | `Delay`           | `double`                               | `0`      | Delay in seconds before the animation starts.

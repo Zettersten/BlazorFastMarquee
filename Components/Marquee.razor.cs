@@ -41,12 +41,14 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
   private IJSObjectReference? _module;
   private IJSObjectReference? _observer;
   private IJSObjectReference? _animationHandler;
+  private IJSObjectReference? _dragHandler;
 
   // Lifecycle tracking
   private bool _isDisposed;
 
   private bool _onMountInvoked;
   private CancellationTokenSource? _cts;
+  private readonly SemaphoreSlim _dragHandlerLock = new(1, 1);
 
   // Layout state
   private double _containerSpan;
@@ -84,6 +86,8 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
   private bool _prevPlay;
   private bool _prevPauseOnHover;
   private bool _prevPauseOnClick;
+  private bool _prevEnableDrag;
+  private bool _enableDragChanged;
   private MarqueeDirection _prevDirection;
   private double _prevSpeed;
   private double _prevDelay;
@@ -132,6 +136,10 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
   /// <summary>Pauses animation on click.</summary>
   [Parameter]
   public bool PauseOnClick { get; set; }
+
+  /// <summary>Enables drag to pan the marquee (respects direction).</summary>
+  [Parameter]
+  public bool EnableDrag { get; set; }
 
   /// <summary>Direction of marquee animation.</summary>
   [Parameter]
@@ -266,7 +274,8 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
       || _containerStyleInvalidated
       || _gradientStyleInvalidated
       || _marqueeStyleInvalidated
-      || _childStyleInvalidated;
+      || _childStyleInvalidated
+      || _enableDragChanged;
 
     return shouldRender;
   }
@@ -280,7 +289,6 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
-    // Guard against disposal during async operations
     if (_isDisposed)
       return;
 
@@ -291,6 +299,10 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
 
       await EnsureObserverAsync();
       await EnsureAnimationHandlerAsync();
+      await EnsureDragHandlerAsync();
+
+      _enableDragChanged = false;
+
       await MeasureAsync();
 
       if (firstRender && OnMount.HasDelegate && !_onMountInvoked)
@@ -458,6 +470,52 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     catch (TaskCanceledException)
     {
       // Expected during disposal
+    }
+  }
+
+  private async Task EnsureDragHandlerAsync()
+  {
+    if (_module is null || _isDisposed)
+      return;
+
+    // Use semaphore to prevent concurrent execution from multiple render cycles
+    await _dragHandlerLock.WaitAsync();
+    try
+    {
+      var isVertical = IsVertical(Direction);
+      var isReversed = IsReversedDirection(Direction);
+
+      if (_dragHandler is null && EnableDrag)
+      {
+        _dragHandler = await _module.InvokeAsync<IJSObjectReference>(
+          "setupDragHandler",
+          _containerRef,
+          _marqueeAnimationRef,
+          isVertical,
+          isReversed
+        );
+      }
+      else if (_dragHandler is not null && EnableDrag)
+      {
+        await _dragHandler.InvokeVoidAsync("update", isVertical, isReversed);
+      }
+      else if (_dragHandler is not null && !EnableDrag)
+      {
+        await DisposeDragHandlerAsync();
+      }
+    }
+    catch (JSDisconnectedException)
+    {
+      // Circuit disconnected - cleanup
+      _dragHandler = null;
+    }
+    catch (TaskCanceledException)
+    {
+      // Expected during disposal
+    }
+    finally
+    {
+      _dragHandlerLock.Release();
     }
   }
 
@@ -672,6 +730,14 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
       _prevDirection = Direction;
     }
 
+    // Track EnableDrag separately to ensure proper drag handler lifecycle
+    if (_prevEnableDrag != EnableDrag)
+    {
+      _enableDragChanged = true;
+      _containerStyleInvalidated = true;
+      _prevEnableDrag = EnableDrag;
+    }
+
     if (
       _prevGradient != Gradient
       || _prevGradientColor != GradientColor
@@ -762,6 +828,9 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
   private static bool IsVertical(MarqueeDirection direction) =>
     direction is MarqueeDirection.Up or MarqueeDirection.Down;
 
+  private static bool IsReversedDirection(MarqueeDirection direction) =>
+    direction is MarqueeDirection.Right or MarqueeDirection.Up;
+
   private static bool AreClose(double left, double right) => Math.Abs(left - right) < 0.1d;
 
   // Zero-allocation transform getters using pre-allocated strings
@@ -840,6 +909,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     _dotNetRef?.Dispose();
 
     // Cleanup JS interop resources
+    await DisposeDragHandlerAsync();
     await DisposeAnimationHandlerAsync();
     await DisposeObserverAsync();
     await DisposeModuleAsync();
@@ -847,6 +917,44 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     // Dispose cancellation token
     _cts?.Dispose();
     _cts = null;
+    
+    // Dispose semaphore
+    _dragHandlerLock?.Dispose();
+  }
+
+  private async ValueTask DisposeDragHandlerAsync()
+  {
+    if (_dragHandler is null)
+      return;
+
+    var handlerToDispose = _dragHandler;
+    _dragHandler = null; // Clear immediately to prevent re-entry
+
+    try
+    {
+      await handlerToDispose.InvokeVoidAsync("dispose");
+    }
+    catch (JSDisconnectedException)
+    {
+      // Circuit already disconnected - expected
+    }
+    catch (ObjectDisposedException)
+    {
+      // Already disposed - expected
+    }
+    catch
+    {
+      // Suppress other errors during disposal
+    }
+
+    try
+    {
+      await handlerToDispose.DisposeAsync();
+    }
+    catch
+    {
+      // Suppress disposal errors
+    }
   }
 
   private async ValueTask DisposeAnimationHandlerAsync()

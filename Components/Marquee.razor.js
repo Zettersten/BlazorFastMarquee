@@ -3,8 +3,6 @@
  * Optimized for minimal allocations and efficient DOM operations.
  */
 
-const noop = () => { };
-
 /**
  * Measures container and marquee dimensions.
  * @param {HTMLElement} container - Container element
@@ -13,10 +11,7 @@ const noop = () => { };
  * @returns {{containerSpan: number, marqueeSpan: number}} Measurement results
  */
 function measureSpan(container, marquee, vertical) {
-  console.log('measureSpan called', { container, marquee, vertical });
-
   if (!container || !marquee) {
-    console.log('measureSpan: missing container or marquee');
     return { containerSpan: 0, marqueeSpan: 0 };
   }
 
@@ -25,7 +20,6 @@ function measureSpan(container, marquee, vertical) {
   const containerSpan = vertical ? containerRect.height : containerRect.width;
   const marqueeSpan = vertical ? marqueeRect.height : marqueeRect.width;
 
-  console.log('measureSpan results', { containerSpan, marqueeSpan });
   return { containerSpan, marqueeSpan };
 }
 
@@ -34,10 +28,7 @@ function measureSpan(container, marquee, vertical) {
  * @param {Object} state - Observer state
  */
 function notify(state) {
-  console.log('notify called', { state: state?.disposed, hasRef: !!state?.dotnetRef });
-
   if (!state.dotnetRef || state.disposed) {
-    console.log('notify: skipping due to disposed or no dotnetRef');
     return;
   }
 
@@ -47,10 +38,9 @@ function notify(state) {
     state.vertical
   );
 
-  console.log('notify: calling UpdateLayout with', { containerSpan, marqueeSpan });
   state.dotnetRef
     .invokeMethodAsync('UpdateLayout', containerSpan, marqueeSpan)
-    .catch(err => console.error('notify error:', err));
+    .catch(() => {});
 }
 
 /**
@@ -59,13 +49,11 @@ function notify(state) {
  * @returns {Object} Observer handle with update/dispose methods
  */
 function createResizeHandle(state) {
-  console.log('createResizeHandle called');
   let resizeObserver = null;
   let resizeHandler = null;
 
   // Use ResizeObserver for efficient resize detection
   if (typeof ResizeObserver !== 'undefined') {
-    console.log('Using ResizeObserver');
     resizeHandler = () => notify(state);
     resizeObserver = new ResizeObserver(resizeHandler);
     resizeObserver.observe(state.container);
@@ -78,7 +66,6 @@ function createResizeHandle(state) {
       }
     };
   } else {
-    console.log('Using window resize fallback');
     // Fallback to window resize for older browsers
     resizeHandler = () => notify(state);
     window.addEventListener('resize', resizeHandler, { passive: true });
@@ -100,7 +87,6 @@ function createResizeHandle(state) {
        * @param {boolean} vertical - Whether to measure vertically
 */
     update(vertical) {
-      console.log('observer update called', vertical);
       if (state.disposed) return;
       state.vertical = Boolean(vertical);
       notify(state);
@@ -110,7 +96,6 @@ function createResizeHandle(state) {
     * Disposes the observer and cleans up resources.
          */
     dispose() {
-      console.log('observer dispose called');
       if (state.disposed) return;
 
       state.disposed = true;
@@ -134,10 +119,7 @@ function createResizeHandle(state) {
  * @returns {Object} Animation handler with dispose method
  */
 function createAnimationHandler(marqueeElement, dotnetRef) {
-  console.log('createAnimationHandler called', { marqueeElement, dotnetRef });
-
   if (!marqueeElement || !dotnetRef) {
-    console.log('createAnimationHandler: missing element or dotnetRef');
     return null;
   }
 
@@ -151,26 +133,23 @@ function createAnimationHandler(marqueeElement, dotnetRef) {
 
   // Animation iteration event handler
   state.iterationHandler = () => {
-    console.log('Animation iteration event fired');
     if (state.disposed || !state.dotnetRef) return;
 
     state.dotnetRef
       .invokeMethodAsync('HandleAnimationIteration')
-      .catch(err => console.error('Animation iteration error:', err));
+      .catch(() => {});
   };
 
   // Animation end event handler
   state.endHandler = () => {
-    console.log('Animation end event fired');
     if (state.disposed || !state.dotnetRef) return;
 
     state.dotnetRef
       .invokeMethodAsync('HandleAnimationEnd')
-      .catch(err => console.error('Animation end error:', err));
+      .catch(() => {});
   };
 
   // Add event listeners
-  console.log('Adding animation event listeners');
   marqueeElement.addEventListener('animationiteration', state.iterationHandler, { passive: true });
   marqueeElement.addEventListener('animationend', state.endHandler, { passive: true });
 
@@ -179,7 +158,6 @@ function createAnimationHandler(marqueeElement, dotnetRef) {
      * Disposes the animation event listeners.
      */
     dispose() {
-      console.log('animation handler dispose called');
       if (state.disposed) return;
 
       state.disposed = true;
@@ -208,7 +186,6 @@ function createAnimationHandler(marqueeElement, dotnetRef) {
  * @returns {{containerSpan: number, marqueeSpan: number}} Measurement results
  */
 export function measure(container, marquee, vertical) {
-  console.log('measure function called');
   return measureSpan(container, marquee, Boolean(vertical));
 }
 
@@ -221,10 +198,7 @@ export function measure(container, marquee, vertical) {
  * @returns {Object|null} Observer handle or null if invalid parameters
  */
 export function observe(container, marquee, vertical, dotnetRef) {
-  console.log('observe function called', { container, marquee, vertical, dotnetRef });
-
   if (!container || !marquee || !dotnetRef) {
-    console.log('observe: invalid parameters');
     return null;
   }
 
@@ -247,8 +221,235 @@ export function observe(container, marquee, vertical, dotnetRef) {
  * @returns {Object|null} Animation handler or null if invalid parameters
  */
 export function setupAnimationEvents(marqueeElement, dotnetRef) {
-  console.log('setupAnimationEvents function called');
   return createAnimationHandler(marqueeElement, dotnetRef);
 }
 
-console.log('Marquee JavaScript module loaded');
+/**
+ * Creates a drag handler for pan/drag functionality.
+ * Scrubs through the animation timeline based on drag movement.
+ * @param {HTMLElement} container - Container element
+ * @param {HTMLElement} marqueeElement - First marquee element (used for reference)
+ * @param {boolean} vertical - Whether to enable vertical dragging
+ * @param {boolean} reversed - Whether the animation direction is reversed (Right/Up)
+ * @returns {Object|null} Drag handler or null if invalid parameters
+ */
+function createDragHandler(container, marqueeElement, vertical, reversed) {
+  if (!container || !marqueeElement) {
+    return null;
+  }
+
+  // Get all marquee elements (there are always 2 for seamless looping)
+  const marqueeElements = container.querySelectorAll('.bfm-marquee');
+  
+  const state = {
+    container,
+    marqueeElements: Array.from(marqueeElements),
+    vertical: Boolean(vertical),
+    reversed: Boolean(reversed),
+    disposed: false,
+    isDragging: false,
+    lastX: 0,
+    lastY: 0,
+    pointerDownHandler: null,
+    pointerMoveHandler: null,
+    pointerUpHandler: null,
+    pointerCancelHandler: null
+  };
+
+  // Get marquee width/height for percentage calculations
+  const getMarqueeSize = () => {
+    if (state.marqueeElements.length > 0) {
+      const rect = state.marqueeElements[0].getBoundingClientRect();
+      return state.vertical ? rect.height : rect.width;
+    }
+    return 1; // Avoid division by zero
+  };
+
+  // Handle pointer down (mouse/touch start)
+  state.pointerDownHandler = (e) => {
+    if (state.disposed) return;
+
+    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+    state.isDragging = true;
+    state.lastX = clientX;
+    state.lastY = clientY;
+
+    // Pause animation during drag so we can scrub through it manually
+    state.marqueeElements.forEach(el => {
+      el.style.animationPlayState = 'paused';
+    });
+
+    state.container.style.cursor = 'grabbing';
+    state.container.style.userSelect = 'none';
+    e.preventDefault();
+  };
+
+  // Handle pointer move (mouse/touch move)
+  state.pointerMoveHandler = (e) => {
+    if (!state.isDragging || state.disposed) return;
+
+    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+    // Calculate movement delta
+    let deltaX = clientX - state.lastX;
+    let deltaY = clientY - state.lastY;
+    
+    // Invert delta for reversed directions (Right/Up)
+    // This makes dragging feel natural with the animation direction
+    if (state.reversed) {
+      deltaX = -deltaX;
+      deltaY = -deltaY;
+    }
+    
+    const delta = state.vertical ? deltaY : deltaX;
+
+    state.lastX = clientX;
+    state.lastY = clientY;
+
+    // Convert delta to percentage of marquee size
+    const marqueeSize = getMarqueeSize();
+    const percentChange = (delta / marqueeSize) * 100;
+
+    // Scrub through the animation by adjusting each element's animation progress
+    state.marqueeElements.forEach(el => {
+      // Get current animation state
+      const animations = el.getAnimations();
+      if (animations.length > 0) {
+        const anim = animations[0];
+        const duration = anim.effect.getTiming().duration;
+        
+        // Current time in the animation (milliseconds)
+        let currentTime = anim.currentTime || 0;
+        
+        // Adjust current time based on drag
+        // Dragging right/down (positive delta) = rewind (go backwards in time)
+        // Dragging left/up (negative delta) = advance (go forwards in time)
+        currentTime -= (percentChange / 100) * duration;
+        
+        // Wrap around the animation duration
+        if (duration > 0) {
+          currentTime = ((currentTime % duration) + duration) % duration;
+        }
+        
+        anim.currentTime = currentTime;
+      }
+    });
+
+    e.preventDefault();
+  };
+
+  // Handle pointer up (mouse/touch end)
+  state.pointerUpHandler = (e) => {
+    if (!state.isDragging || state.disposed) return;
+
+    state.isDragging = false;
+    state.container.style.cursor = 'grab';
+    state.container.style.userSelect = '';
+
+    // Resume animation from wherever we scrubbed to
+    state.marqueeElements.forEach(el => {
+      el.style.animationPlayState = '';
+    });
+  };
+
+  // Handle pointer cancel (touch cancel)
+  state.pointerCancelHandler = (e) => {
+    if (!state.isDragging || state.disposed) return;
+    state.pointerUpHandler(e);
+  };
+
+  // Set initial cursor
+  state.container.style.cursor = 'grab';
+
+  // Add mouse event listeners
+  state.container.addEventListener('mousedown', state.pointerDownHandler, { passive: false });
+  document.addEventListener('mousemove', state.pointerMoveHandler, { passive: false });
+  document.addEventListener('mouseup', state.pointerUpHandler, { passive: true });
+
+  // Add touch event listeners for mobile support
+  state.container.addEventListener('touchstart', state.pointerDownHandler, { passive: false });
+  document.addEventListener('touchmove', state.pointerMoveHandler, { passive: false });
+  document.addEventListener('touchend', state.pointerUpHandler, { passive: true });
+  document.addEventListener('touchcancel', state.pointerCancelHandler, { passive: true });
+
+  return {
+    /**
+     * Updates the drag orientation and direction.
+     */
+    update(vertical, reversed) {
+      if (state.disposed) return;
+      state.vertical = Boolean(vertical);
+      state.reversed = Boolean(reversed);
+      
+      // End any active drag when orientation changes
+      if (state.isDragging) {
+        state.pointerUpHandler(new Event('mouseup'));
+      }
+    },
+
+    /**
+     * Disposes the drag handler and cleans up event listeners.
+     */
+    dispose() {
+      if (state.disposed) return;
+      state.disposed = true;
+
+      // Clean up active drag state
+      if (state.isDragging) {
+        state.isDragging = false;
+        state.marqueeElements.forEach(el => {
+          el?.style.removeProperty('animation-play-state');
+        });
+      }
+
+      // Remove cursor and selection styles
+      if (state.container) {
+        state.container.style.removeProperty('cursor');
+        state.container.style.removeProperty('user-select');
+      }
+
+      // Remove event listeners
+      if (state.container && state.pointerDownHandler) {
+        state.container.removeEventListener('mousedown', state.pointerDownHandler);
+        state.container.removeEventListener('touchstart', state.pointerDownHandler);
+      }
+
+      if (state.pointerMoveHandler) {
+        document.removeEventListener('mousemove', state.pointerMoveHandler);
+        document.removeEventListener('touchmove', state.pointerMoveHandler);
+      }
+
+      if (state.pointerUpHandler) {
+        document.removeEventListener('mouseup', state.pointerUpHandler);
+        document.removeEventListener('touchend', state.pointerUpHandler);
+      }
+
+      if (state.pointerCancelHandler) {
+        document.removeEventListener('touchcancel', state.pointerCancelHandler);
+      }
+
+      // Clear all references
+      state.container = null;
+      state.marqueeElements = [];
+      state.pointerDownHandler = null;
+      state.pointerMoveHandler = null;
+      state.pointerUpHandler = null;
+      state.pointerCancelHandler = null;
+    }
+  };
+}
+
+/**
+ * Sets up drag handler for the marquee.
+ * @param {HTMLElement} container - Container element
+ * @param {HTMLElement} marqueeElement - Marquee element to manipulate
+ * @param {boolean} vertical - Whether to enable vertical dragging
+ * @param {boolean} reversed - Whether the animation direction is reversed (Right/Up)
+ * @returns {Object|null} Drag handler or null if invalid parameters
+ */
+export function setupDragHandler(container, marqueeElement, vertical, reversed) {
+  return createDragHandler(container, marqueeElement, Boolean(vertical), Boolean(reversed));
+}

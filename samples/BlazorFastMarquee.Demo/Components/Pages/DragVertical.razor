@@ -1,0 +1,483 @@
+@page "/drag-vertical"
+@using BlazorFastMarquee
+
+<PageTitle>Vertical Drag - BlazorFastMarquee Demo</PageTitle>
+
+<h1>↕️ Vertical Drag</h1>
+<p class="page-subtitle">Drag up and down to pan the marquee with your mouse or touch</p>
+
+<section class="demo-section">
+    <h2>Drag Up Direction</h2>
+    <p>Click and drag vertically to pan the marquee. Release to resume animation.</p>
+    
+    <div class="vertical-gallery-container">
+        <Marquee Direction="MarqueeDirection.Up" Speed="30" EnableDrag="true" PauseOnHover="true" Gradient="true" GradientColor="#ffffff">
+            <div class="vertical-gallery">
+                <div class="drag-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">🖱️</div>
+                        <div class="drag-title">Drag Me!</div>
+                        <div class="drag-subtitle">Click & Hold</div>
+                    </div>
+                </div>
+                <div class="drag-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">↕️</div>
+                        <div class="drag-title">Pan Up/Down</div>
+                        <div class="drag-subtitle">Vertical Scroll</div>
+                    </div>
+                </div>
+                <div class="drag-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">⏸️</div>
+                        <div class="drag-title">Auto Pauses</div>
+                        <div class="drag-subtitle">While Dragging</div>
+                    </div>
+                </div>
+                <div class="drag-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">🎯</div>
+                        <div class="drag-title">Interactive</div>
+                        <div class="drag-subtitle">Full Control</div>
+                    </div>
+                </div>
+                <div class="drag-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">✨</div>
+                        <div class="drag-title">Smooth Motion</div>
+                        <div class="drag-subtitle">Seamless Animation</div>
+                    </div>
+                </div>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee EnableDrag="true" Direction="MarqueeDirection.Up"&gt;
+    &lt;!-- Drag up/down to pan --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Drag Down Direction</h2>
+    <p>Works the same with down-scrolling marquees</p>
+    
+    <div class="vertical-gallery-container">
+        <Marquee Direction="MarqueeDirection.Down" Speed="30" EnableDrag="true" PauseOnHover="true" Gradient="true" GradientColor="#ffffff">
+            <div class="vertical-gallery">
+                <div class="drag-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">⬇️</div>
+                        <div class="drag-title">Scroll Down</div>
+                        <div class="drag-subtitle">Drag Enabled</div>
+                    </div>
+                </div>
+                <div class="drag-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">🎮</div>
+                        <div class="drag-title">Full Control</div>
+                        <div class="drag-subtitle">Manual Scrolling</div>
+                    </div>
+                </div>
+                <div class="drag-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">📱</div>
+                        <div class="drag-title">Touch Support</div>
+                        <div class="drag-subtitle">Mobile Friendly</div>
+                    </div>
+                </div>
+                <div class="drag-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">🌟</div>
+                        <div class="drag-title">Smooth</div>
+                        <div class="drag-subtitle">Fluid Animation</div>
+                    </div>
+                </div>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee EnableDrag="true" Direction="MarqueeDirection.Down"&gt;
+    &lt;!-- Drag vertically in any direction --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Side-by-Side Comparison</h2>
+    <p>Compare up and down directions with drag enabled</p>
+    
+    <div class="side-by-side">
+        <div class="comparison-item">
+            <h3>Scroll Up ⬆️ (Draggable)</h3>
+            <div class="vertical-gallery-container compact">
+                <Marquee Direction="MarqueeDirection.Up" Speed="25" EnableDrag="true" Gradient="true" GradientColor="#ffffff">
+                    <div class="vertical-gallery">
+                        <div class="drag-card-compact" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <div class="drag-content-compact">
+                                <div class="drag-icon-compact">📝</div>
+                                <div class="drag-title-compact">Item 1</div>
+                            </div>
+                        </div>
+                        <div class="drag-card-compact" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <div class="drag-content-compact">
+                                <div class="drag-icon-compact">📝</div>
+                                <div class="drag-title-compact">Item 2</div>
+                            </div>
+                        </div>
+                        <div class="drag-card-compact" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <div class="drag-content-compact">
+                                <div class="drag-icon-compact">📝</div>
+                                <div class="drag-title-compact">Item 3</div>
+                            </div>
+                        </div>
+                        <div class="drag-card-compact" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <div class="drag-content-compact">
+                                <div class="drag-icon-compact">📝</div>
+                                <div class="drag-title-compact">Item 4</div>
+                            </div>
+                        </div>
+                    </div>
+                </Marquee>
+            </div>
+        </div>
+        
+        <div class="comparison-item">
+            <h3>Scroll Down ⬇️ (Draggable)</h3>
+            <div class="vertical-gallery-container compact">
+                <Marquee Direction="MarqueeDirection.Down" Speed="25" EnableDrag="true" Gradient="true" GradientColor="#ffffff">
+                    <div class="vertical-gallery">
+                        <div class="drag-card-compact" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <div class="drag-content-compact">
+                                <div class="drag-icon-compact">📝</div>
+                                <div class="drag-title-compact">Item A</div>
+                            </div>
+                        </div>
+                        <div class="drag-card-compact" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <div class="drag-content-compact">
+                                <div class="drag-icon-compact">📝</div>
+                                <div class="drag-title-compact">Item B</div>
+                            </div>
+                        </div>
+                        <div class="drag-card-compact" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <div class="drag-content-compact">
+                                <div class="drag-icon-compact">📝</div>
+                                <div class="drag-title-compact">Item C</div>
+                            </div>
+                        </div>
+                        <div class="drag-card-compact" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <div class="drag-content-compact">
+                                <div class="drag-icon-compact">📝</div>
+                                <div class="drag-title-compact">Item D</div>
+                            </div>
+                        </div>
+                    </div>
+                </Marquee>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Toggle Drag Dynamically</h2>
+    <p>Enable or disable vertical drag functionality on the fly</p>
+    
+    <div class="control-panel">
+        <button class="control-btn @(_dragEnabled ? "active" : "")" @onclick="ToggleDrag">
+            @(_dragEnabled ? "🔓 Drag Enabled" : "🔒 Drag Disabled")
+        </button>
+    </div>
+    
+    <div class="vertical-gallery-container">
+        <Marquee Direction="MarqueeDirection.Up" Speed="30" EnableDrag="@_dragEnabled" Gradient="true" GradientColor="#ffffff">
+            <div class="vertical-gallery">
+                <div class="drag-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">@(_dragEnabled ? "🖱️" : "🔒")</div>
+                        <div class="drag-title">@(_dragEnabled ? "Try Dragging!" : "Drag Disabled")</div>
+                        <div class="drag-subtitle">@(_dragEnabled ? "Interactive" : "View Only")</div>
+                    </div>
+                </div>
+                <div class="drag-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">@(_dragEnabled ? "✅" : "❌")</div>
+                        <div class="drag-title">@(_dragEnabled ? "Interactive" : "Locked")</div>
+                        <div class="drag-subtitle">@(_dragEnabled ? "Enabled" : "Disabled")</div>
+                    </div>
+                </div>
+                <div class="drag-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <div class="drag-content">
+                        <div class="drag-icon">@(_dragEnabled ? "🎮" : "▶️")</div>
+                        <div class="drag-title">@(_dragEnabled ? "Control" : "Auto-Play")</div>
+                        <div class="drag-subtitle">Toggle Above</div>
+                    </div>
+                </div>
+            </div>
+        </Marquee>
+    </div>
+</section>
+
+<section class="info-box">
+    <h3>💡 How Vertical Drag Works</h3>
+    <div class="info-content">
+        <div class="info-item">
+            <strong>🖱️ Mouse Support:</strong>
+            <p>Click and hold, then drag up or down to pan the vertical marquee.</p>
+        </div>
+        <div class="info-item">
+            <strong>📱 Touch Support:</strong>
+            <p>Works seamlessly on mobile devices with vertical swipe gestures.</p>
+        </div>
+        <div class="info-item">
+            <strong>⏸️ Auto Pause:</strong>
+            <p>Animation automatically pauses while dragging and resumes on release.</p>
+        </div>
+        <div class="info-item">
+            <strong>↕️ Direction Aware:</strong>
+            <p>Only allows vertical dragging for up/down marquee directions.</p>
+        </div>
+    </div>
+</section>
+
+<section class="info-box use-cases-box">
+    <h3>🎯 Use Cases</h3>
+    <div class="use-cases">
+        <div class="use-case">
+            <strong>📱 Mobile Apps:</strong> Natural vertical scrolling experience on mobile devices
+        </div>
+        <div class="use-case">
+            <strong>📜 Timeline Display:</strong> Users can scrub through events manually
+        </div>
+        <div class="use-case">
+            <strong>📊 Vertical Stats:</strong> Explore data by dragging through vertical content
+        </div>
+        <div class="use-case">
+            <strong>🎨 Content Feed:</strong> Manual control over content feed scrolling
+        </div>
+    </div>
+</section>
+
+@code {
+    private bool _dragEnabled = true;
+    
+    private void ToggleDrag() => _dragEnabled = !_dragEnabled;
+}
+
+<style>
+    /* Vertical Gallery Container - mimics gallery page */
+    .vertical-gallery-container {
+        background: white;
+        border-radius: 1rem;
+        height: 500px;
+        overflow: hidden;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .vertical-gallery-container.compact {
+        height: 350px;
+        padding: 1.5rem;
+    }
+    
+    .vertical-gallery {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    /* Drag Cards */
+    .drag-card {
+        width: 280px;
+        height: 180px;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        cursor: grab;
+        transition: transform 0.2s;
+    }
+    
+    .drag-card:active {
+        cursor: grabbing;
+    }
+    
+    .drag-card:hover {
+        transform: scale(1.02);
+    }
+    
+    .drag-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        gap: 0.5rem;
+    }
+    
+    .drag-icon {
+        font-size: 3rem;
+    }
+    
+    .drag-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+    
+    .drag-subtitle {
+        font-size: 0.9375rem;
+        opacity: 0.9;
+    }
+    
+    /* Compact Cards */
+    .drag-card-compact {
+        width: 220px;
+        height: 140px;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        cursor: grab;
+    }
+    
+    .drag-card-compact:active {
+        cursor: grabbing;
+    }
+    
+    .drag-content-compact {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        gap: 0.5rem;
+    }
+    
+    .drag-icon-compact {
+        font-size: 2.5rem;
+    }
+    
+    .drag-title-compact {
+        font-size: 1rem;
+        font-weight: 700;
+    }
+    
+    /* Side by Side Layout */
+    .side-by-side {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 1.5rem 0;
+    }
+    
+    .comparison-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .comparison-item h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.125rem;
+        text-align: center;
+        color: #1f2937;
+    }
+    
+    /* Control Panel */
+    .control-panel {
+        display: flex;
+        gap: 0.875rem;
+        margin-bottom: 1.5rem;
+        justify-content: center;
+    }
+    
+    .control-btn {
+        padding: 0.75rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .control-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+    }
+    
+    .control-btn:active {
+        transform: translateY(0);
+    }
+    
+    .control-btn.active {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    /* Info Box */
+    .info-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 3rem 0;
+    }
+    
+    .info-box h3 {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.5rem;
+    }
+    
+    .info-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+    
+    .info-item {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+    }
+    
+    .info-item strong {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+    
+    .info-item p {
+        margin: 0;
+        line-height: 1.5;
+        font-size: 0.9375rem;
+        opacity: 0.95;
+    }
+    
+    /* Use Cases Box */
+    .use-cases-box {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+    
+    .use-cases {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 0.875rem;
+    }
+    
+    .use-case {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        line-height: 1.5;
+        font-size: 0.9375rem;
+    }
+    
+    .use-case strong {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+</style>

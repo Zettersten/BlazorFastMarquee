@@ -1,0 +1,350 @@
+@page "/drag-horizontal"
+@using BlazorFastMarquee
+
+<PageTitle>Horizontal Drag - BlazorFastMarquee Demo</PageTitle>
+
+<h1>🖱️ Horizontal Drag</h1>
+<p class="page-subtitle">Drag left and right to pan the marquee with your mouse or touch</p>
+
+<section class="demo-section">
+    <h2>Drag Left Direction</h2>
+    <p>Click and drag horizontally to pan the marquee. Release to resume animation.</p>
+    
+    <div class="demo-container drag-indicator">
+        <Marquee Speed="50" EnableDrag="true" Direction="MarqueeDirection.Left" Gradient="true">
+            <div class="drag-content">
+                <span class="drag-item drag-left">🖱️ Drag Me!</span>
+                <span class="drag-item drag-left">👆 Click & Hold</span>
+                <span class="drag-item drag-left">↔️ Pan Horizontally</span>
+                <span class="drag-item drag-left">⏸️ Auto Pauses</span>
+                <span class="drag-item drag-left">🎯 Interactive</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee EnableDrag="true" Direction="MarqueeDirection.Left"&gt;
+    &lt;!-- Drag left/right to pan --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Drag Right Direction</h2>
+    <p>Works the same with right-scrolling marquees</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="50" EnableDrag="true" Direction="MarqueeDirection.Right" Gradient="true" GradientColor="#f0f0f0">
+            <div class="drag-content">
+                <span class="drag-item drag-right">⬅️ Right to Left</span>
+                <span class="drag-item drag-right">🖱️ Drag Enabled</span>
+                <span class="drag-item drag-right">🎮 Full Control</span>
+                <span class="drag-item drag-right">✨ Smooth</span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee EnableDrag="true" Direction="MarqueeDirection.Right"&gt;
+    &lt;!-- Drag horizontally in any direction --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Drag with Different Speeds</h2>
+    <p>Drag works seamlessly with any animation speed</p>
+    
+    <div class="speed-comparison">
+        <div class="speed-demo-item">
+            <label>Slow (25 px/s)</label>
+            <Marquee Speed="25" EnableDrag="true" Gradient="true">
+                <div class="drag-content-compact">
+                    <span class="drag-item-small">🐢 Slow</span>
+                    <span class="drag-item-small">🖱️ Drag</span>
+                    <span class="drag-item-small">👆 Pan</span>
+                </div>
+            </Marquee>
+        </div>
+        
+        <div class="speed-demo-item">
+            <label>Normal (50 px/s)</label>
+            <Marquee Speed="50" EnableDrag="true" Gradient="true">
+                <div class="drag-content-compact">
+                    <span class="drag-item-small">🚶 Normal</span>
+                    <span class="drag-item-small">🖱️ Drag</span>
+                    <span class="drag-item-small">👆 Pan</span>
+                </div>
+            </Marquee>
+        </div>
+        
+        <div class="speed-demo-item">
+            <label>Fast (100 px/s)</label>
+            <Marquee Speed="100" EnableDrag="true" Gradient="true">
+                <div class="drag-content-compact">
+                    <span class="drag-item-small">🏃 Fast</span>
+                    <span class="drag-item-small">🖱️ Drag</span>
+                    <span class="drag-item-small">👆 Pan</span>
+                </div>
+            </Marquee>
+        </div>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Toggle Drag Dynamically</h2>
+    <p>Enable or disable drag functionality on the fly</p>
+    
+    <div class="control-panel">
+        <button class="control-btn @(_dragEnabled ? "active" : "")" @onclick="ToggleDrag">
+            @(_dragEnabled ? "🔓 Drag Enabled" : "🔒 Drag Disabled")
+        </button>
+    </div>
+    
+    <div class="demo-container">
+        <Marquee Speed="50" EnableDrag="@_dragEnabled" Gradient="true">
+            <div class="drag-content">
+                <span class="drag-item drag-toggle">
+                    @(_dragEnabled ? "🖱️ Try Dragging!" : "🔒 Drag Disabled")
+                </span>
+                <span class="drag-item drag-toggle">
+                    @(_dragEnabled ? "✅ Interactive" : "❌ Locked")
+                </span>
+                <span class="drag-item drag-toggle">
+                    @(_dragEnabled ? "🎮 Control" : "▶️ Auto-Play")
+                </span>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>@@code {
+    private bool _dragEnabled = true;
+}
+
+&lt;button @@onclick="() => _dragEnabled = !_dragEnabled"&gt;
+    Toggle Drag
+&lt;/button&gt;
+
+&lt;Marquee EnableDrag="@@_dragEnabled"&gt;
+    &lt;!-- Drag can be toggled dynamically --&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="info-box">
+    <h3>💡 How Horizontal Drag Works</h3>
+    <div class="info-content">
+        <div class="info-item">
+            <strong>🖱️ Mouse Support:</strong>
+            <p>Click and hold, then drag left or right to pan the marquee.</p>
+        </div>
+        <div class="info-item">
+            <strong>📱 Touch Support:</strong>
+            <p>Works seamlessly on mobile devices with touch gestures.</p>
+        </div>
+        <div class="info-item">
+            <strong>⏸️ Auto Pause:</strong>
+            <p>Animation automatically pauses while dragging and resumes on release.</p>
+        </div>
+        <div class="info-item">
+            <strong>↔️ Direction Aware:</strong>
+            <p>Only allows horizontal dragging for left/right marquee directions.</p>
+        </div>
+    </div>
+</section>
+
+<section class="info-box use-cases-box">
+    <h3>🎯 Use Cases</h3>
+    <div class="use-cases">
+        <div class="use-case">
+            <strong>🖼️ Image Gallery:</strong> Users can scrub through images at their own pace
+        </div>
+        <div class="use-case">
+            <strong>📰 News Ticker:</strong> Pause and pan to read specific news items
+        </div>
+        <div class="use-case">
+            <strong>🏢 Logo Carousel:</strong> Manual control to view specific brand logos
+        </div>
+        <div class="use-case">
+            <strong>📊 Data Display:</strong> Explore data points by dragging through content
+        </div>
+    </div>
+</section>
+
+@code {
+    private bool _dragEnabled = true;
+    
+    private void ToggleDrag() => _dragEnabled = !_dragEnabled;
+}
+
+<style>
+    .drag-content {
+        display: flex;
+        gap: 1.5rem;
+    }
+    
+    .drag-content-compact {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .drag-item {
+        font-size: 1.0625rem;
+        font-weight: 600;
+        padding: 0.875rem 1.5rem;
+        color: white;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .drag-item-small {
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.625rem 1rem;
+        color: white;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .drag-left {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .drag-right {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .drag-toggle {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .drag-indicator {
+        position: relative;
+    }
+    
+    .drag-indicator::before {
+        content: "👆 Click and drag horizontally!";
+        position: absolute;
+        top: -2rem;
+        right: 1rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 600;
+    }
+    
+    .speed-comparison {
+        display: grid;
+        gap: 1rem;
+    }
+    
+    .speed-demo-item {
+        background: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .speed-demo-item label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        margin-bottom: 0.75rem;
+        color: #1f2937;
+    }
+    
+    .control-panel {
+        display: flex;
+        gap: 0.875rem;
+        margin-bottom: 1.25rem;
+        justify-content: center;
+    }
+    
+    .control-btn {
+        padding: 0.625rem 1.5rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .control-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .control-btn:active {
+        transform: translateY(0);
+    }
+    
+    .control-btn.active {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        margin: 1.75rem 0;
+    }
+    
+    .info-box h3 {
+        margin: 0 0 1.25rem 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+    
+    .info-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+    
+    .info-item {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
+    
+    .info-item strong {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+    
+    .info-item p {
+        margin: 0;
+        line-height: 1.5;
+        font-size: 0.9375rem;
+        opacity: 0.95;
+    }
+    
+    .use-cases-box {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+    
+    .use-cases {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 0.875rem;
+    }
+    
+    .use-case {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        line-height: 1.5;
+        font-size: 0.9375rem;
+    }
+    
+    .use-case strong {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+</style>
