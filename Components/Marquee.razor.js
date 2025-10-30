@@ -3,8 +3,6 @@
  * Optimized for minimal allocations and efficient DOM operations.
  */
 
-const noop = () => { };
-
 /**
  * Measures container and marquee dimensions.
  * @param {HTMLElement} container - Container element
@@ -399,20 +397,18 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
       if (state.disposed) return;
       state.disposed = true;
 
-      // Clean up any active drag state
+      // Clean up active drag state
       if (state.isDragging) {
         state.isDragging = false;
-        if (state.container) {
-          state.container.style.removeProperty('cursor');
-          state.container.style.removeProperty('user-select');
-        }
-        
-        // Resume animation if it was paused
         state.marqueeElements.forEach(el => {
-          if (el) {
-            el.style.removeProperty('animation-play-state');
-          }
+          el?.style.removeProperty('animation-play-state');
         });
+      }
+
+      // Remove cursor and selection styles
+      if (state.container) {
+        state.container.style.removeProperty('cursor');
+        state.container.style.removeProperty('user-select');
       }
 
       // Remove event listeners
@@ -435,12 +431,7 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
         document.removeEventListener('touchcancel', state.pointerCancelHandler);
       }
 
-      // Remove inline cursor style
-      if (state.container) {
-        state.container.style.removeProperty('cursor');
-      }
-
-      // Clear all state references
+      // Clear all references
       state.container = null;
       state.marqueeElements = [];
       state.pointerDownHandler = null;
