@@ -269,7 +269,10 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
 
   // Handle pointer down (mouse/touch start)
   state.pointerDownHandler = (e) => {
-    if (state.disposed) return;
+    if (state.disposed) {
+      console.log('[DragHandler] pointerDown called but state is disposed!');
+      return;
+    }
 
     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
@@ -420,9 +423,14 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
 
       // Remove event listeners - omit options to ensure removal regardless of how they were added
       if (state.container && state.pointerDownHandler) {
-        console.log('[DragHandler] Removing container event listeners');
+        console.log('[DragHandler] Removing container event listeners', {
+          hasContainer: !!state.container,
+          hasHandler: !!state.pointerDownHandler,
+          handlerType: typeof state.pointerDownHandler
+        });
         state.container.removeEventListener('mousedown', state.pointerDownHandler);
         state.container.removeEventListener('touchstart', state.pointerDownHandler);
+        console.log('[DragHandler] Container listeners removed');
       }
 
       // Remove event listeners from document
