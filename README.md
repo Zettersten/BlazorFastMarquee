@@ -12,11 +12,11 @@ Blazor Fast Marquee is a high-performance marquee component for Blazor inspired 
 
 ## Examples
 
-![Sample 1](https://github.com/Zettersten/BlazorFastMarquee/blob/main/sample-1.gif?raw=true)
+![Sample 1](https://raw.githubusercontent.com/Zettersten/BlazorFastMarquee/refs/heads/main/sample-1.gif)
 
-![Sample 2](https://github.com/Zettersten/BlazorFastMarquee/blob/main/sample-2.gif?raw=true)
+![Sample 2](https://raw.githubusercontent.com/Zettersten/BlazorFastMarquee/refs/heads/main/sample-2.gif)
 
-![Sample 3](https://github.com/Zettersten/BlazorFastMarquee/blob/main/sample-3.gif?raw=true)
+![Sample 3](https://raw.githubusercontent.com/Zettersten/BlazorFastMarquee/refs/heads/main/sample-3.gif)
 
 ## Highlights
 
