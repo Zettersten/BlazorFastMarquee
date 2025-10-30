@@ -296,7 +296,9 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     if (_isDisposed)
       return;
 
-    System.Diagnostics.Debug.WriteLine($"[Marquee] OnAfterRenderAsync called - firstRender: {firstRender}, EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
+    Logger.LogInformation(
+      $"[Marquee] OnAfterRenderAsync called - firstRender: {firstRender}, EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}"
+    );
 
     try
     {
@@ -305,13 +307,13 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
 
       await EnsureObserverAsync();
       await EnsureAnimationHandlerAsync();
-      
+
       // Always ensure drag handler is in correct state
       await EnsureDragHandlerAsync();
-      
+
       // Reset the enableDragChanged flag after handling
       _enableDragChanged = false;
-      
+
       await MeasureAsync();
 
       if (firstRender && OnMount.HasDelegate && !_onMountInvoked)
@@ -328,8 +330,10 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     {
       // Component disposed during async operation - expected
     }
-    
-    System.Diagnostics.Debug.WriteLine($"[Marquee] OnAfterRenderAsync complete - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
+
+    Logger.LogInformation(
+      $"[Marquee] OnAfterRenderAsync complete - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}"
+    );
   }
 
   #endregion Lifecycle Methods
@@ -755,9 +759,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     // Track EnableDrag separately to ensure proper drag handler lifecycle
     if (_prevEnableDrag != EnableDrag)
     {
-      System.Diagnostics.Debug.WriteLine(
-        $"[Marquee] EnableDrag changed from {_prevEnableDrag} to {EnableDrag}"
-      );
+      Logger.LogInformation($"[Marquee] EnableDrag changed from {_prevEnableDrag} to {EnableDrag}");
       _enableDragChanged = true; // Flag that drag state changed
       _containerStyleInvalidated = true; // Force a re-render
       _prevEnableDrag = EnableDrag;
@@ -948,14 +950,18 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
   {
     if (_dragHandler is null)
     {
-      System.Diagnostics.Debug.WriteLine("[Marquee] DisposeDragHandlerAsync called but _dragHandler is already null");
+      Logger.LogInformation(
+        "[Marquee] DisposeDragHandlerAsync called but _dragHandler is already null"
+      );
       return;
     }
 
     var handlerToDispose = _dragHandler;
     _dragHandler = null; // Clear immediately to prevent re-entry
-    
-    System.Diagnostics.Debug.WriteLine("[Marquee] DisposeDragHandlerAsync: Setting _dragHandler to null and disposing");
+
+    Logger.LogInformation(
+      "[Marquee] DisposeDragHandlerAsync: Setting _dragHandler to null and disposing"
+    );
 
     try
     {
@@ -971,19 +977,19 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     }
     catch (Exception ex)
     {
-      System.Diagnostics.Debug.WriteLine($"[Marquee] Error calling dispose: {ex.Message}");
+      Logger.LogInformation($"[Marquee] Error calling dispose: {ex.Message}");
     }
-    
+
     try
     {
       await handlerToDispose.DisposeAsync();
     }
     catch (Exception ex)
     {
-      System.Diagnostics.Debug.WriteLine($"[Marquee] Error in DisposeAsync: {ex.Message}");
+      Logger.LogInformation($"[Marquee] Error in DisposeAsync: {ex.Message}");
     }
-    
-    System.Diagnostics.Debug.WriteLine("[Marquee] DisposeDragHandlerAsync complete, _dragHandler is now null");
+
+    Logger.LogInformation("[Marquee] DisposeDragHandlerAsync complete, _dragHandler is now null");
   }
 
   private async ValueTask DisposeAnimationHandlerAsync()
