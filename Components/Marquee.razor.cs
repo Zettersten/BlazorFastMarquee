@@ -49,6 +49,7 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
 
   private bool _onMountInvoked;
   private CancellationTokenSource? _cts;
+  private readonly SemaphoreSlim _dragHandlerLock = new(1, 1);
 
   // Layout state
   private double _containerSpan;
@@ -493,14 +494,18 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     if (_module is null || _isDisposed)
       return;
 
-    var isVertical = IsVertical(Direction);
-    var isReversed = IsReversedDirection(Direction);
-
+    // Use semaphore to prevent concurrent execution from multiple render cycles
+    await _dragHandlerLock.WaitAsync();
     try
     {
+      System.Diagnostics.Debug.WriteLine($"[Marquee] EnsureDragHandlerAsync LOCKED - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
+      
+      var isVertical = IsVertical(Direction);
+      var isReversed = IsReversedDirection(Direction);
+
       if (_dragHandler is null && EnableDrag)
       {
-        Logger.LogInformation($"[Marquee] Creating drag handler - EnableDrag: {EnableDrag}");
+        System.Diagnostics.Debug.WriteLine($"[Marquee] Creating drag handler - EnableDrag: {EnableDrag}");
         _dragHandler = await _module.InvokeAsync<IJSObjectReference>(
           "setupDragHandler",
           _containerRef,
@@ -508,40 +513,40 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
           isVertical,
           isReversed
         );
-        Logger.LogInformation($"[Marquee] Drag handler created: {_dragHandler != null}");
+        System.Diagnostics.Debug.WriteLine($"[Marquee] Drag handler created: {_dragHandler != null}");
       }
       else if (_dragHandler is not null && EnableDrag)
       {
-        Logger.LogInformation($"[Marquee] Updating drag handler - EnableDrag: {EnableDrag}");
+        System.Diagnostics.Debug.WriteLine($"[Marquee] Updating drag handler - EnableDrag: {EnableDrag}");
         await _dragHandler.InvokeVoidAsync("update", isVertical, isReversed);
       }
       else if (_dragHandler is not null && !EnableDrag)
       {
-        Logger.LogInformation(
-          $"[Marquee] Disposing drag handler - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}"
-        );
+        System.Diagnostics.Debug.WriteLine($"[Marquee] Disposing drag handler - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
         await DisposeDragHandlerAsync();
-        Logger.LogInformation(
-          $"[Marquee] Drag handler disposed - _dragHandler is now: {_dragHandler == null}"
-        );
+        System.Diagnostics.Debug.WriteLine($"[Marquee] Drag handler disposed - _dragHandler is now: {_dragHandler == null}");
       }
       else
       {
-        Logger.LogInformation(
-          $"[Marquee] No action - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}"
-        );
+        System.Diagnostics.Debug.WriteLine($"[Marquee] No action - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
       }
+      
+      System.Diagnostics.Debug.WriteLine($"[Marquee] EnsureDragHandlerAsync UNLOCKING - EnableDrag: {EnableDrag}, _dragHandler: {_dragHandler != null}");
     }
     catch (JSDisconnectedException)
     {
       // Circuit disconnected - cleanup
-      Logger.LogInformation("[Marquee] JS disconnected");
+      System.Diagnostics.Debug.WriteLine("[Marquee] JS disconnected");
       _dragHandler = null;
     }
     catch (TaskCanceledException)
     {
       // Expected during disposal
-      Logger.LogInformation("[Marquee] Task cancelled");
+      System.Diagnostics.Debug.WriteLine("[Marquee] Task cancelled");
+    }
+    finally
+    {
+      _dragHandlerLock.Release();
     }
   }
 
@@ -944,6 +949,9 @@ public partial class Marquee : ComponentBase, IAsyncDisposable
     // Dispose cancellation token
     _cts?.Dispose();
     _cts = null;
+    
+    // Dispose semaphore
+    _dragHandlerLock?.Dispose();
   }
 
   private async ValueTask DisposeDragHandlerAsync()
