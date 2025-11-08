@@ -1,6 +1,7 @@
 # Blazor Fast Marquee
 
 [![NuGet](https://img.shields.io/nuget/v/BlazorFastMarquee.svg)](https://www.nuget.org/packages/BlazorFastMarquee/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Zettersten/BlazorFastMarquee)
 
 Blazor Fast Marquee is a high-performance marquee component for Blazor inspired by the battle-tested [`react-fast-marquee`](https://www.react-fast-marquee.com) library. It delivers the same API surface while embracing .NET's ahead-of-time (AOT) compilation and aggressive trimming so your applications remain lean without sacrificing fidelity.
 
