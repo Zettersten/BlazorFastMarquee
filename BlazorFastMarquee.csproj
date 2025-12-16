@@ -13,7 +13,7 @@
     <Authors>Zettersten</Authors>
     <Company>Zettersten</Company>
     <Product>BlazorFastMarquee</Product>
-    <Description>High-performance Blazor marquee component inspired by react-fast-marquee. Optimized for AOT, trimming-friendly, and deterministic layout with full API parity.</Description>
+    <Description>High-performance Blazor marquee component inspired by react-fast-marquee. Optimized for .NET 10, AOT compilation, and trimming-friendly with full API parity. Built with C# 14 language features for deterministic layout and production-grade performance.</Description>
     <Copyright>Copyright © $(Authors) $([System.DateTime]::Now.Year)</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Zettersten/BlazorFastMarquee</PackageProjectUrl>
