@@ -248,6 +248,9 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
     reversed: Boolean(reversed),
     disposed: false,
     isDragging: false,
+    hasMoved: false,
+    startX: 0,
+    startY: 0,
     lastX: 0,
     lastY: 0,
     pointerDownHandler: null,
@@ -255,6 +258,9 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
     pointerUpHandler: null,
     pointerCancelHandler: null
   };
+
+  // Drag threshold in pixels - movement less than this is considered a click
+  const DRAG_THRESHOLD = 5;
 
   // Get marquee width/height for percentage calculations
   const getMarqueeSize = () => {
@@ -273,17 +279,14 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
 
     state.isDragging = true;
+    state.hasMoved = false;
+    state.startX = clientX;
+    state.startY = clientY;
     state.lastX = clientX;
     state.lastY = clientY;
 
-    // Pause animation during drag so we can scrub through it manually
-    state.marqueeElements.forEach(el => {
-      el.style.animationPlayState = 'paused';
-    });
-
-    state.container.style.cursor = 'grabbing';
-    state.container.style.userSelect = 'none';
-    e.preventDefault();
+    // Don't prevent default yet - allow clicks to work
+    // We'll only prevent default once actual dragging starts
   };
 
   // Handle pointer move (mouse/touch move)
@@ -293,52 +296,73 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
 
-    // Calculate movement delta
-    let deltaX = clientX - state.lastX;
-    let deltaY = clientY - state.lastY;
-    
-    // Invert delta for reversed directions (Right/Up)
-    // This makes dragging feel natural with the animation direction
-    if (state.reversed) {
-      deltaX = -deltaX;
-      deltaY = -deltaY;
+    // Calculate total movement from start position
+    const totalDeltaX = Math.abs(clientX - state.startX);
+    const totalDeltaY = Math.abs(clientY - state.startY);
+    const totalMovement = state.vertical ? totalDeltaY : totalDeltaX;
+
+    // Check if we've moved beyond the drag threshold
+    if (!state.hasMoved && totalMovement > DRAG_THRESHOLD) {
+      state.hasMoved = true;
+      
+      // Now we're actually dragging - pause animation and update UI
+      state.marqueeElements.forEach(el => {
+        el.style.animationPlayState = 'paused';
+      });
+      state.container.style.cursor = 'grabbing';
+      state.container.style.userSelect = 'none';
     }
-    
-    const delta = state.vertical ? deltaY : deltaX;
 
-    state.lastX = clientX;
-    state.lastY = clientY;
-
-    // Convert delta to percentage of marquee size
-    const marqueeSize = getMarqueeSize();
-    const percentChange = (delta / marqueeSize) * 100;
-
-    // Scrub through the animation by adjusting each element's animation progress
-    state.marqueeElements.forEach(el => {
-      // Get current animation state
-      const animations = el.getAnimations();
-      if (animations.length > 0) {
-        const anim = animations[0];
-        const duration = anim.effect.getTiming().duration;
-        
-        // Current time in the animation (milliseconds)
-        let currentTime = anim.currentTime || 0;
-        
-        // Adjust current time based on drag
-        // Dragging right/down (positive delta) = rewind (go backwards in time)
-        // Dragging left/up (negative delta) = advance (go forwards in time)
-        currentTime -= (percentChange / 100) * duration;
-        
-        // Wrap around the animation duration
-        if (duration > 0) {
-          currentTime = ((currentTime % duration) + duration) % duration;
-        }
-        
-        anim.currentTime = currentTime;
+    // Only process drag if we've moved beyond threshold
+    if (state.hasMoved) {
+      // Calculate movement delta
+      let deltaX = clientX - state.lastX;
+      let deltaY = clientY - state.lastY;
+      
+      // Invert delta for reversed directions (Right/Up)
+      // This makes dragging feel natural with the animation direction
+      if (state.reversed) {
+        deltaX = -deltaX;
+        deltaY = -deltaY;
       }
-    });
+      
+      const delta = state.vertical ? deltaY : deltaX;
 
-    e.preventDefault();
+      state.lastX = clientX;
+      state.lastY = clientY;
+
+      // Convert delta to percentage of marquee size
+      const marqueeSize = getMarqueeSize();
+      const percentChange = (delta / marqueeSize) * 100;
+
+      // Scrub through the animation by adjusting each element's animation progress
+      state.marqueeElements.forEach(el => {
+        // Get current animation state
+        const animations = el.getAnimations();
+        if (animations.length > 0) {
+          const anim = animations[0];
+          const duration = anim.effect.getTiming().duration;
+          
+          // Current time in the animation (milliseconds)
+          let currentTime = anim.currentTime || 0;
+          
+          // Adjust current time based on drag
+          // Dragging right/down (positive delta) = rewind (go backwards in time)
+          // Dragging left/up (negative delta) = advance (go forwards in time)
+          currentTime -= (percentChange / 100) * duration;
+          
+          // Wrap around the animation duration
+          if (duration > 0) {
+            currentTime = ((currentTime % duration) + duration) % duration;
+          }
+          
+          anim.currentTime = currentTime;
+        }
+      });
+
+      // Prevent default only when actually dragging
+      e.preventDefault();
+    }
   };
 
   // Handle pointer up (mouse/touch end)
@@ -346,13 +370,19 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
     if (!state.isDragging || state.disposed) return;
 
     state.isDragging = false;
-    state.container.style.cursor = 'grab';
-    state.container.style.userSelect = '';
+    
+    // Only restore cursor and resume animation if we actually dragged
+    if (state.hasMoved) {
+      state.container.style.cursor = 'grab';
+      state.container.style.userSelect = '';
 
-    // Resume animation from wherever we scrubbed to
-    state.marqueeElements.forEach(el => {
-      el.style.animationPlayState = '';
-    });
+      // Resume animation from wherever we scrubbed to
+      state.marqueeElements.forEach(el => {
+        el.style.animationPlayState = '';
+      });
+    }
+    
+    state.hasMoved = false;
   };
 
   // Handle pointer cancel (touch cancel)
