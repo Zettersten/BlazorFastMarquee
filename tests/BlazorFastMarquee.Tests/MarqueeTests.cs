@@ -10,7 +10,7 @@ namespace BlazorFastMarquee.Tests;
 /// Comprehensive test suite for Marquee component.
 /// Tests SSR, Server, and WASM compatibility scenarios.
 /// </summary>
-public class MarqueeTests : TestContext
+public class MarqueeTests : BunitContext
 {
   [Fact]
   public void RendersWithDefaultMarkup()
@@ -18,7 +18,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters => parameters.AddChildContent("Hello world"));
+    var cut = Render<Marquee>(parameters => parameters.AddChildContent("Hello world"));
 
     var container = cut.Find(".bfm-marquee-container");
     Assert.Contains("--pause-on-hover", container.GetAttribute("style"));
@@ -32,7 +32,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters => parameters.AddChildContent("SSR Test"));
+    var cut = Render<Marquee>(parameters => parameters.AddChildContent("SSR Test"));
 
     Assert.NotNull(cut.Find(".bfm-marquee-container"));
     Assert.NotNull(cut.Find(".bfm-marquee"));
@@ -44,7 +44,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters.Add(p => p.AutoFill, true).AddChildContent("Item")
     );
 
@@ -67,7 +67,7 @@ public class MarqueeTests : TestContext
     var cycles = 0;
     var finished = 0;
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters
         .Add(p => p.Loop, 1)
         .Add(p => p.OnCycleComplete, EventCallback.Factory.Create(this, () => cycles++))
@@ -86,7 +86,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters
         .Add(p => p.ClassName, "custom")
         .AddUnmatched("data-testid", "marquee")
@@ -110,7 +110,7 @@ public class MarqueeTests : TestContext
 
     var mountCount = 0;
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters
         .Add(p => p.OnMount, EventCallback.Factory.Create(this, () => mountCount++))
         .AddChildContent("Mounted")
@@ -132,7 +132,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters.Add(p => p.Direction, direction).AddChildContent("Direction Test")
     );
 
@@ -155,7 +155,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters.Add(p => p.Speed, 100).Add(p => p.Delay, 2).AddChildContent("Speed Test")
     );
 
@@ -171,7 +171,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters
         .Add(p => p.Gradient, true)
         .Add(p => p.GradientColor, "blue")
@@ -192,7 +192,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters.Add(p => p.Play, false).AddChildContent("Paused")
     );
 
@@ -208,7 +208,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters => parameters.AddChildContent("Dispose Test"));
+    var cut = Render<Marquee>(parameters => parameters.AddChildContent("Dispose Test"));
 
     var instance = cut.Instance;
     await instance.DisposeAsync();
@@ -237,7 +237,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters.Add(p => p.AutoFill, true).AddChildContent("Layout Test")
     );
 
@@ -260,7 +260,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>();
+    var cut = Render<Marquee>();
 
     Assert.NotNull(cut.Find(".bfm-marquee-container"));
   }
@@ -271,7 +271,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters.Add(p => p.Direction, MarqueeDirection.Left).AddChildContent("Cache Test")
     );
 
@@ -291,7 +291,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters.Add(p => p.EnableDrag, true).AddChildContent("Drag Test")
     );
 
@@ -310,7 +310,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters.Add(p => p.EnableDrag, true).Add(p => p.Direction, direction).AddChildContent("Direction Drag")
     );
 
@@ -325,7 +325,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters.Add(p => p.EnableDrag, false).AddChildContent("No Drag")
     );
 
@@ -340,26 +340,36 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    // First render with drag disabled
+    var cut = Render<Marquee>(parameters =>
       parameters.Add(p => p.EnableDrag, false).AddChildContent("Toggle Drag")
     );
 
     Assert.False(cut.Instance.EnableDrag);
 
-    // Update parameter to enable drag
-    cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, true));
+    // Re-render with drag enabled
+    cut.Render();
+    cut = Render<Marquee>(parameters =>
+      parameters.Add(p => p.EnableDrag, true).AddChildContent("Toggle Drag")
+    );
     Assert.True(cut.Instance.EnableDrag);
 
-    // Disable drag again - should dispose the drag handler and trigger re-render
-    cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, false));
+    // Disable drag again
+    cut = Render<Marquee>(parameters =>
+      parameters.Add(p => p.EnableDrag, false).AddChildContent("Toggle Drag")
+    );
     Assert.False(cut.Instance.EnableDrag);
     
     // Re-enable to verify it can be toggled multiple times
-    cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, true));
+    cut = Render<Marquee>(parameters =>
+      parameters.Add(p => p.EnableDrag, true).AddChildContent("Toggle Drag")
+    );
     Assert.True(cut.Instance.EnableDrag);
     
     // Disable one more time to verify repeated toggling works
-    cut.SetParametersAndRender(parameters => parameters.Add(p => p.EnableDrag, false));
+    cut = Render<Marquee>(parameters =>
+      parameters.Add(p => p.EnableDrag, false).AddChildContent("Toggle Drag")
+    );
     Assert.False(cut.Instance.EnableDrag);
   }
 
@@ -373,7 +383,7 @@ public class MarqueeTests : TestContext
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
 
-    var cut = RenderComponent<Marquee>(parameters =>
+    var cut = Render<Marquee>(parameters =>
       parameters
         .Add(p => p.EnableDrag, true)
         .Add(p => p.Direction, direction)

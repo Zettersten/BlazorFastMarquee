@@ -5,6 +5,8 @@
 
 Blazor Fast Marquee is a high-performance marquee component for Blazor inspired by the battle-tested [`react-fast-marquee`](https://www.react-fast-marquee.com) library. It delivers the same API surface while embracing .NET's ahead-of-time (AOT) compilation and aggressive trimming so your applications remain lean without sacrificing fidelity.
 
+Built for **.NET 10** with **C# 14** language features, this component is production-ready and fully compatible with the latest Blazor runtime improvements.
+
 > **Why another marquee?** Because shipping to WebAssembly or native ahead-of-time targets demands components that are deterministic, trimming safe, and optimized from the first render. Blazor Fast Marquee was built from the ground up with those goals in mind.
 
 ## Live Demo
@@ -22,11 +24,12 @@ Blazor Fast Marquee is a high-performance marquee component for Blazor inspired 
 ## Highlights
 
 - ⚡ **API parity with React Fast Marquee.** Drop-in familiar parameters such as `speed`, `gradientColor`, `pauseOnHover`, and lifecycle callbacks like `onCycleComplete`.
-- 🖱️ **Interactive drag support.** Enable drag-to-pan for desktop and mobile with `EnableDrag`. Automatically respects direction (horizontal for left/right, vertical for up/down).
+- 🖱️ **Interactive drag support.** Enable drag-to-pan for desktop and mobile with `EnableDrag`. Automatically respects direction (horizontal for left/right, vertical for up/down). Smart click detection ensures buttons and links work seamlessly inside draggable marquees.
 - 🪶 **Trimming-friendly by design.** The library is marked as trimmable, ships without reflection, and has analyzers enabled so you can confidently publish with `PublishTrimmed=true`.
 - 🚀 **AOT ready.** `RunAOTCompilation` is enabled so the component is validated against Native AOT constraints during publish.
 - 🧭 **Deterministic layout.** A lightweight JavaScript module only measures the rendered width/height and falls back gracefully when observers are unavailable.
 - 🧩 **Composable.** Works with any child content—text, components, images, or complex layouts.
+- 🎯 **.NET 10 optimized.** Leverages the latest C# 14 language features and .NET 10 runtime improvements for peak performance.
 
 ## Getting Started
 
