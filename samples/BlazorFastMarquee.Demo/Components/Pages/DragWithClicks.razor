@@ -65,7 +65,7 @@
     <p>Buttons, links, and text - all clickable with drag enabled</p>
     
     <div class="demo-container">
-        <Marquee Speed="40" EnableDrag="true" Gradient="true">
+        <Marquee Speed="40" EnableDrag="@_dragEnabled" Gradient="true">
             <div class="clickable-content">
                 <span class="clickable-text" @onclick="() => HandleTextClick()">
                     📝 Clickable Text (Clicks: @_textClicks)
