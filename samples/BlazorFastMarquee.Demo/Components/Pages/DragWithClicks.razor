@@ -1,0 +1,316 @@
+@page "/drag-with-clicks"
+@using BlazorFastMarquee
+
+<PageTitle>Drag with Clickable Elements - BlazorFastMarquee Demo</PageTitle>
+
+<h1>🖱️ Drag with Clickable Elements</h1>
+<p class="page-subtitle">Drag enabled marquee with clickable buttons and links inside</p>
+
+<section class="demo-section">
+    <h2>Buttons Inside Draggable Marquee</h2>
+    <p>Click the buttons OR drag the marquee - both should work!</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="30" EnableDrag="true" Gradient="true">
+            <div class="clickable-content">
+                <button class="clickable-btn" @onclick="() => HandleClick(1)">
+                    🎯 Button 1 (Clicks: @_button1Clicks)
+                </button>
+                <button class="clickable-btn" @onclick="() => HandleClick(2)">
+                    🎮 Button 2 (Clicks: @_button2Clicks)
+                </button>
+                <button class="clickable-btn" @onclick="() => HandleClick(3)">
+                    ⭐ Button 3 (Clicks: @_button3Clicks)
+                </button>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="status-panel">
+        <p><strong>Total Clicks:</strong> @(_button1Clicks + _button2Clicks + _button3Clicks)</p>
+        <p><em>Note: Dragging should NOT trigger clicks, but clicking should work!</em></p>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee EnableDrag="true"&gt;
+    &lt;button @@onclick="HandleClick"&gt;Clickable!&lt;/button&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Links Inside Draggable Marquee</h2>
+    <p>Click links to navigate OR drag to pan - both work independently</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="30" EnableDrag="true" Direction="MarqueeDirection.Right" Gradient="true" GradientColor="#f0f0f0">
+            <div class="clickable-content">
+                <a href="/" class="clickable-link">🏠 Home</a>
+                <a href="/interactive" class="clickable-link">👆 Interactive</a>
+                <a href="/drag-horizontal" class="clickable-link">🖱️ Drag Horizontal</a>
+                <a href="/logos" class="clickable-link">🎨 Logos</a>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="code-block">
+        <pre><code>&lt;Marquee EnableDrag="true"&gt;
+    &lt;a href="/page"&gt;Navigate&lt;/a&gt;
+&lt;/Marquee&gt;</code></pre>
+    </div>
+</section>
+
+<section class="demo-section">
+    <h2>Mixed Interactive Elements</h2>
+    <p>Buttons, links, and text - all clickable with drag enabled</p>
+    
+    <div class="demo-container">
+        <Marquee Speed="40" EnableDrag="@_dragEnabled" Gradient="true">
+            <div class="clickable-content">
+                <span class="clickable-text" @onclick="() => HandleTextClick()">
+                    📝 Clickable Text (Clicks: @_textClicks)
+                </span>
+                <button class="clickable-btn-small" @onclick="IncrementCounter">
+                    ➕ Count: @_counter
+                </button>
+                <button class="clickable-link-small" @onclick="ToggleDragEnabled">
+                    @(_dragEnabled ? "🔓 Disable Drag" : "🔒 Enable Drag")
+                </button>
+            </div>
+        </Marquee>
+    </div>
+    
+    <div class="status-panel">
+        <p><strong>Drag Status:</strong> @(_dragEnabled ? "Enabled ✅" : "Disabled ❌")</p>
+        <p><strong>Counter:</strong> @_counter</p>
+        <p><strong>Text Clicks:</strong> @_textClicks</p>
+    </div>
+</section>
+
+<section class="info-box">
+    <h3>💡 How It Works</h3>
+    <div class="info-content">
+        <div class="info-item">
+            <strong>🎯 Smart Detection:</strong>
+            <p>The marquee distinguishes between clicks and drags. Small movements (&lt; 5px) are treated as clicks.</p>
+        </div>
+        <div class="info-item">
+            <strong>🖱️ Drag to Pan:</strong>
+            <p>Click and drag beyond the threshold to pan the marquee. The animation pauses while dragging.</p>
+        </div>
+        <div class="info-item">
+            <strong>👆 Click to Interact:</strong>
+            <p>Simple clicks (without dragging) trigger the normal click events on buttons, links, and other elements.</p>
+        </div>
+    </div>
+</section>
+
+@code {
+    private int _button1Clicks = 0;
+    private int _button2Clicks = 0;
+    private int _button3Clicks = 0;
+    private int _textClicks = 0;
+    private int _counter = 0;
+    private bool _dragEnabled = true;
+    
+    private void HandleClick(int buttonNumber)
+    {
+        switch (buttonNumber)
+        {
+            case 1:
+                _button1Clicks++;
+                break;
+            case 2:
+                _button2Clicks++;
+                break;
+            case 3:
+                _button3Clicks++;
+                break;
+        }
+    }
+    
+    private void HandleTextClick()
+    {
+        _textClicks++;
+    }
+    
+    private void IncrementCounter()
+    {
+        _counter++;
+    }
+    
+    private void ToggleDragEnabled()
+    {
+        _dragEnabled = !_dragEnabled;
+    }
+}
+
+<style>
+    .clickable-content {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+    }
+    
+    .clickable-btn {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        color: white;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+    }
+    
+    .clickable-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .clickable-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+    }
+    
+    .clickable-btn-small {
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.625rem 1rem;
+        color: white;
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        border: none;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+    }
+    
+    .clickable-btn-small:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(67, 233, 123, 0.4);
+    }
+    
+    .clickable-link {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        color: white;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 0.5rem;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: all 0.2s;
+        display: inline-block;
+    }
+    
+    .clickable-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
+    }
+    
+    .clickable-link-small {
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.625rem 1rem;
+        color: white;
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        border-radius: 0.375rem;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: all 0.2s;
+        display: inline-block;
+    }
+    
+    .clickable-link-small:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(250, 112, 154, 0.4);
+    }
+    
+    .clickable-text {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        color: white;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        border-radius: 0.5rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+        display: inline-block;
+        user-select: none;
+    }
+    
+    .clickable-text:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+    }
+    
+    .clickable-text:active {
+        transform: translateY(0);
+    }
+    
+    .status-panel {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-panel p {
+        margin: 0.5rem 0;
+        font-size: 0.9375rem;
+    }
+    
+    .status-panel strong {
+        color: #1f2937;
+        font-weight: 600;
+    }
+    
+    .status-panel em {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        margin: 1.75rem 0;
+    }
+    
+    .info-box h3 {
+        margin: 0 0 1.25rem 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+    
+    .info-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+    
+    .info-item {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
+    
+    .info-item strong {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+    
+    .info-item p {
+        margin: 0;
+        line-height: 1.5;
+        font-size: 0.9375rem;
+        opacity: 0.95;
+    }
+</style>
