@@ -73,9 +73,9 @@
                 <button class="clickable-btn-small" @onclick="IncrementCounter">
                     ➕ Count: @_counter
                 </button>
-                <a href="#" class="clickable-link-small" @onclick:preventDefault @onclick="ToggleDragEnabled">
+                <button class="clickable-link-small" @onclick="ToggleDragEnabled">
                     @(_dragEnabled ? "🔓 Disable Drag" : "🔒 Enable Drag")
-                </a>
+                </button>
             </div>
         </Marquee>
     </div>

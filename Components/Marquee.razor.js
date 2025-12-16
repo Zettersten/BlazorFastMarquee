@@ -248,9 +248,9 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
     reversed: Boolean(reversed),
     disposed: false,
     isDragging: false,
-    hasMoved: false,
-    startX: 0,
-    startY: 0,
+    hasMoved: false,  // Tracks if pointer has moved beyond drag threshold
+    startX: 0,        // Initial pointer X position for threshold calculation
+    startY: 0,        // Initial pointer Y position for threshold calculation
     lastX: 0,
     lastY: 0,
     pointerDownHandler: null,
@@ -285,8 +285,8 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
     state.lastX = clientX;
     state.lastY = clientY;
 
-    // Don't prevent default yet - allow clicks to work
-    // We'll only prevent default once actual dragging starts
+    // Don't prevent default yet - allow clicks to work on child elements
+    // preventDefault is only called after movement exceeds DRAG_THRESHOLD
   };
 
   // Handle pointer move (mouse/touch move)
