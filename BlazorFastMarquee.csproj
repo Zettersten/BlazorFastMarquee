@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RazorLangVersion>9.0</RazorLangVersion>
+    <RazorLangVersion>latest</RazorLangVersion>
+    <LangVersion>14.0</LangVersion>
     
     <!-- Package Configuration -->
     <IsPackable>true</IsPackable>
@@ -12,7 +13,7 @@
     <Authors>Zettersten</Authors>
     <Company>Zettersten</Company>
     <Product>BlazorFastMarquee</Product>
-    <Description>High-performance Blazor marquee component inspired by react-fast-marquee. Optimized for AOT, trimming-friendly, and deterministic layout with full API parity.</Description>
+    <Description>High-performance Blazor marquee component inspired by react-fast-marquee. Optimized for .NET 10, AOT compilation, and trimming-friendly with full API parity. Built with C# 14 language features for deterministic layout and production-grade performance.</Description>
     <Copyright>Copyright © $(Authors) $([System.DateTime]::Now.Year)</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Zettersten/BlazorFastMarquee</PackageProjectUrl>
@@ -87,13 +88,13 @@
 
   <!-- Package references for Blazor components (works with both Server and WASM) -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.1" />
   </ItemGroup>
   
   <!-- Build & Packaging Tools -->
   <ItemGroup>
     <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
-    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.25" PrivateAssets="all" />
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.39" PrivateAssets="all" />
   </ItemGroup>
 </Project>
