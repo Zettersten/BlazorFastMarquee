@@ -239,171 +239,183 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
   }
 
   // Get all marquee elements (there are always 2 for seamless looping)
-  const marqueeElements = container.querySelectorAll('.bfm-marquee');
-  
+  const marqueeElements = Array.from(container.querySelectorAll('.bfm-marquee'));
+
   const state = {
     container,
-    marqueeElements: Array.from(marqueeElements),
+    marqueeElements,
     vertical: Boolean(vertical),
     reversed: Boolean(reversed),
     disposed: false,
+    pointerId: null,
     isDragging: false,
-    hasMoved: false,  // Tracks if pointer has moved beyond drag threshold
-    startX: 0,        // Initial pointer X position for threshold calculation
-    startY: 0,        // Initial pointer Y position for threshold calculation
+    hasMoved: false, // moved beyond threshold (true drag vs click)
+    suppressClick: false,
+    startX: 0,
+    startY: 0,
     lastX: 0,
     lastY: 0,
+    marqueeSize: 1,
+    // cached animations for this drag gesture (avoid allocations in move handler)
+    animations: [],
     pointerDownHandler: null,
     pointerMoveHandler: null,
     pointerUpHandler: null,
-    pointerCancelHandler: null
+    pointerCancelHandler: null,
+    clickCaptureHandler: null
   };
 
   // Drag threshold in pixels - movement less than this is considered a click
   const DRAG_THRESHOLD = 5;
 
-  // Get marquee width/height for percentage calculations
-  const getMarqueeSize = () => {
-    if (state.marqueeElements.length > 0) {
-      const rect = state.marqueeElements[0].getBoundingClientRect();
-      return state.vertical ? rect.height : rect.width;
-    }
-    return 1; // Avoid division by zero
+  const updateTouchAction = () => {
+    // Allow page scrolling in the orthogonal direction while draggable.
+    // Horizontal marquee => allow vertical scroll; Vertical marquee => allow horizontal scroll.
+    state.container.style.touchAction = state.vertical ? 'pan-x' : 'pan-y';
   };
 
-  // Handle pointer down (mouse/touch start)
+  const captureAnimations = () => {
+    state.animations.length = 0;
+    for (let i = 0; i < state.marqueeElements.length; i++) {
+      const el = state.marqueeElements[i];
+      const anims = el.getAnimations();
+      const anim = anims && anims.length > 0 ? anims[0] : null;
+      const duration = anim && anim.effect && anim.effect.getTiming ? anim.effect.getTiming().duration : 0;
+      state.animations.push({ anim, duration });
+    }
+
+    if (state.marqueeElements.length > 0) {
+      const rect = state.marqueeElements[0].getBoundingClientRect();
+      const size = state.vertical ? rect.height : rect.width;
+      state.marqueeSize = size > 0 ? size : 1;
+    } else {
+      state.marqueeSize = 1;
+    }
+  };
+
+  state.clickCaptureHandler = (e) => {
+    if (!state.suppressClick) return;
+    // A drag gesture just occurred; suppress the synthetic click.
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    state.suppressClick = false;
+  };
+
   state.pointerDownHandler = (e) => {
     if (state.disposed) return;
 
-    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+    // Only left mouse button initiates drag; touch/pen are always ok.
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
 
+    state.pointerId = e.pointerId;
     state.isDragging = true;
     state.hasMoved = false;
-    state.startX = clientX;
-    state.startY = clientY;
-    state.lastX = clientX;
-    state.lastY = clientY;
+    state.suppressClick = false;
 
-    // Don't prevent default yet - allow clicks to work on child elements
-    // preventDefault is only called after movement exceeds DRAG_THRESHOLD
+    state.startX = e.clientX;
+    state.startY = e.clientY;
+    state.lastX = e.clientX;
+    state.lastY = e.clientY;
+
+    captureAnimations();
+
+    // Capture pointer so we keep receiving move/up events.
+    try { state.container.setPointerCapture(e.pointerId); } catch (_) {}
   };
 
-  // Handle pointer move (mouse/touch move)
   state.pointerMoveHandler = (e) => {
-    if (!state.isDragging || state.disposed) return;
+    if (state.disposed || !state.isDragging || state.pointerId !== e.pointerId) return;
 
-    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
 
-    // Calculate total movement from start position
     const totalDeltaX = Math.abs(clientX - state.startX);
     const totalDeltaY = Math.abs(clientY - state.startY);
     const totalMovement = state.vertical ? totalDeltaY : totalDeltaX;
 
-    // Check if we've moved beyond the drag threshold
     if (!state.hasMoved && totalMovement > DRAG_THRESHOLD) {
       state.hasMoved = true;
-      
-      // Now we're actually dragging - pause animation and update UI
-      state.marqueeElements.forEach(el => {
-        el.style.animationPlayState = 'paused';
-      });
-      state.container.style.cursor = 'grabbing';
-      state.container.style.userSelect = 'none';
-    }
+      state.suppressClick = true;
 
-    // Only process drag if we've moved beyond threshold
-    if (state.hasMoved) {
-      // Calculate movement delta
-      let deltaX = clientX - state.lastX;
-      let deltaY = clientY - state.lastY;
-      
-      // Invert delta for reversed directions (Right/Up)
-      // This makes dragging feel natural with the animation direction
-      if (state.reversed) {
-        deltaX = -deltaX;
-        deltaY = -deltaY;
+      state.container.classList.add('bfm-dragging');
+
+      // Pause animation while dragging.
+      for (let i = 0; i < state.marqueeElements.length; i++) {
+        state.marqueeElements[i].style.animationPlayState = 'paused';
       }
-      
-      const delta = state.vertical ? deltaY : deltaX;
-
-      state.lastX = clientX;
-      state.lastY = clientY;
-
-      // Convert delta to percentage of marquee size
-      const marqueeSize = getMarqueeSize();
-      const percentChange = (delta / marqueeSize) * 100;
-
-      // Scrub through the animation by adjusting each element's animation progress
-      state.marqueeElements.forEach(el => {
-        // Get current animation state
-        const animations = el.getAnimations();
-        if (animations.length > 0) {
-          const anim = animations[0];
-          const duration = anim.effect.getTiming().duration;
-          
-          // Current time in the animation (milliseconds)
-          let currentTime = anim.currentTime || 0;
-          
-          // Adjust current time based on drag
-          // Dragging right/down (positive delta) = rewind (go backwards in time)
-          // Dragging left/up (negative delta) = advance (go forwards in time)
-          currentTime -= (percentChange / 100) * duration;
-          
-          // Wrap around the animation duration
-          if (duration > 0) {
-            currentTime = ((currentTime % duration) + duration) % duration;
-          }
-          
-          anim.currentTime = currentTime;
-        }
-      });
-
-      // Prevent default only when actually dragging
-      e.preventDefault();
     }
+
+    if (!state.hasMoved) return;
+
+    let deltaX = clientX - state.lastX;
+    let deltaY = clientY - state.lastY;
+
+    if (state.reversed) {
+      deltaX = -deltaX;
+      deltaY = -deltaY;
+    }
+
+    const delta = state.vertical ? deltaY : deltaX;
+    state.lastX = clientX;
+    state.lastY = clientY;
+
+    const size = state.marqueeSize || 1;
+
+    // Scrub through each element's animation timeline (no getAnimations/getTiming in hot path)
+    for (let i = 0; i < state.animations.length; i++) {
+      const entry = state.animations[i];
+      const anim = entry.anim;
+      const duration = entry.duration;
+      if (!anim || !duration || duration <= 0) continue;
+
+      let currentTime = anim.currentTime || 0;
+      currentTime -= (delta / size) * duration;
+
+      // Wrap around [0, duration)
+      currentTime = ((currentTime % duration) + duration) % duration;
+      anim.currentTime = currentTime;
+    }
+
+    // Prevent scrolling while actively dragging.
+    e.preventDefault();
   };
 
-  // Handle pointer up (mouse/touch end)
   state.pointerUpHandler = (e) => {
-    if (!state.isDragging || state.disposed) return;
+    if (state.disposed || !state.isDragging || state.pointerId !== e.pointerId) return;
 
     state.isDragging = false;
-    
-    // Only restore cursor and resume animation if we actually dragged
-    if (state.hasMoved) {
-      state.container.style.cursor = 'grab';
-      state.container.style.userSelect = '';
 
-      // Resume animation from wherever we scrubbed to
-      state.marqueeElements.forEach(el => {
-        el.style.animationPlayState = '';
-      });
+    if (state.hasMoved) {
+      state.container.classList.remove('bfm-dragging');
+
+      // Resume animation from wherever we scrubbed to.
+      for (let i = 0; i < state.marqueeElements.length; i++) {
+        state.marqueeElements[i].style.animationPlayState = '';
+      }
     }
-    
+
     state.hasMoved = false;
+    state.pointerId = null;
+
+    try { state.container.releasePointerCapture(e.pointerId); } catch (_) {}
   };
 
-  // Handle pointer cancel (touch cancel)
   state.pointerCancelHandler = (e) => {
-    if (!state.isDragging || state.disposed) return;
+    if (state.disposed) return;
     state.pointerUpHandler(e);
   };
 
-  // Set initial cursor
-  state.container.style.cursor = 'grab';
+  // Initial configuration
+  state.container.classList.add('bfm-draggable');
+  updateTouchAction();
 
-  // Add mouse event listeners
-  state.container.addEventListener('mousedown', state.pointerDownHandler, { passive: false });
-  document.addEventListener('mousemove', state.pointerMoveHandler, { passive: false });
-  document.addEventListener('mouseup', state.pointerUpHandler, { passive: true });
-
-  // Add touch event listeners for mobile support
-  state.container.addEventListener('touchstart', state.pointerDownHandler, { passive: false });
-  document.addEventListener('touchmove', state.pointerMoveHandler, { passive: false });
-  document.addEventListener('touchend', state.pointerUpHandler, { passive: true });
-  document.addEventListener('touchcancel', state.pointerCancelHandler, { passive: true });
+  // Pointer events unify mouse/touch/pen and avoid document-level listeners.
+  state.container.addEventListener('pointerdown', state.pointerDownHandler, { passive: true });
+  state.container.addEventListener('pointermove', state.pointerMoveHandler, { passive: false });
+  state.container.addEventListener('pointerup', state.pointerUpHandler, { passive: true });
+  state.container.addEventListener('pointercancel', state.pointerCancelHandler, { passive: true });
+  // Capture-phase click suppression only when a drag happened.
+  state.container.addEventListener('click', state.clickCaptureHandler, true);
 
   return {
     /**
@@ -413,10 +425,20 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
       if (state.disposed) return;
       state.vertical = Boolean(vertical);
       state.reversed = Boolean(reversed);
+      updateTouchAction();
       
       // End any active drag when orientation changes
       if (state.isDragging) {
-        state.pointerUpHandler(new Event('mouseup'));
+        try {
+          // Best-effort termination; pointerup won't fire if capture is lost in some cases.
+          state.isDragging = false;
+          state.hasMoved = false;
+          state.pointerId = null;
+          state.container.classList.remove('bfm-dragging');
+          for (let i = 0; i < state.marqueeElements.length; i++) {
+            state.marqueeElements[i].style.animationPlayState = '';
+          }
+        } catch (_) {}
       }
     },
 
@@ -435,30 +457,22 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
         });
       }
 
-      // Remove cursor and selection styles
       if (state.container) {
-        state.container.style.removeProperty('cursor');
-        state.container.style.removeProperty('user-select');
+        state.container.classList.remove('bfm-dragging');
+        state.container.classList.remove('bfm-draggable');
+        state.container.style.removeProperty('touch-action');
       }
 
       // Remove event listeners
       if (state.container && state.pointerDownHandler) {
-        state.container.removeEventListener('mousedown', state.pointerDownHandler);
-        state.container.removeEventListener('touchstart', state.pointerDownHandler);
+        state.container.removeEventListener('pointerdown', state.pointerDownHandler);
+        state.container.removeEventListener('pointermove', state.pointerMoveHandler);
+        state.container.removeEventListener('pointerup', state.pointerUpHandler);
+        state.container.removeEventListener('pointercancel', state.pointerCancelHandler);
       }
 
-      if (state.pointerMoveHandler) {
-        document.removeEventListener('mousemove', state.pointerMoveHandler);
-        document.removeEventListener('touchmove', state.pointerMoveHandler);
-      }
-
-      if (state.pointerUpHandler) {
-        document.removeEventListener('mouseup', state.pointerUpHandler);
-        document.removeEventListener('touchend', state.pointerUpHandler);
-      }
-
-      if (state.pointerCancelHandler) {
-        document.removeEventListener('touchcancel', state.pointerCancelHandler);
+      if (state.container && state.clickCaptureHandler) {
+        state.container.removeEventListener('click', state.clickCaptureHandler, true);
       }
 
       // Clear all references
@@ -468,6 +482,8 @@ function createDragHandler(container, marqueeElement, vertical, reversed) {
       state.pointerMoveHandler = null;
       state.pointerUpHandler = null;
       state.pointerCancelHandler = null;
+      state.clickCaptureHandler = null;
+      state.animations = [];
     }
   };
 }

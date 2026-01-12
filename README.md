@@ -29,7 +29,8 @@ Built for **.NET 10** with **C# 14** language features, this component is produc
 - 🚀 **AOT ready.** `RunAOTCompilation` is enabled so the component is validated against Native AOT constraints during publish.
 - 🧭 **Deterministic layout.** A lightweight JavaScript module only measures the rendered width/height and falls back gracefully when observers are unavailable.
 - 🧩 **Composable.** Works with any child content—text, components, images, or complex layouts.
-- 🎯 **.NET 10 optimized.** Leverages the latest C# 14 language features and .NET 10 runtime improvements for peak performance.
+- 🎯 **Allocation-aware.** Minimizes allocations with cached style strings and reuse of internal buffers.
+- 🎯 **.NET 10 optimized.** Leverages .NET 10 + C# 14 for modern, trimming-safe component authoring.
 
 ## Getting Started
 
@@ -109,7 +110,7 @@ Add some styling (optional):
 Blazor Fast Marquee is validated with trimming analyzers and Native AOT so you can ship the smallest possible payloads. When publishing your application run:
 
 ```bash
- dotnet publish -c Release -p:PublishTrimmed=true -p:TrimMode=link -p:RunAOTCompilation=true
+dotnet publish -c Release -p:PublishTrimmed=true -p:TrimMode=link -p:RunAOTCompilation=true
 ```
 
 The library opts into invariant globalization to minimize ICU payload size. If your app requires full globalization data, override `InvariantGlobalization` in your project file.
@@ -143,6 +144,19 @@ The library opts into invariant globalization to minimize ICU payload size. If y
 - Keep `Speed` within a comfortable range and consider offering controls to pause for accessibility compliance.
 - Combine marquees with `prefers-reduced-motion` to disable animations for users who request it.
 
+### Reduced motion
+
+If your app supports reduced motion, you can disable the marquee animation via CSS:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .bfm-marquee {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+```
+
 ## Testing
 
 The solution includes automated BUnit tests covering layout measurement, callbacks, and attribute forwarding. Run them locally with:
@@ -150,6 +164,10 @@ The solution includes automated BUnit tests covering layout measurement, callbac
 ```bash
  dotnet test
 ```
+
+## Changelog
+
+See [`CHANGELOG.md`](CHANGELOG.md).
 
 ## License
 
