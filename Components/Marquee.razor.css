@@ -11,18 +11,24 @@
   margin: 0 auto;
 }
 
-  /* When drag is enabled, cursor is set via JavaScript */
-  .bfm-marquee-container[style*="cursor: grab"] {
-    touch-action: none; /* Disable default touch behavior when draggable */
-  }
+/* When drag is enabled, JS toggles these classes */
+.bfm-marquee-container.bfm-draggable {
+  cursor: grab;
+}
 
-  .bfm-marquee-container:hover div {
-    animation-play-state: var(--pause-on-hover);
-  }
+.bfm-marquee-container.bfm-dragging {
+  cursor: grabbing;
+  touch-action: none; /* Prevent scroll while actively dragging */
+  user-select: none;
+}
 
-  .bfm-marquee-container:active div {
-    animation-play-state: var(--pause-on-click);
-  }
+.bfm-marquee-container:hover .bfm-marquee {
+  animation-play-state: var(--pause-on-hover);
+}
+
+.bfm-marquee-container:active .bfm-marquee {
+  animation-play-state: var(--pause-on-click);
+}
 
 .bfm-overlay {
   position: absolute;

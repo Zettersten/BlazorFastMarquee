@@ -22,7 +22,7 @@
   <!-- Replace BASE_HREF token in index.html during build -->
   <Target Name="ReplaceBaseHref" AfterTargets="Publish">
     <PropertyGroup>
-      <IndexHtmlPath>$(PublishDir)wwwroot\index.html</IndexHtmlPath>
+      <IndexHtmlPath>$(PublishDir)wwwroot/index.html</IndexHtmlPath>
     </PropertyGroup>
     <ReplaceFileText InputFilename="$(IndexHtmlPath)" OutputFilename="$(IndexHtmlPath)" MatchExpression="&lt;base href=&quot;/&quot; /&gt;" ReplacementText="&lt;base href=&quot;$(BaseHref)&quot; /&gt;" />
   </Target>

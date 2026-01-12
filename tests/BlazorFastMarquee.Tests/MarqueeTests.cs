@@ -301,11 +301,11 @@ public class MarqueeTests : BunitContext
   }
 
   [Theory]
-  [InlineData(MarqueeDirection.Left, false)]
-  [InlineData(MarqueeDirection.Right, false)]
-  [InlineData(MarqueeDirection.Up, true)]
-  [InlineData(MarqueeDirection.Down, true)]
-  public void DragHandlerRespectsDirection(MarqueeDirection direction, bool shouldBeVertical)
+  [InlineData(MarqueeDirection.Left)]
+  [InlineData(MarqueeDirection.Right)]
+  [InlineData(MarqueeDirection.Up)]
+  [InlineData(MarqueeDirection.Down)]
+  public void DragHandlerRespectsDirection(MarqueeDirection direction)
   {
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
@@ -374,11 +374,11 @@ public class MarqueeTests : BunitContext
   }
 
   [Theory]
-  [InlineData(MarqueeDirection.Left, false)]
-  [InlineData(MarqueeDirection.Right, true)]
-  [InlineData(MarqueeDirection.Up, true)]
-  [InlineData(MarqueeDirection.Down, false)]
-  public void DragHandlerReceivesCorrectReversedFlag(MarqueeDirection direction, bool expectedReversed)
+  [InlineData(MarqueeDirection.Left)]
+  [InlineData(MarqueeDirection.Right)]
+  [InlineData(MarqueeDirection.Up)]
+  [InlineData(MarqueeDirection.Down)]
+  public void DragHandlerReceivesCorrectReversedFlag(MarqueeDirection direction)
   {
     var jsRuntime = new StubJsRuntime();
     Services.AddSingleton<IJSRuntime>(jsRuntime);
